@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return Inertia::render('mental-gym');
@@ -15,3 +15,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('questions', AdminQuestionController::class)->except(['show']);
+});
