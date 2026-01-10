@@ -36,6 +36,7 @@ export default function MentalGym() {
             const response = await fetch('/api/question/random', {
                 headers: {
                     'X-Session-Id': storedSessionId,
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
                 credentials: 'include',
             });
@@ -76,7 +77,9 @@ export default function MentalGym() {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     question_id: question.id,
                     response_text: responseText,
