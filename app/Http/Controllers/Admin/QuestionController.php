@@ -24,7 +24,10 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'text' => 'required|string',
+            'title' => 'nullable|string|max:255',
+            'text' => 'nullable|string',
+            'prompt' => 'nullable|string',
+            'task' => 'nullable|string',
             'principle' => 'nullable|string',
             'intent_tag' => 'nullable|string|max:255',
             'tags' => 'nullable|string',
@@ -52,7 +55,10 @@ class QuestionController extends Controller
     public function update(Request $request, Question $question)
     {
         $validated = $request->validate([
-            'text' => 'required|string',
+            'title' => 'nullable|string|max:255',
+            'text' => 'nullable|string',
+            'prompt' => 'nullable|string',
+            'task' => 'nullable|string',
             'principle' => 'nullable|string',
             'intent_tag' => 'nullable|string|max:255',
             'tags' => 'nullable|string',

@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 
 interface Question {
     id: number;
+    title: string | null;
     text: string;
+    prompt: string | null;
+    task: string | null;
     principle: string | null;
     intent_tag: string;
 }
@@ -154,21 +157,45 @@ export default function MentalGym() {
 
                     {state === 'question' && (
                         <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-8 md:p-12 transition-all">
+                            {question?.title && (
+                                <div className="mb-4">
+                                    <span className="inline-block px-3 py-1 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-full">
+                                        {question.title}
+                                    </span>
+                                </div>
+                            )}
                             {question?.principle && (
-                                <div className="mb-8 pb-6 border-b border-neutral-100">
+                                <div className="mb-6 pb-4 border-b border-neutral-100">
                                     <p className="text-base text-neutral-500 leading-relaxed">
                                         {question.principle}
                                     </p>
                                 </div>
                             )}
-                            <p className="text-2xl md:text-3xl text-neutral-800 leading-relaxed mb-8 font-medium">
-                                {question?.text}
-                            </p>
+                            {question?.prompt && (
+                                <div className="mb-6 pl-4 border-l-2 border-neutral-200">
+                                    <p className="text-base text-neutral-600 leading-relaxed italic">
+                                        {question.prompt}
+                                    </p>
+                                </div>
+                            )}
+                            {question?.text && (
+                                <p className="text-2xl md:text-3xl text-neutral-800 leading-relaxed mb-6 font-medium">
+                                    {question.text}
+                                </p>
+                            )}
+                            {question?.task && (
+                                <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                    <p className="text-sm text-amber-800 font-medium">
+                                        {question.task}
+                                    </p>
+                                </div>
+                            )}
                             <textarea
                                 value={responseText}
                                 onChange={(e) => setResponseText(e.target.value)}
                                 placeholder="Write honestly. No one sees your name."
-                                className="w-full h-48 md:h-64 p-4 text-lg border border-neutral-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:border-transparent transition-all"
+                                className="w-full h-48 md:h-64 p-4 text-lg border border-neutral-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:border-transparent transition-all text-neutral-900 placeholder-neutral-400 bg-white"
+                                style={{ WebkitTextFillColor: '#171717', opacity: 1 }}
                             />
                             <button
                                 onClick={handleSubmitResponse}
@@ -190,7 +217,8 @@ export default function MentalGym() {
                                 value={feedbackText}
                                 onChange={(e) => setFeedbackText(e.target.value)}
                                 placeholder="One sentence is enough."
-                                className="mt-8 w-full h-32 p-4 text-base border border-neutral-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:border-transparent transition-all"
+                                className="mt-8 w-full h-32 p-4 text-base border border-neutral-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:border-transparent transition-all text-neutral-900 placeholder-neutral-400 bg-white"
+                                style={{ WebkitTextFillColor: '#171717', opacity: 1 }}
                             />
                             <button
                                 onClick={handleFinish}

@@ -9,7 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model
 {
     protected $fillable = [
+        'title',
         'text',
+        'prompt',
+        'task',
         'principle',
         'intent_tag',
         'active',

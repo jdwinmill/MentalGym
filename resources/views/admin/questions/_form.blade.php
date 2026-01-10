@@ -1,19 +1,46 @@
 <div class="space-y-6">
     <div>
-        <label for="text" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Question <span class="text-red-500">*</span>
+        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Title <span class="text-gray-400 text-xs">(optional, e.g. "Compression Drill")</span>
         </label>
-        <textarea name="text" id="text" rows="4"
-                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required>{{ old('text', $question->text ?? '') }}</textarea>
+        <input type="text" name="title" id="title"
+               value="{{ old('title', $question->title ?? '') }}"
+               placeholder="e.g. Compression Drill"
+               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
     </div>
 
     <div>
         <label for="principle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Principle
         </label>
-        <textarea name="principle" id="principle" rows="3"
+        <textarea name="principle" id="principle" rows="2"
                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('principle', $question->principle ?? '') }}</textarea>
+    </div>
+
+    <div>
+        <label for="prompt" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Prompt <span class="text-gray-400 text-xs">(optional context/scenario)</span>
+        </label>
+        <textarea name="prompt" id="prompt" rows="3"
+                  placeholder="Additional context or scenario..."
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('prompt', $question->prompt ?? '') }}</textarea>
+    </div>
+
+    <div>
+        <label for="text" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Question <span class="text-gray-400 text-xs">(optional)</span>
+        </label>
+        <textarea name="text" id="text" rows="3"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('text', $question->text ?? '') }}</textarea>
+    </div>
+
+    <div>
+        <label for="task" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Task <span class="text-gray-400 text-xs">(optional specific instruction)</span>
+        </label>
+        <textarea name="task" id="task" rows="2"
+                  placeholder="e.g. Compress to ≤15 words"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">{{ old('task', $question->task ?? '') }}</textarea>
     </div>
 
     <div>
