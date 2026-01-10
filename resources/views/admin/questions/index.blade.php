@@ -10,31 +10,31 @@
         </a>
     </div>
 
-    <div class="mt-6 bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+    <div class="mt-6 bg-white dark:bg-gray-800 shadow overflow-x-auto sm:rounded-lg">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="w-[40%] px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Question</th>
-                    <th class="w-[35%] px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Principle</th>
-                    <th class="w-[10%] px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
-                    <th class="w-[5%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                    <th class="w-[10%] px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    <th class="w-[30%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Question</th>
+                    <th class="w-[25%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Principle</th>
+                    <th class="w-[15%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+                    <th class="w-[10%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
+                    <th class="w-[20%] px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse($questions as $question)
                     <tr>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                        <td class="px-4 py-4 text-sm text-gray-900 dark:text-gray-100">
                             <div class="truncate" title="{{ $question->text }}">
-                                {{ Str::limit($question->text, 80) }}
+                                {{ Str::limit($question->text, 50) }}
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
                             <div class="truncate" title="{{ $question->principle }}">
-                                {{ Str::limit($question->principle, 70) }}
+                                {{ Str::limit($question->principle, 40) }}
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             {{ $question->intent_tag ?? '-' }}
                         </td>
                         <td class="px-4 py-4 whitespace-nowrap text-sm">
