@@ -36,6 +36,12 @@
         })();
     </script>
 
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+
+    @vite(['resources/css/app.css'])
+
     <style>
         /* SharpStack Landing Page Colors: Black + Orange + Cream */
         :root {
@@ -76,60 +82,65 @@
         }
     </style>
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
-
-    @vite(['resources/css/app.css'])
-
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
     <div x-data="landingPage()" class="min-h-screen">
         <!-- Header / Logo -->
         <header class="px-6 pt-6 md:pt-8 max-w-3xl mx-auto">
-            <a href="/" class="inline-block text-2xl md:text-3xl font-bold tracking-tight text-foreground hover:opacity-80 transition-opacity">
-                Sharp<span class="text-primary">Stack</span>
+            <a href="/" class="inline-block text-2xl md:text-3xl tracking-tight hover:opacity-80 transition-opacity">
+                <span class="font-bold text-foreground">SharpStack</span>
+                <span class="text-muted-foreground font-normal mx-2">|</span>
+                <span class="text-muted-foreground font-medium text-lg md:text-xl">Daily Mental Training</span>
             </a>
         </header>
 
         <!-- Hero Section -->
         <section class="px-6 pt-10 md:pt-14 max-w-3xl mx-auto">
             <h1 class="text-2xl md:text-4xl font-bold leading-tight mb-4">
-                You're sharper than you think. But not as sharp as you could be.
+                You're leaving wins on the table.
             </h1>
 
             <div class="space-y-4 text-lg md:text-xl text-muted-foreground leading-relaxed mb-10">
                 <p>
-                    Most people struggle to really listen. Break down tough problems. Stay clear under pressure.
+                    In the interview. The negotiation. The conversation that mattered.
                 </p>
                 <p>
-                    You've read the articles. Watched the videos. But when it matters, the same gaps show up.
+                    You knew you could have listened better. Thought more clearly. Read the room faster.
+                </p>
+                <p>
+                    You've collected the tips. You know what good thinking looks like. But when pressure hits, the same gaps appear.
                 </p>
             </div>
 
             <!-- Value Prop - Stands Out -->
             <div class="border-l-4 border-primary pl-6 py-2 mb-6">
                 <p class="text-xl md:text-2xl font-bold text-foreground mb-2">
-                    SharpStack is different.
+                    SharpStack builds the skills tips can't teach.
                 </p>
-                <p class="text-lg md:text-xl text-foreground">
-                    Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room.
+                <p class="text-lg md:text-xl text-foreground mb-3">
+                    Daily practice sessions that systematically improve how you think, listen, and operate under pressure.
+                </p>
+                <p class="text-base md:text-lg text-muted-foreground">
+                    Not tips. Not frameworks. Actual training: you practice, get diagnostic feedback on exactly where you're weak, then drill those gaps until they close.
                 </p>
             </div>
 
-            <p class="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Not tips. Not inspiration. Real practice that shows you where you stumble, and how to stack up.
+            <p class="text-lg md:text-xl text-foreground font-medium leading-relaxed">
+                5-15 minutes daily. Measurable improvement in weeks.
             </p>
         </section>
 
         <!-- Topic Selection Section -->
         <section class="px-6 py-12 md:py-16 max-w-3xl mx-auto">
+            <h2 class="text-xl md:text-2xl font-bold text-foreground mb-2">
+                What you'll train:
+            </h2>
             <p class="text-lg text-muted-foreground mb-2">
-                5-15 minute daily sessions targeting:
+                5-15 minute daily sessions. Each one improves a specific cognitive skill you'll use that same day.
             </p>
             <p class="text-sm text-muted-foreground mb-6">
-                <span class="font-medium text-foreground">Tap any that interest you.</span> We'll prioritize what to build based on demand.
+                <span class="font-medium text-foreground">Select what matters most to you</span> - we'll prioritize building what people actually need:
             </p>
 
             <!-- Topic Selection Bubbles -->
