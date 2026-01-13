@@ -31,7 +31,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'MentalGym') }}</title>
+        <title inertia>{{ config('app.name', 'SharpStack') }}</title>
 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 

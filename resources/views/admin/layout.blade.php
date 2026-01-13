@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Admin - {{ config('app.name', 'MentalGym') }}</title>
+    <title>Admin - {{ config('app.name', 'SharpStack') }}</title>
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
@@ -18,7 +18,7 @@
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{{ route('home') }}" class="text-xl font-bold text-gray-800 dark:text-white">
-                            MentalGym
+                            SharpStack
                         </a>
                         <span class="ml-2 px-2 py-1 text-xs font-semibold bg-indigo-600 text-white rounded">Admin</span>
                     </div>

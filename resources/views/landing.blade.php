@@ -6,24 +6,24 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- SEO Meta Tags -->
-    <title>Thought Reps - Daily Mental Training That Actually Works</title>
-    <meta name="description" content="Short, daily practice sessions that train critical thinking, active listening, and mental clarity. Not tips. Real reps that show you where your thinking breaks down.">
-    <meta name="keywords" content="mental training, critical thinking, active listening, first principles, cognitive training, brain training, mental fitness">
-    <meta name="author" content="Thought Reps">
+    <title>SharpStack - Daily Practice for the Skills That Count</title>
+    <meta name="description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice that shows you where you stumble.">
+    <meta name="keywords" content="mental training, critical thinking, active listening, communication skills, cognitive training, brain training, mental fitness">
+    <meta name="author" content="SharpStack">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
-    <meta property="og:title" content="Thought Reps - Daily Mental Training That Actually Works">
-    <meta property="og:description" content="Short, daily practice sessions that train critical thinking, active listening, and mental clarity. Real reps that show you where your thinking breaks down.">
-    <meta property="og:site_name" content="Thought Reps">
+    <meta property="og:title" content="SharpStack - Daily Practice for the Skills That Count">
+    <meta property="og:description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice.">
+    <meta property="og:site_name" content="SharpStack">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url('/') }}">
-    <meta name="twitter:title" content="Thought Reps - Daily Mental Training That Actually Works">
-    <meta name="twitter:description" content="Short, daily practice sessions that train critical thinking, active listening, and mental clarity. Real reps that show you where your thinking breaks down.">
+    <meta name="twitter:title" content="SharpStack - Daily Practice for the Skills That Count">
+    <meta name="twitter:description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url('/') }}">
@@ -57,38 +57,38 @@
     <div x-data="landingPage()" class="min-h-screen">
         <!-- Header / Logo -->
         <header class="px-6 pt-6 md:pt-8 max-w-3xl mx-auto">
-            <a href="/" class="inline-block text-xl font-bold tracking-tight text-foreground hover:opacity-80 transition-opacity">
-                Thought<span class="text-primary">Reps</span>
+            <a href="/" class="inline-block text-2xl md:text-3xl font-bold tracking-tight text-foreground hover:opacity-80 transition-opacity">
+                Sharp<span class="text-primary">Stack</span>
             </a>
         </header>
 
         <!-- Hero Section -->
         <section class="px-6 pt-10 md:pt-14 max-w-3xl mx-auto">
-            <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-4">
-                You know you're not as sharp as you could be.
+            <h1 class="text-2xl md:text-4xl font-bold leading-tight mb-4">
+                You're sharper than you think. But not as sharp as you could be.
             </h1>
 
             <div class="space-y-4 text-lg md:text-xl text-muted-foreground leading-relaxed mb-10">
                 <p>
-                    Most people are <strong class="text-foreground font-semibold">bad at listening</strong>. <strong class="text-foreground font-semibold">Weak at breaking down problems</strong>. <strong class="text-foreground font-semibold">Terrible under pressure</strong>.
+                    Most people struggle to really listen. Break down tough problems. Stay clear under pressure.
                 </p>
                 <p>
-                    You've read the articles. Watched the videos. Still stuck with the same mental gaps when it matters.
+                    You've read the articles. Watched the videos. But when it matters, the same gaps show up.
                 </p>
             </div>
 
             <!-- Value Prop - Stands Out -->
             <div class="border-l-4 border-primary pl-6 py-2 mb-6">
                 <p class="text-xl md:text-2xl font-bold text-foreground mb-2">
-                    Thought Reps is different.
+                    SharpStack is different.
                 </p>
                 <p class="text-lg md:text-xl text-foreground">
-                    We're building actual training. Short, daily practice sessions that force you to get better at the mental skills that matter.
+                    Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room.
                 </p>
             </div>
 
             <p class="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                Not tips. Not inspiration. Real reps that show you exactly where your thinking breaks down and how to fix it.
+                Not tips. Not inspiration. Real practice that shows you where you stumble, and how to stack up.
             </p>
         </section>
 
@@ -126,8 +126,9 @@
             </div>
         </section>
 
-        <!-- First Email Signup -->
+        <!-- Email Signup -->
         <section class="px-6 pb-16 md:pb-20 max-w-xl mx-auto">
+            <div class="bg-secondary rounded-2xl p-6 md:p-8">
             <!-- Success State -->
             <div x-show="submitted" x-cloak class="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center">
                 <div class="text-4xl mb-4">&#10003;</div>
@@ -175,7 +176,7 @@
                         x-model="email"
                         placeholder="your@email.com"
                         required
-                        class="flex-1 px-5 py-4 text-lg rounded-xl border-2 border-border bg-card focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                        class="flex-1 px-5 py-4 text-lg rounded-xl border-2 border-border bg-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                         :class="emailError ? 'border-red-500' : ''"
                     >
                     <button
@@ -201,93 +202,16 @@
                 <p x-show="error" x-text="error" class="text-red-500 text-sm"></p>
 
                 <!-- Small Print -->
-                <p class="text-sm text-muted-foreground">
+                <p class="text-sm text-muted-foreground text-center">
                     No spam. One email when we launch.
                 </p>
             </form>
-        </section>
-
-        <!-- How It Works Section -->
-        <section class="px-6 py-16 md:py-20 bg-secondary/50">
-            <div class="max-w-3xl mx-auto">
-                <h2 class="text-2xl md:text-3xl font-bold mb-8">How it works:</h2>
-
-                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-10 text-xl md:text-2xl font-semibold">
-                    <span class="text-primary">Practice</span>
-                    <span class="text-muted-foreground hidden md:inline">&rarr;</span>
-                    <span class="text-muted-foreground md:hidden">&darr;</span>
-                    <span class="text-primary">Feedback</span>
-                    <span class="text-muted-foreground hidden md:inline">&rarr;</span>
-                    <span class="text-muted-foreground md:hidden">&darr;</span>
-                    <span class="text-primary">Improve</span>
-                </div>
-
-                <div class="space-y-4 text-lg text-muted-foreground leading-relaxed">
-                    <p>
-                        You'll do the exercise. We'll show you exactly where you failed. You'll practice the weak spots until they're not weak anymore.
-                    </p>
-                    <p>
-                        Simple formats. Real improvement in weeks, not years.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Bottom CTA (for scrollers) -->
-        <section x-show="!submitted" class="px-6 py-16 md:py-20">
-            <div class="max-w-xl mx-auto text-center">
-                <p class="text-xl md:text-2xl font-bold mb-6">Ready to train?</p>
-                <form @submit.prevent="submitForm" class="space-y-4">
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input
-                            type="email"
-                            x-model="email"
-                            placeholder="your@email.com"
-                            required
-                            class="flex-1 px-5 py-4 text-lg rounded-xl border-2 border-border bg-card focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                            :class="emailError ? 'border-red-500' : ''"
-                        >
-                        <button
-                            type="submit"
-                            :disabled="!isValid || loading"
-                            class="px-6 py-4 text-lg font-bold rounded-xl transition-all duration-200 whitespace-nowrap"
-                            :class="[
-                                isValid && !loading
-                                    ? 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl cursor-pointer'
-                                    : 'bg-muted text-muted-foreground cursor-not-allowed'
-                            ]"
-                        >
-                            <span x-show="!loading">Get early access</span>
-                            <span x-show="loading" class="inline-flex items-center gap-2">
-                                <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </span>
-                        </button>
-                    </div>
-                    <p x-show="emailError" x-text="emailError" class="text-red-500 text-sm"></p>
-                    <p x-show="error" x-text="error" class="text-red-500 text-sm"></p>
-                </form>
-                @if($signupCount >= 10)
-                <p class="mt-6 text-muted-foreground">
-                    Join <span class="font-semibold text-foreground">{{ $signupCount }}+</span> people waiting
-                </p>
-                @endif
-            </div>
-        </section>
-
-        <!-- Success State (for scrollers who already signed up) -->
-        <section x-show="submitted" x-cloak class="px-6 py-16 md:py-20">
-            <div class="max-w-xl mx-auto text-center">
-                <div class="text-5xl mb-4">&#10003;</div>
-                <h3 class="text-2xl font-bold text-green-600 dark:text-green-400" x-text="successMessage"></h3>
             </div>
         </section>
 
         <!-- Footer -->
         <footer class="px-6 py-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {{ date('Y') }} Thought Reps. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} SharpStack - a product of Outpost AI Labs LLC. All rights reserved.</p>
         </footer>
     </div>
 
@@ -295,12 +219,12 @@
         function landingPage() {
             return {
                 topics: [
-                    { id: 'critical-thinking', emoji: '🎯', name: 'Critical Thinking', description: 'Break down complex problems without getting lost' },
-                    { id: 'active-listening', emoji: '👂', name: 'Active Listening', description: 'Actually hear what people say (not what you assume)' },
-                    { id: 'first-principles', emoji: '🧠', name: 'First Principles Thinking', description: 'Cut through BS to what\'s actually true' },
-                    { id: 'strategic-thinking', emoji: '💼', name: 'Strategic Thinking', description: 'See patterns and make better decisions' },
-                    { id: 'clear-communication', emoji: '🗣️', name: 'Clear Communication', description: 'Say what you mean without confusion' },
-                    { id: 'thinking-under-pressure', emoji: '⚡', name: 'Thinking Under Pressure', description: 'Stay sharp when stakes are high' },
+                    { id: 'speaking-with-confidence', emoji: '🗣️', name: 'Speaking With Confidence', description: 'Say what you mean without second-guessing yourself' },
+                    { id: 'handling-conflict', emoji: '🔥', name: 'Handling Conflict', description: 'Keep your cool when conversations get tense' },
+                    { id: 'thinking-under-pressure', emoji: '⚡', name: 'Thinking Clearly Under Pressure', description: 'Stay sharp when stakes are high' },
+                    { id: 'actually-listening', emoji: '👂', name: 'Actually Listening', description: 'Hear what people say (not what you assume)' },
+                    { id: 'breaking-down-problems', emoji: '🧩', name: 'Breaking Down Problems', description: 'Cut through complexity without getting lost' },
+                    { id: 'reading-the-room', emoji: '👀', name: 'Reading the Room', description: 'Pick up on what\'s not being said' },
                 ],
                 selectedTopics: [],
                 email: '',
