@@ -8,7 +8,7 @@
     <!-- SEO Meta Tags -->
     <title>SharpStack - Daily Practice for the Skills That Count</title>
     <meta name="description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice that shows you where you stumble.">
-    <meta name="keywords" content="mental training, critical thinking, active listening, communication skills, cognitive training, brain training, mental fitness">
+    <meta name="keywords" content="speaking with confidence, handling conflict, thinking under pressure, active listening, problem solving, reading the room, communication skills, mental training">
     <meta name="author" content="SharpStack">
     <meta name="robots" content="index, follow">
 
@@ -37,11 +37,42 @@
     </script>
 
     <style>
+        /* SharpStack Landing Page Colors: Black + Orange + Cream */
+        :root {
+            --background: #faf9f6;
+            --foreground: #000000;
+            --card: #faf9f6;
+            --card-foreground: #000000;
+            --primary: #ff6b35;
+            --primary-foreground: #ffffff;
+            --secondary: #f0ede8;
+            --secondary-foreground: #000000;
+            --muted: #f0ede8;
+            --muted-foreground: #555555;
+            --border: #e5e2dc;
+            --input: #e5e2dc;
+            --ring: #ff6b35;
+        }
+        .dark {
+            --background: #0a0a0a;
+            --foreground: #faf9f6;
+            --card: #0a0a0a;
+            --card-foreground: #faf9f6;
+            --primary: #ff6b35;
+            --primary-foreground: #000000;
+            --secondary: #1a1a1a;
+            --secondary-foreground: #faf9f6;
+            --muted: #1a1a1a;
+            --muted-foreground: #999999;
+            --border: #2a2a2a;
+            --input: #2a2a2a;
+            --ring: #ff6b35;
+        }
         html {
-            background-color: oklch(1 0 0);
+            background-color: #faf9f6;
         }
         html.dark {
-            background-color: oklch(0.145 0 0);
+            background-color: #0a0a0a;
         }
     </style>
 
