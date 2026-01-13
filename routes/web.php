@@ -1,10 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\LandingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+// Landing page (public)
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::post('/early-access', [LandingController::class, 'store'])
+    ->middleware('throttle:5,1') // 5 attempts per minute
+    ->name('early-access.store');
+
+// Mental Gym app (moved to /app)
+Route::get('/app', function () {
     return Inertia::render('mental-gym');
 })->name('home');
 
