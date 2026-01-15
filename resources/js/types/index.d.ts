@@ -31,6 +31,13 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export interface Track {
+    id: number;
+    title: string;
+    description: string;
+    active: boolean;
+}
+
 export interface User {
     id: number;
     name: string;
