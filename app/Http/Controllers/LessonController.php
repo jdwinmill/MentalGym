@@ -10,6 +10,7 @@ use App\Models\UserLessonAttempt;
 use App\Models\UserWeaknessPattern;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -40,6 +41,18 @@ class LessonController extends Controller
                 $option->feedback = AnswerFeedback::where('question_id', $question->id)
                     ->where('answer_option_id', $option->id)
                     ->first();
+            }
+        }
+
+        // Convert relative audio URLs to internal streaming URLs
+        foreach ($lesson->contentBlocks as $block) {
+            if ($block->block_type === 'audio') {
+                $content = $block->content;
+                if (isset($content['audio_url']) && $content['audio_url']) {
+                    // Use internal route to stream audio from S3
+                    $content['url'] = route('media.stream', ['path' => $content['audio_url']]);
+                }
+                $block->content = $content;
             }
         }
 
@@ -209,5 +222,47 @@ class LessonController extends Controller
         );
 
         $pattern->recordOccurrence();
+    }
+
+    /**
+     * Stream audio file from S3.
+     */
+    public function streamAudio(string $path): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        // Validate the path is an audio file
+        if (!preg_match('/\.(mp3|wav|ogg|m4a)$/i', $path)) {
+            abort(404);
+        }
+
+        // Check if file exists
+        if (!Storage::disk('s3')->exists($path)) {
+            abort(404);
+        }
+
+        $mimeTypes = [
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'ogg' => 'audio/ogg',
+            'm4a' => 'audio/mp4',
+        ];
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mimeType = $mimeTypes[$extension] ?? 'audio/mpeg';
+        $size = Storage::disk('s3')->size($path);
+
+        return response()->stream(
+            function () use ($path) {
+                $stream = Storage::disk('s3')->readStream($path);
+                fpassthru($stream);
+                fclose($stream);
+            },
+            200,
+            [
+                'Content-Type' => $mimeType,
+                'Content-Length' => $size,
+                'Accept-Ranges' => 'bytes',
+                'Cache-Control' => 'public, max-age=3600',
+            ]
+        );
     }
 }

@@ -32,6 +32,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('attempts.answers.store');
     Route::post('attempts/{attempt}/complete', [LessonController::class, 'completeAttempt'])
         ->name('attempts.complete');
+
+    // Media streaming from S3
+    Route::get('media/{path}', [LessonController::class, 'streamAudio'])
+        ->where('path', '.*')
+        ->name('media.stream');
 });
 
 require __DIR__.'/settings.php';
