@@ -1,7 +1,8 @@
+import { TrackCard } from '@/components/track-card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem, type Track } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { type BreadcrumbItem, type TrackWithDetails } from '@/types';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,31 +12,20 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface DashboardProps {
-    tracks: Track[];
+    tracks: TrackWithDetails[];
 }
 
 export default function Dashboard({ tracks }: DashboardProps) {
-    const activeTracks = tracks.filter((track) => track.active);
+    const activeTracks = tracks.filter((track) => track.is_active);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {activeTracks.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className="space-y-4 max-w-3xl mx-auto w-full">
                         {activeTracks.map((track) => (
-                            <Link
-                                key={track.id}
-                                href={`/tracks/${track.id}`}
-                                className="block rounded-xl bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:bg-neutral-800 dark:hover:bg-neutral-700"
-                            >
-                                <h3 className="font-bold text-neutral-900 dark:text-neutral-100">
-                                    {track.title}
-                                </h3>
-                                <p className="mt-2 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-400">
-                                    {track.description}
-                                </p>
-                            </Link>
+                            <TrackCard key={track.id} track={track} />
                         ))}
                     </div>
                 ) : (

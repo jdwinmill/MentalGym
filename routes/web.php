@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
-use App\Models\Track;
+use App\Http\Controllers\LessonController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,11 +19,19 @@ Route::get('/app', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard', [
-            'tracks' => Track::all(),
-        ]);
-    })->name('dashboard');
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Lesson routes
+    Route::get('lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
+    Route::post('lessons/{lesson}/attempts', [LessonController::class, 'startAttempt'])
+        ->name('lessons.attempts.start');
+    Route::post('attempts/{attempt}/interactions', [LessonController::class, 'recordInteraction'])
+        ->name('attempts.interactions.store');
+    Route::post('attempts/{attempt}/answers', [LessonController::class, 'submitAnswer'])
+        ->name('attempts.answers.store');
+    Route::post('attempts/{attempt}/complete', [LessonController::class, 'completeAttempt'])
+        ->name('attempts.complete');
 });
 
 require __DIR__.'/settings.php';

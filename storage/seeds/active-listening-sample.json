@@ -1,0 +1,3004 @@
+{
+  "track": {
+    "slug": "active-listening",
+    "name": "Active Listening",
+    "description": "Stop missing what people actually mean in high-stakes conversations",
+    "pitch": "You're losing deals, missing social cues, and getting told 'you're not listening.' This track exposes exactly how your listening fails and trains you to catch what people actually mean—not just what they say.",
+    "duration_weeks": 8,
+    "sessions_per_week": 5,
+    "session_duration_minutes": 2,
+    "is_active": true,
+    "sort_order": 1
+  },
+  "skill_levels": [
+    {
+      "slug": "facts",
+      "name": "Level 1: Facts",
+      "description": "Capture explicit information accurately without interpretation. Most professionals think they hear everything—they don't. This level exposes how much you miss when people are giving you critical details.",
+      "level_number": 1,
+      "pass_threshold": 0.80
+    }
+  ],
+  "lessons": [
+    {
+      "lesson_number": 1,
+      "skill_level_slug": "facts",
+      "title": "Job Interview Debrief",
+      "learning_objectives": [
+        "Accurately capture numerical data (years, salaries, timeframes)",
+        "Track multiple distinct facts from a single speaker",
+        "Distinguish between stated facts vs. preferences/desires",
+        "Recognize when information is emphasized through repetition"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You just finished interviewing a candidate for your team. Your hiring manager asks what you learned. You need to brief them accurately—if you get the details wrong, you'll hire the wrong person or pass on someone great."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Sarah Chen Interview Debrief",
+            "context": "Your colleague is debriefing you on a senior engineer candidate interview",
+            "transcript": "So I interviewed Sarah Chen this morning for the senior engineer role. She's currently at DataCore—been there three years, not two like her resume said. Before that she was at a startup called Velocity for 18 months. She mentioned she left because they pivoted away from infrastructure work, which is what she wants to focus on.\n\nShe's looking for $165K base, which is higher than our range, but she said she's flexible on equity. Her notice period is three weeks, not the standard two. She specifically asked about our deployment frequency—said her current team ships twice a month and she wants to move faster.\n\nOne thing that stood out: she's worked with Kubernetes extensively at DataCore but only dabbled with it at Velocity. She's never led a team but she's mentored two junior engineers. And she really emphasized she wants to stay technical—made it clear three times she's not interested in management track.",
+            "duration_seconds": 75,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How long has Sarah been at DataCore?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3 years",
+          "explanation": "The interviewer explicitly stated Sarah has been at DataCore for three years, correcting what was on her resume.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "2 years",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "You just misremembered her tenure. In salary negotiations, being off by a year changes your leverage. This is why you lose deals.",
+                "pattern_tag": "conflating_numbers",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "3 years",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. She's been at DataCore for 3 years.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "18 months",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's how long she was at Velocity, not DataCore. You're conflating two different pieces of information.",
+                "pattern_tag": "conflating_similar_facts",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "5 years",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You just invented a number that wasn't mentioned. Your brain filled in a gap with a guess.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's her salary requirement?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$165K base, firm on base but flexible on equity",
+          "explanation": "Sarah wants $165K base (non-negotiable) but said she's flexible on equity.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "$165K base, firm",
+              "is_correct": true,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Correct. She wants $165K base and while she's flexible on equity, base salary is firm.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$165K base, flexible on both base and equity",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "She said she's flexible on EQUITY, not base salary. You just entered a negotiation thinking you have room to move when you don't.",
+                "pattern_tag": "misattributing_flexibility",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Flexible on both base and equity",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "No. She's flexible on equity only. Base is firm at $165K. This mistake costs you real money in negotiations.",
+                "pattern_tag": "misattributing_flexibility",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "She didn't specify a number",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "She explicitly stated $165K base. You missed one of the most important pieces of information in a hiring conversation.",
+                "pattern_tag": "missing_explicit_facts",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "Why did she leave Velocity?",
+          "question_type": "multiple_choice",
+          "correct_answer": "They pivoted away from infrastructure work",
+          "explanation": "She left Velocity because they pivoted away from infrastructure work, which is what she wants to focus on.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "Wanted management opportunities",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "She explicitly said three times she's NOT interested in management. You heard the opposite of what she said.",
+                "pattern_tag": "inverting_meaning",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Wanted faster deployment cycles",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "You're confusing what she wants at her NEXT job (faster deployments) with why she LEFT her last job (pivot away from infrastructure). These are different conversations.",
+                "pattern_tag": "conflating_past_future",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "They pivoted away from infrastructure work",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Velocity pivoted away from infrastructure work, which is what she wants to focus on.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Limited Kubernetes experience there",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "She has extensive Kubernetes experience at DataCore. You mixed up her experience levels at different companies.",
+                "pattern_tag": "conflating_similar_facts",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's her notice period?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3 weeks",
+          "explanation": "Sarah's notice period is 3 weeks, not the standard 2 weeks.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "2 weeks",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "She said 3 weeks, not 2. You just told your manager she can start earlier than she can. Now you've delayed your project timeline.",
+                "pattern_tag": "defaulting_to_standard",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "3 weeks",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Three weeks, not the standard two.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "4 weeks",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "You added an extra week. She said 3, not 4. Now your timeline is off by a week.",
+                "pattern_tag": "conflating_numbers",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "Negotiable",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "She gave a specific timeframe: 3 weeks. Nothing was negotiable about this.",
+                "pattern_tag": "adding_flexibility",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How many times did she mention not wanting management responsibilities?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Three times",
+          "explanation": "The interviewer noted Sarah emphasized staying technical three times—a clear signal of non-negotiability.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "Once",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "She said it THREE times. When someone repeats something multiple times, it's a red flag or dealbreaker. You completely missed the emphasis.",
+                "pattern_tag": "missing_repetition_signals",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Twice",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "She emphasized this THREE times, not twice. You're still underestimating how important this is to her.",
+                "pattern_tag": "missing_repetition_signals",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Three times",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. She emphasized wanting to stay technical three times—a clear signal this is non-negotiable.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "She didn't mention this",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "She made it clear THREE times. You completely missed a critical signal about what would make her quit.",
+                "pattern_tag": "missing_explicit_facts",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 2,
+      "skill_level_slug": "facts",
+      "title": "Client Budget Meeting",
+      "learning_objectives": [
+        "Track multiple interconnected numerical values",
+        "Distinguish between total budget vs. available budget",
+        "Capture conditional requirements and their implications",
+        "Remember context that colors the numbers"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're meeting with a potential client about a consulting project. They're explaining their budget and constraints. Miss the details and you'll either underbid (leaving money on the table) or overbid (lose the deal entirely)."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Digital Transformation Budget Discussion",
+            "context": "A potential client explains their consulting budget and timeline constraints",
+            "transcript": "Thanks for coming in. So we've got $850K approved for this digital transformation project, but $200K of that is already committed to our Salesforce licenses. The CFO wants to keep $100K as contingency, which leaves us with $550K for consulting work.\n\nWe need this done in two phases. Phase one is the assessment and strategy—we're thinking 6 weeks, not 8 like you proposed. Phase two is implementation, that's where the bulk of the budget goes. Our fiscal year ends June 30th, so we need phase one completed by April 15th to get phase two approved before the budget cycle closes.\n\nOne more thing—we can do $450K this fiscal year and roll $100K into next year's budget, or we can do the full $550K this year if you can guarantee completion by June 15th. Our previous consultant burned through $300K and delivered nothing, so the board is really skeptical about bringing in outside help again.",
+            "duration_seconds": 80,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the total available budget for consulting work?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$550K",
+          "explanation": "$850K total minus $200K for Salesforce minus $100K contingency = $550K available for consulting.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "$850K",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's the TOTAL approved budget, but $200K is committed to Salesforce and $100K is contingency. Available for consulting = $550K. You just quoted based on the wrong number.",
+                "pattern_tag": "missing_deductions",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$650K",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "You subtracted the Salesforce licenses but forgot the $100K contingency. Math error: $850K - $200K - $100K = $550K.",
+                "pattern_tag": "incomplete_calculation",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$550K",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. $850K total, minus $200K Salesforce, minus $100K contingency = $550K available.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$450K",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's one of the split options for THIS fiscal year, not the total available budget. You're confusing payment structure with budget size.",
+                "pattern_tag": "conflating_related_numbers",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How long do they want phase one to take?",
+          "question_type": "multiple_choice",
+          "correct_answer": "6 weeks",
+          "explanation": "The client wants phase one done in 6 weeks, not the 8 weeks originally proposed.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "8 weeks",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That was YOUR proposal. They said 6 weeks, NOT 8. You're already misaligned on timeline before the contract is even signed.",
+                "pattern_tag": "substituting_own_info",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "6 weeks",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. They want 6 weeks for phase one, not the 8 you proposed.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Until April 15th",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "April 15th is the DEADLINE for phase one completion, not the duration. They want it done in 6 weeks.",
+                "pattern_tag": "conflating_deadline_duration",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Until June 15th",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "June 15th is the completion date IF they do full $550K this year. Phase one duration is 6 weeks.",
+                "pattern_tag": "conflating_related_dates",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When does phase one need to be completed?",
+          "question_type": "multiple_choice",
+          "correct_answer": "April 15th",
+          "explanation": "Phase one must be completed by April 15th so phase two can be approved before the fiscal year ends June 30th.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "June 30th",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's when the fiscal year ENDS, not when phase one needs to be done. Phase one must finish April 15th so phase two can be approved before June 30th.",
+                "pattern_tag": "conflating_related_dates",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "June 15th",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "That's the completion date for the ENTIRE project if they pay $550K this year. Phase one deadline is April 15th.",
+                "pattern_tag": "conflating_related_dates",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "April 15th",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. April 15th deadline for phase one so phase two can be approved before fiscal year ends June 30th.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "End of fiscal year",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "End of fiscal year is June 30th, but phase one needs to be done by April 15th. Mix this up and your project plan is worthless.",
+                "pattern_tag": "vague_vs_specific",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much did the previous consultant spend?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$300K",
+          "explanation": "The previous consultant burned through $300K with no results, which is why the board is skeptical.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "$100K",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's the contingency amount. Previous consultant burned $300K. You need to know this number to address their concerns about being burned again.",
+                "pattern_tag": "conflating_numbers",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$200K",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "That's what's committed to Salesforce. Previous consultant spent $300K with no results. This is the source of their skepticism.",
+                "pattern_tag": "conflating_numbers",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$300K",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Previous consultant burned $300K with no results—this is why they're skeptical and why you need to over-deliver.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$450K",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's one of the budget split options. Previous consultant wasted $300K. You're mixing up current budget with past failures.",
+                "pattern_tag": "conflating_numbers",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What are the two budget split options they offered?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$450K this year + $100K next year, OR $550K this year with June 15th completion",
+          "explanation": "They offered two payment structures with different completion requirements tied to budget constraints.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "$450K this year + $100K next year, OR $550K this year with June 15th completion",
+              "is_correct": true,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Correct. Two options with different completion requirements. This flexibility is crucial for your proposal.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$550K this year, OR $650K over two years",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "You invented numbers that weren't mentioned. They said $450K + $100K OR $550K this year. You just walked into a negotiation with made-up options.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$450K firm, OR $550K if you reduce timeline",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Close but wrong. The choice isn't about reducing timeline—it's about payment timing tied to a June 15th completion guarantee. You missed the conditional structure.",
+                "pattern_tag": "misunderstanding_conditionals",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$550K this year only",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "They gave you TWO specific options with different completion requirements. You just walked into a negotiation without knowing what flexibility you actually have.",
+                "pattern_tag": "missing_options",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 3,
+      "skill_level_slug": "facts",
+      "title": "Performance Review Feedback",
+      "learning_objectives": [
+        "Separate specific facts from general impressions",
+        "Track what went right vs what needs improvement",
+        "Capture quantifiable metrics mentioned",
+        "Distinguish between examples of good work and areas needing work"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "Your manager is giving you feedback on a project that didn't go well. Get the details wrong and you'll either be defensive about the wrong things or miss what actually needs to improve."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Morrison Pitch Debrief",
+            "context": "Your manager reviews your performance on a recent client pitch",
+            "transcript": "Let's talk about the Morrison pitch. I know you put in a lot of work, but there were some execution issues. First, you sent the deck to their CEO at 9pm the night before—she forwarded it to their team, but that's not how we operate. We send materials 48 hours in advance, not 12.\n\nSecond issue: the pricing on slide 14 showed $340K when we'd verbally discussed $380K with their VP. I had to correct it in the meeting. That's not a good look. And you included case studies from the healthcare vertical when they specifically said they wanted tech company examples.\n\nThe presentation itself was solid—your delivery was confident, the design was clean. But you missed three of their four questions during Q&A. When they asked about integration timelines, you said 'a few weeks' instead of giving them the 6-8 week range we discussed. And you forgot to mention we have SOC 2 compliance when they brought up security.\n\nThe good news is they're still interested, but we need to tighten up your prep process.",
+            "duration_seconds": 75,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How far in advance should materials be sent?",
+          "question_type": "multiple_choice",
+          "correct_answer": "48 hours",
+          "explanation": "The manager stated the standard is 48 hours in advance, not the 12 hours (night before) that was done.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "12 hours",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's what you DID (9pm night before), not what you SHOULD do. 48 hours is the standard. You're now going to make this mistake again.",
+                "pattern_tag": "confusing_what_happened_with_standard",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "24 hours",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Close but wrong. The standard is 48 hours, not 24. Being off by a day means you'll still miss the expectation.",
+                "pattern_tag": "approximate_recall",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "48 hours",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. 48 hours is the standard. This is the actual requirement you need to follow.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "72 hours",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're overshooting. The standard is 48 hours. Adding unnecessary buffer suggests you're guessing rather than remembering.",
+                "pattern_tag": "fabricating_details",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What was wrong with the pricing on slide 14?",
+          "question_type": "multiple_choice",
+          "correct_answer": "It showed $340K instead of $380K",
+          "explanation": "The slide showed $340K when the verbally discussed price was $380K—a $40K discrepancy.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "It showed $380K instead of $340K",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "You have it backwards. Showed $340K when it should have been $380K. That's $40K UNDER, not over. This reversal matters in negotiations.",
+                "pattern_tag": "inverting_numbers",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "It showed $340K instead of $380K",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. You showed $340K when you'd discussed $380K. That's a $40K discrepancy that had to be corrected in front of the client.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "It was missing entirely",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "The pricing was there—it was just WRONG. It showed $340K instead of $380K. You're confusing 'wrong information' with 'missing information.'",
+                "pattern_tag": "wrong_error_type",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "It wasn't approved by finance",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Finance approval was never mentioned. The issue was the number itself: $340K vs $380K. You just invented a different problem.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What case studies should have been included?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Tech company examples",
+          "explanation": "The client specifically requested tech company examples, but healthcare vertical examples were included instead.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "Healthcare vertical",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's what you INCLUDED, not what they WANTED. They specifically asked for tech examples. You weren't listening in the planning meeting.",
+                "pattern_tag": "confusing_what_happened_with_requirement",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Tech company examples",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. They specifically wanted tech company examples, but you gave them healthcare instead.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Any case studies",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "They were SPECIFIC about wanting tech examples. Adding vagueness where there was a clear requirement shows you missed the instruction.",
+                "pattern_tag": "generalizing_specific_requirements",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Morrison's competitors",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Competitor case studies were never mentioned. They wanted tech company examples. You're inventing details that weren't discussed.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How many questions did you miss during Q&A?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3 out of 4",
+          "explanation": "The manager stated you missed three of their four questions during the Q&A session.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "1 out of 4",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "You missed THREE out of four, not one. You're drastically underestimating the gap. Track the actual severity.",
+                "pattern_tag": "minimizing_problems",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "2 out of 4",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Three out of four, not two. That's 75% miss rate, not 50%. This difference matters when assessing how serious the problem is.",
+                "pattern_tag": "minimizing_problems",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "3 out of 4",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. You missed 3 out of 4 questions—a 75% miss rate. That's why this needs immediate attention.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "All 4",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Three out of four, not all. You got one right. Exaggerating problems is as bad as minimizing them—both distort reality.",
+                "pattern_tag": "exaggerating_problems",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What timeline did you give for integration?",
+          "question_type": "multiple_choice",
+          "correct_answer": "A few weeks (vague, when 6-8 weeks was discussed)",
+          "explanation": "You said 'a few weeks' instead of the specific 6-8 week range that was discussed internally.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "6-8 weeks",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's what you SHOULD have said. You actually said 'a few weeks'—vague when specificity was needed. You're confusing the standard with what you did.",
+                "pattern_tag": "confusing_what_happened_with_standard",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "A few weeks (vague)",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. You said 'a few weeks' instead of the specific 6-8 week range. Vague answers make you look unprepared.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "2 months",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Neither 'a few weeks' nor '6-8 weeks' equals 2 months. You're inventing an answer that wasn't discussed at all.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Didn't give a timeline",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You DID give a timeline—'a few weeks'—it was just vague and wrong. Missing that you answered at all is a complete listening failure.",
+                "pattern_tag": "missing_what_happened",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 4,
+      "skill_level_slug": "facts",
+      "title": "Doctor's Appointment",
+      "learning_objectives": [
+        "Accurately capture medical measurements and values",
+        "Distinguish between different related metrics",
+        "Remember dosage instructions and timing",
+        "Track critical warning signs vs general advice"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're at a doctor's appointment getting test results and treatment options. Get these details wrong and you'll literally take the wrong medication or miss important follow-up."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Cholesterol Test Results",
+            "context": "Your doctor reviews your bloodwork results and prescribes treatment",
+            "transcript": "Okay, so your bloodwork came back. Your cholesterol is elevated—LDL is 168, should be under 130. HDL is fine at 52. Triglycerides are 245, which is high—we want that below 150. Your A1C is 5.9, which puts you in the prediabetic range.\n\nHere's what I recommend: Start with 10mg of atorvastatin daily, take it at night with food. We'll recheck your levels in 8 weeks, not 12 like we usually do, because I want to catch this early. If the statin doesn't bring your LDL down by at least 30 points, we'll increase to 20mg.\n\nDiet changes: Cut saturated fat to less than 7% of daily calories. Increase omega-3s—aim for fatty fish twice a week. And you really need to get your exercise up to 150 minutes per week of moderate activity. Right now you're doing what, maybe 45 minutes?\n\nOne more thing: call me immediately if you experience muscle pain or weakness while on the statin. That's rare but it happens. And no grapefruit juice—it interferes with the medication. Your next appointment is March 22nd at 2:30pm.",
+            "duration_seconds": 85,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What is your current LDL cholesterol level?",
+          "question_type": "multiple_choice",
+          "correct_answer": "168",
+          "explanation": "Your LDL (the 'bad' cholesterol) is currently 168, which is above the target of 130.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "130",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's the TARGET, not your current level. You're at 168. Confusing targets with actuals means you won't know if treatment is working.",
+                "pattern_tag": "confusing_target_with_current",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "168",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Your LDL is 168—this is the number you need to track to see if medication is working.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "245",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's your triglycerides, not LDL. You're conflating two different cholesterol measures. This confusion could lead to medication errors.",
+                "pattern_tag": "conflating_similar_metrics",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "52",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's your HDL (the 'good' cholesterol), not LDL. Mixing these up means you can't understand your test results.",
+                "pattern_tag": "conflating_similar_metrics",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When should you take the medication?",
+          "question_type": "multiple_choice",
+          "correct_answer": "At night with food",
+          "explanation": "Atorvastatin should be taken at night with food—timing and food intake both matter for effectiveness.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "In the morning on empty stomach",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Wrong on both counts. At night WITH FOOD, not morning on empty stomach. Take it wrong and you'll have side effects or reduced effectiveness.",
+                "pattern_tag": "completely_wrong_instructions",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "At night with food",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. At night WITH food. Both timing and food matter for this medication.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Twice daily with meals",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "It's once daily, not twice. At night with food. Taking double the prescribed frequency could cause serious side effects.",
+                "pattern_tag": "wrong_frequency",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Any time of day",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Timing matters—specifically at night with food. Statins work best when taken at night. You're adding flexibility that doesn't exist.",
+                "pattern_tag": "adding_flexibility",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When is your follow-up bloodwork?",
+          "question_type": "multiple_choice",
+          "correct_answer": "8 weeks",
+          "explanation": "Follow-up bloodwork is in 8 weeks (not the usual 12) to catch problems early.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "6 weeks",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's 8 weeks, not 6. Being off by 2 weeks means you might show up too early or miss the window entirely.",
+                "pattern_tag": "approximate_recall",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "8 weeks",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 8 weeks, not the usual 12. Miss this appointment and you won't know if the medication is working or needs adjustment.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "12 weeks",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's the USUAL timeline, but your doctor said 8 weeks because they want to catch this early. You're using the standard when an exception was made.",
+                "pattern_tag": "defaulting_to_standard",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "16 weeks",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're doubling the usual timeline. It's 8 weeks. Waiting 16 weeks could let problems develop unchecked.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the minimum LDL reduction needed before increasing dosage?",
+          "question_type": "multiple_choice",
+          "correct_answer": "30 points",
+          "explanation": "If LDL doesn't drop by at least 30 points (from 168 to 138 or below), the dose will be increased.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "20 points",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's at least 30 points, not 20. If your LDL drops from 168 to 148, that's 20 points but your dose would still increase. You're underestimating the threshold.",
+                "pattern_tag": "approximate_recall",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "25 points",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "At least 30 points, not 25. This 5-point difference determines whether your medication gets adjusted. Precision matters in medical thresholds.",
+                "pattern_tag": "approximate_recall",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "30 points",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. At least 30 points reduction. This is how you track if the medication is working at the current dose.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "40 points",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're setting a higher bar than your doctor. It's 30 points. Misremembering this means you might think treatment is failing when it's actually working.",
+                "pattern_tag": "exaggerating_requirement",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What food/drink must you avoid?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Grapefruit juice",
+          "explanation": "Grapefruit juice interferes with the statin medication and must be avoided.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "Alcohol",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Alcohol wasn't mentioned as a restriction. The specific warning was grapefruit juice. You're applying general health advice rather than listening to what was said.",
+                "pattern_tag": "substituting_general_knowledge",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Grapefruit juice",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Grapefruit juice interferes with the statin. Consume it and you're undermining your treatment.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Dairy",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Dairy wasn't mentioned. The specific warning was grapefruit juice. You're inventing restrictions that don't exist.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Caffeine",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Caffeine wasn't mentioned. Grapefruit juice was the specific warning. You're making up dietary restrictions.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 5,
+      "skill_level_slug": "facts",
+      "title": "Real Estate Showing",
+      "learning_objectives": [
+        "Track multiple related but distinct numbers",
+        "Capture conditional offers and their requirements",
+        "Remember what's included vs excluded",
+        "Distinguish between different types of costs"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're touring a house with your real estate agent. Miss these details and you'll either overpay, miss red flags, or make an offer on a property that doesn't actually meet your needs."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Bay Ridge Property Tour",
+            "context": "Your real estate agent walks you through property details and seller motivation",
+            "transcript": "This one just came on the market yesterday at $875K. It's been sitting empty for 3 months since the owner moved out—they relocated to Portland for work. Built in 1987, fully renovated in 2019. Square footage is 2,400, but that doesn't include the finished basement, which adds another 600 square feet.\n\nProperty taxes are $14,200 annually. HOA is $185 per month, covers exterior maintenance and the community pool. Roof was replaced in 2021, should be good for another 15-20 years. HVAC system is original from the renovation, so 2019.\n\nThe sellers are motivated—they've already bought in Portland and are carrying two mortgages. Their realtor told me they'd entertain offers between $825K and $850K. They want to close by April 30th because that's when their Portland mortgage rate lock expires.\n\nOne thing to know: the previous buyers' inspection found some settling in the foundation—not structural, but it'll cost about $8K to repair. Sellers agreed to cover half of that. And the appliances in the kitchen stay except the washer and dryer, those are going with them.",
+            "duration_seconds": 80,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the total square footage including the basement?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3,000 sq ft",
+          "explanation": "Main floor is 2,400 sq ft plus 600 sq ft finished basement = 3,000 sq ft total.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "2,400 sq ft",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's ONLY the main floor. Add the 600 sq ft basement = 3,000 total. You just compared this house to others using the wrong square footage.",
+                "pattern_tag": "incomplete_calculation",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "2,600 sq ft",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "You're 400 sq ft short. It's 2,400 main + 600 basement = 3,000. Math error affects your price-per-square-foot analysis.",
+                "pattern_tag": "calculation_error",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "3,000 sq ft",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. 2,400 main floor + 600 basement = 3,000 total square feet.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "3,200 sq ft",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're adding 200 sq ft that don't exist. It's exactly 3,000. Overestimating space could lead to overpaying.",
+                "pattern_tag": "fabricating_details",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the realistic offer range the sellers would accept?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$825K-$850K",
+          "explanation": "The sellers' realtor indicated they'd entertain offers between $825K and $850K (below the $875K list price).",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "$875K (list price)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's the LIST price, not what they'll actually accept. Their realtor said $825K-$850K. You just planned to offer $875K when you could save $25K-$50K.",
+                "pattern_tag": "ignoring_insider_info",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$850K-$875K",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Close but wrong. The range is $825K-$850K, not $850K-$875K. You're starting negotiations $25K too high.",
+                "pattern_tag": "range_shifted",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$825K-$850K",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Their realtor said $825K-$850K. This insider information gives you negotiating leverage.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Below $825K",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "The range starts AT $825K, not below. Lowballing below their stated range could insult them and kill the deal.",
+                "pattern_tag": "misunderstanding_floor",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "Why do the sellers want to close by April 30th?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Their Portland mortgage rate lock expires",
+          "explanation": "The sellers need to close by April 30th because their mortgage rate lock on their Portland purchase expires then.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "They're carrying two mortgages",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That explains they're motivated, but the SPECIFIC reason for April 30th is the rate lock expiring. Understanding the deadline driver gives you more leverage.",
+                "pattern_tag": "confusing_general_with_specific",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "They want to move into their new house",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "That's a logical guess but not what was said. The rate lock expires April 30th. You're filling in assumed motivations rather than listening.",
+                "pattern_tag": "substituting_assumptions",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Their Portland mortgage rate lock expires",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Rate lock expires April 30th. They HAVE to close by then or lose their rate. This is leverage—they can't walk away.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Tax reasons",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Tax reasons were never mentioned. The specific reason is rate lock expiration. You're inventing motivations.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much will the foundation repair cost you?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$4K (half of $8K)",
+          "explanation": "Total repair is $8K, sellers cover half = $4K out of your pocket.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "$8K (full amount)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Sellers cover half. Total is $8K, so you pay $4K. Not budgeting this split could surprise you at closing.",
+                "pattern_tag": "missing_split",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$4K (half of $8K)",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Total repair is $8K, sellers cover half = $4K out of your pocket. Budget this into your offer.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$0 (sellers covering it)",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Sellers cover HALF, not all. You're on the hook for $4K. Missing this cost could blow your budget.",
+                "pattern_tag": "misunderstanding_coverage",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Not specified",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "$8K total, sellers cover half. It WAS specified. You completely missed a material cost discussion.",
+                "pattern_tag": "missing_explicit_facts",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When was the HVAC system installed?",
+          "question_type": "multiple_choice",
+          "correct_answer": "2019 (from the renovation)",
+          "explanation": "The HVAC system is original from the 2019 renovation, making it about 6 years old.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "1987 (original construction)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "The house was built in 1987, but HVAC is from the 2019 renovation. You're confusing two different dates. A 37-year-old HVAC vs 6-year-old matters hugely.",
+                "pattern_tag": "conflating_dates",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "2019 (from the renovation)",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. HVAC is from 2019 renovation—about 6 years old. This affects your maintenance planning and home warranty decisions.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "2021 (with the roof)",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Roof was replaced in 2021, but HVAC is from the 2019 renovation. You're conflating two separate upgrades.",
+                "pattern_tag": "conflating_upgrades",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Unknown/not mentioned",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "It WAS mentioned—original from the 2019 renovation. You completely missed a key system age disclosure.",
+                "pattern_tag": "missing_explicit_facts",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 6,
+      "skill_level_slug": "facts",
+      "title": "Startup Investor Pitch",
+      "learning_objectives": [
+        "Track business metrics and growth rates",
+        "Distinguish between committed capital and total raise",
+        "Capture burn rate and runway calculations",
+        "Remember target customer profiles"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're a junior associate at a VC firm. A startup founder just pitched your team. Your partner asks what you learned. Get it wrong and you look incompetent or miss a critical red flag."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "BuildRight Series A Pitch",
+            "context": "Construction project management startup founder presents to your VC firm",
+            "transcript": "We're BuildRight, a construction project management platform. We launched 14 months ago and we're at $1.2M ARR, growing 18% month-over-month. We have 47 paying customers—average contract value is $28K annually.\n\nWe're raising a $4M Series A. We've already got $2.5M committed from Construct Ventures and two angels. We're allocating $1.8M to sales and marketing, $1.5M to product development, and keeping $700K for operations and runway extension.\n\nOur burn rate is currently $180K per month. This raise gives us 22 months of runway, but we'll be cash-flow positive in 14 months if we hit our targets. We're targeting general contractors with 50-200 employees—too small and they won't pay, too large and they've already got enterprise solutions.\n\nOur biggest competitor is Procore, but they're focused on enterprise customers at $100K+ contracts. We're going after the mid-market they ignore. Two of our customers switched from them because we're easier to implement and one-third the cost. We launched in Texas, now expanding to Arizona and Colorado this quarter.",
+            "duration_seconds": 75,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's their current ARR?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$1.2M",
+          "explanation": "BuildRight is currently at $1.2M in annual recurring revenue.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "$1M",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "They're at $1.2M ARR, not $1M. Rounding loses precision needed for valuation models. $200K difference matters in early-stage companies.",
+                "pattern_tag": "approximate_recall",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$1.2M",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. $1.2M ARR. This is baseline for valuation and growth rate calculations.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$1.8M",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's the sales and marketing allocation, not ARR. You're conflating revenue with planned spending. Get this wrong and your entire analysis is off.",
+                "pattern_tag": "conflating_revenue_and_allocation",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$2.5M",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's committed capital in the raise, not ARR. Mixing up revenue and fundraising metrics shows fundamental confusion.",
+                "pattern_tag": "conflating_metrics",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much runway does this raise provide?",
+          "question_type": "multiple_choice",
+          "correct_answer": "22 months",
+          "explanation": "The $4M raise provides 22 months of runway at their current burn rate.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "14 months",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "14 months is when they'll be cash-flow positive, not total runway. Confusing these means you don't understand their risk profile—they have 8 months of buffer.",
+                "pattern_tag": "conflating_milestones",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "18 months",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "18% is their monthly growth rate, not runway. You're mixing up completely different metrics.",
+                "pattern_tag": "conflating_metrics",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "22 months",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. 22 months runway. If they don't hit cash-flow positive in 14 months, they still have 8 months of buffer before needing another raise.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "24 months",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're rounding up to 2 years. It's specifically 22 months. In VC diligence, 2-month differences matter for follow-on timing.",
+                "pattern_tag": "approximate_recall",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's their current monthly burn rate?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$180K",
+          "explanation": "They're currently burning $180K per month.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "$100K",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's $180K, not $100K. You're drastically underestimating burn. This affects your assessment of whether the runway calculation makes sense.",
+                "pattern_tag": "fabricating_details",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$150K",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "$180K, not $150K. Being off by $30K/month ($360K annually) means you can't validate their runway claims.",
+                "pattern_tag": "approximate_recall",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$180K",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. $180K/month burn. You need this to validate their 22-month runway claim and assess spending efficiency.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$220K",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're inflating the burn rate. It's $180K. Overestimating makes them look less efficient than they are.",
+                "pattern_tag": "exaggerating_numbers",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's their target customer size?",
+          "question_type": "multiple_choice",
+          "correct_answer": "50-200 employees",
+          "explanation": "They target general contractors with 50-200 employees—the mid-market between small firms and enterprise.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "Under 50 employees",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "They explicitly said too small won't pay. Target is 50-200 employees. Getting ICP wrong means you can't evaluate their go-to-market strategy.",
+                "pattern_tag": "missing_boundary",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "50-200 employees",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 50-200 employees. This defines their entire sales strategy and competitive positioning.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "200-500 employees",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Above 200 starts entering enterprise territory with existing solutions. Their sweet spot is 50-200. You've misunderstood their market position.",
+                "pattern_tag": "wrong_range",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Enterprise (500+)",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "They explicitly said too large already have enterprise solutions. They're going MID-MARKET at 50-200 employees. You missed their core differentiation.",
+                "pattern_tag": "inverting_strategy",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much are they allocating to sales and marketing?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$1.8M",
+          "explanation": "Of the $4M raise, $1.8M is allocated to sales and marketing.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "$1.5M",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's product development, not sales/marketing. $1.8M is sales/marketing. Mixing these up means you can't assess their growth strategy vs product investment balance.",
+                "pattern_tag": "conflating_allocations",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$1.8M",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. $1.8M to sales and marketing—that's 45% of the raise. Aggressive growth investment or wasteful spending? You need the right number to form an opinion.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$2.5M",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's already committed capital, not S&M allocation. You're confusing fundraising status with spending plans.",
+                "pattern_tag": "conflating_metrics",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$700K",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's ops and runway, not S&M. $1.8M is S&M. Getting this backwards makes their strategy look conservative when it's actually aggressive.",
+                "pattern_tag": "conflating_allocations",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 7,
+      "skill_level_slug": "facts",
+      "title": "Legal Contract Review",
+      "learning_objectives": [
+        "Distinguish between different payment structures",
+        "Track vesting schedules and cliffs",
+        "Remember multiple timeframes and their purposes",
+        "Capture conditional clawback provisions"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "Your lawyer is walking you through a contract for a new job offer. These aren't suggestions—they're binding terms. Miss a detail and you're legally committed to something you didn't agree to."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Employment Contract Terms",
+            "context": "Your attorney reviews key terms in your new job offer",
+            "transcript": "Let's go through the key terms. Base salary is $175K with a $35K signing bonus, paid in two installments—$20K at start date, $15K after 6 months if you're still employed. Your annual bonus target is 20% of base, but it's discretionary, not guaranteed.\n\nEquity is 12,000 options at a $2.50 strike price, vesting over 4 years with a 1-year cliff. That means nothing vests in year one, then 25% vests at 12 months, and the rest vests monthly after that. If you leave before the cliff, you get zero.\n\nNon-compete clause is 12 months, not the 18 months you saw in the first draft—I negotiated that down. But it covers any company in the HR tech space within the US. There's also a non-solicit for 24 months—you can't recruit any employees or contractors you worked with.\n\nNotice period is 30 days unless terminated for cause, then it's immediate. Severance is 2 months base salary if they terminate you without cause, but only if you sign a release. And there's a clawback provision—if you're terminated for cause within the first year, you have to repay 50% of the signing bonus.\n\nPTO is 20 days annually but doesn't roll over. Health insurance starts immediately, 401k match is 4% but doesn't start until month 3.",
+            "duration_seconds": 85,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much is the signing bonus and when is it paid?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$20K at start, $15K after 6 months (if still employed)",
+          "explanation": "Signing bonus is $35K total, split: $20K at start and $15K after 6 months IF still employed.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "$35K at start date",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's SPLIT into two payments: $20K now, $15K at 6 months IF you're still there. Plan to quit in month 5? You just lost $15K.",
+                "pattern_tag": "missing_split",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$20K at start, $15K after 6 months",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Split payment with the second installment contingent on still being employed. This retention mechanism matters for your plans.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$15K at start, $20K after 6 months",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "You reversed it. $20K first, then $15K. Getting payment amounts backwards could affect your financial planning.",
+                "pattern_tag": "reversed_amounts",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$35K after 6 months",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You'd get $20K immediately. It's split: $20K now + $15K later. Thinking you have to wait 6 months for ANY bonus is completely wrong.",
+                "pattern_tag": "wrong_timing",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When do your stock options start vesting?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Nothing until 12 months, then 25%, then monthly",
+          "explanation": "1-year cliff means zero vesting for 12 months, then 25% vests, then remaining 75% vests monthly over 3 years.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "Immediately, then monthly",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "1-year CLIFF means ZERO for 12 months. Leave in month 11? You get nothing. Understanding cliffs is critical to equity value.",
+                "pattern_tag": "missing_cliff",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Monthly from day one",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "There's a 1-year cliff. Nothing vests until month 12. You just planned your career move without understanding you'd forfeit all options.",
+                "pattern_tag": "missing_cliff",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Nothing until 12 months, then 25%, then monthly",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. 1-year cliff = zero equity if you leave before 12 months. Then 25% vests, remaining 75% vests monthly over 3 years.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "25% per year for 4 years",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "After the cliff, it vests MONTHLY, not annually. You'd accrue equity much faster than you think. This affects when you can afford to leave.",
+                "pattern_tag": "wrong_schedule",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How long is the non-compete period?",
+          "question_type": "multiple_choice",
+          "correct_answer": "12 months",
+          "explanation": "Non-compete was negotiated down from 18 months to 12 months.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "18 months (original draft)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Your lawyer negotiated it DOWN to 12 months. Thinking it's still 18 means you don't know what you actually agreed to.",
+                "pattern_tag": "using_old_version",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "12 months",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 12 months—your lawyer got this reduced from 18. Don't confuse with the 24-month non-solicit.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "24 months",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "24 months is the NON-SOLICIT, not non-compete. These are different restrictions. Confusing them means you don't know what you can't do.",
+                "pattern_tag": "conflating_restrictions",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "No non-compete",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "There IS a 12-month non-compete covering HR tech companies in the US. Missing this entirely could lead to legal violations.",
+                "pattern_tag": "missing_restriction",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What happens if you're terminated for cause in the first year?",
+          "question_type": "multiple_choice",
+          "correct_answer": "You repay 50% of signing bonus",
+          "explanation": "Clawback provision: if terminated for cause within first year, you must repay 50% of the signing bonus.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "You keep all signing bonus",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "50% CLAWBACK on signing bonus. Get fired for cause in month 11? You owe them $17,500. Did you budget for that risk?",
+                "pattern_tag": "missing_clawback",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "You repay 50% of signing bonus",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 50% clawback in first year if terminated for cause. That's $17,500 you might owe back.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "You repay 100% of signing bonus",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "It's 50%, not 100%. Still significant ($17,500) but not the full amount. Accuracy matters in financial exposure.",
+                "pattern_tag": "exaggerating_penalty",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "No clawback provision",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "There IS a clawback—50% of signing bonus if terminated for cause in year one. Missing this is a $17,500 blind spot.",
+                "pattern_tag": "missing_provision",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When does the 401k match start?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Month 3",
+          "explanation": "401k match is 4% but doesn't start until month 3, unlike health insurance which starts immediately.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "Immediately",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Health insurance starts immediately, but 401k match starts month 3. You just planned your retirement contributions thinking you'd get matched from day one.",
+                "pattern_tag": "conflating_benefits",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "After 1 month",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "It's month 3, not month 1. That's 2 months of lost employer contributions if you don't time your own contributions right.",
+                "pattern_tag": "wrong_timing",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "After 3 months",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Month 3 is when 401k match begins. Plan your contributions accordingly to maximize the 4% match.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "After 6 months",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're confusing this with the second signing bonus payment. 401k match starts month 3, not 6. That's 3 months of match you could be getting.",
+                "pattern_tag": "conflating_timelines",
+                "severity": "high"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 8,
+      "skill_level_slug": "facts",
+      "title": "Emergency Room Discharge",
+      "learning_objectives": [
+        "Capture precise medical instructions and timing",
+        "Distinguish between monitoring frequency and medication frequency",
+        "Remember specific warning signs vs general advice",
+        "Track multiple timeframes for different restrictions"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're picking up your spouse from the ER after a minor accident. The doctor is giving discharge instructions. Get these wrong and you'll miss warning signs that require immediate return or give medication incorrectly."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Head Injury Discharge Instructions",
+            "context": "ER doctor provides home care instructions after ruling out concussion",
+            "transcript": "Okay, so we've ruled out a concussion, but you did have a significant impact to your head. You're clear to go home but someone needs to stay with you for the next 24 hours and wake you every 3 hours, not every hour—we don't want to disrupt your sleep too much.\n\nI'm prescribing 600mg ibuprofen every 6 hours as needed for pain. Don't exceed 3,200mg in 24 hours. No aspirin or other NSAIDs on top of this. You can also use ice packs for 15 minutes at a time, but wait at least 2 hours between applications.\n\nReturn to the ER immediately if you experience any of these: vomiting more than twice, severe headache that doesn't respond to the ibuprofen, confusion or slurred speech, vision changes, or clear fluid draining from your nose or ears. That last one especially—that could indicate a CSF leak.\n\nNo driving for 48 hours. No alcohol for 72 hours—it can interact with the head injury. You can return to work in 3 days if you're symptom-free, but no intense physical activity for a full week.\n\nFollow up with your primary care doctor in 5 days, sooner if symptoms worsen. Your CT scan images are being sent to them automatically. Any questions?",
+            "duration_seconds": 80,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How often should you wake them during the night?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Every 3 hours",
+          "explanation": "Wake them every 3 hours (not every hour) to check on them without causing sleep deprivation.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "Every hour",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Doctor specifically said NOT every hour—every 3 hours. Wake them every hour and you're causing sleep deprivation that makes recovery worse.",
+                "pattern_tag": "ignoring_negation",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Every 2 hours",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Every 3 hours, not 2. That extra hour matters for sleep quality during recovery. You're being more aggressive than medically needed.",
+                "pattern_tag": "approximate_recall",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "Every 3 hours",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Every 3 hours balances monitoring with needed sleep. More frequent waking causes problems.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Every 4 hours",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "It's 3 hours, not 4. Waiting longer could miss developing symptoms. This isn't about convenience—it's safety monitoring.",
+                "pattern_tag": "minimizing_requirement",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the maximum ibuprofen dosage in 24 hours?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3,200mg",
+          "explanation": "Maximum safe dose is 3,200mg in 24 hours—exceeding this risks serious side effects.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "2,400mg",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's 3,200mg, not 2,400mg. You'd be restricting pain relief more than necessary. Still, being conservative is safer than going over.",
+                "pattern_tag": "underestimating_limit",
+                "severity": "low"
+              }
+            },
+            {
+              "option_text": "3,200mg",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 3,200mg maximum in 24 hours. This is a safety limit—exceed it and you risk kidney damage or GI bleeding.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "3,600mg",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "You're 400mg over the safe limit. 3,200mg is the max. Exceeding this could cause serious harm.",
+                "pattern_tag": "exceeding_limit",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "4,000mg",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Dangerously high. Max is 3,200mg. At 4,000mg you're risking kidney damage and GI bleeding. This isn't a suggestion—it's a medical safety limit.",
+                "pattern_tag": "exceeding_limit",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How long should you avoid driving?",
+          "question_type": "multiple_choice",
+          "correct_answer": "48 hours",
+          "explanation": "No driving for 48 hours after head impact—reaction time and judgment may be impaired.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "24 hours",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "48 hours, not 24. Let them drive after 24 and they could have delayed symptoms behind the wheel. This is a safety restriction.",
+                "pattern_tag": "halving_restriction",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "48 hours",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 48 hours no driving. Symptoms can develop in the first 2 days after head trauma.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "72 hours",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "You're confusing this with the alcohol restriction (72 hours). Driving restriction is 48 hours. Being overly cautious by 24 hours is fine, but know the actual rule.",
+                "pattern_tag": "conflating_restrictions",
+                "severity": "low"
+              }
+            },
+            {
+              "option_text": "1 week",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "That's the intense physical activity restriction. Driving restriction is 48 hours. You're conflating different recovery timelines.",
+                "pattern_tag": "conflating_restrictions",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "Which symptom requires immediate return to the ER?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Clear fluid from nose or ears",
+          "explanation": "Clear fluid from nose/ears could indicate CSF leak—a medical emergency requiring immediate ER visit.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "Mild headache",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Mild headache is expected. The warning was SEVERE headache that doesn't respond to ibuprofen. You're being overly cautious about normal symptoms.",
+                "pattern_tag": "missing_severity_qualifier",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "Fatigue",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Fatigue wasn't on the warning list. The specific red flags were: vomiting 2+ times, severe headache, confusion, vision changes, or clear fluid from nose/ears.",
+                "pattern_tag": "adding_general_symptoms",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Clear fluid from nose or ears",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Clear fluid from nose/ears indicates possible CSF leak—a medical emergency. Miss this and you're gambling with brain infection risk.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Difficulty sleeping",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Sleep difficulty wasn't mentioned as a red flag. You're waking them every 3 hours anyway. The real warnings are vomiting, severe headache, confusion, vision changes, and CSF leak signs.",
+                "pattern_tag": "fabricating_symptoms",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When is the follow-up appointment with primary care?",
+          "question_type": "multiple_choice",
+          "correct_answer": "5 days",
+          "explanation": "Follow up with primary care in 5 days, sooner if symptoms worsen.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "3 days (when can return to work)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "3 days is return-to-work timeline if symptom-free. Follow-up appointment is 5 days. These are separate milestones with different purposes.",
+                "pattern_tag": "conflating_milestones",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "5 days",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 5-day follow-up with primary care, sooner if symptoms worsen. Miss this and complications could go undetected.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "1 week",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "1 week is the no-intense-activity period. Follow-up is 5 days. You're mixing up restrictions with medical follow-up.",
+                "pattern_tag": "conflating_timelines",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "2 weeks",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Way too long. It's 5 days. Waiting 2 weeks could let complications develop. You're either guessing or applying standard check-up timing.",
+                "pattern_tag": "defaulting_to_standard",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 9,
+      "skill_level_slug": "facts",
+      "title": "Wedding Venue Walkthrough",
+      "learning_objectives": [
+        "Calculate total costs including fees and taxes",
+        "Track cancellation penalties at different timeframes",
+        "Distinguish between recommended vs maximum capacity",
+        "Remember time-based restrictions and requirements"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "You're touring a wedding venue with your partner. These details determine whether your day goes smoothly or becomes a disaster. Miss something and you'll have 150 guests dealing with the consequences."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Riverside Pavilion Tour",
+            "context": "Wedding venue coordinator explains pricing, policies, and requirements",
+            "transcript": "Welcome! So this is the Riverside Pavilion. Maximum capacity is 180 for a seated dinner, but we recommend keeping it to 160 for comfortable spacing. The venue rental is $8,500 and that includes the space from 2pm to midnight—any earlier setup or later breakdown is $200 per hour.\n\nWe provide tables and chairs for up to 200 guests—anything beyond that is $12 per chair, $45 per table. We have a required catering list of 4 approved vendors—you must use one of them, no outside catering allowed. Bar service is separate, and there's a required $2,000 minimum bar spend, plus 20% service fee and 8% tax on top of that.\n\nParking is included for 60 cars. We have an overflow lot 3 blocks away with 40 additional spaces. Valet service is available for $600 flat rate, covers up to 100 cars. You need to provide your own liability insurance—minimum $2 million coverage—or purchase it through us for $400.\n\nFinal payment is due 30 days before the event. We require a $2,500 non-refundable deposit to hold the date. Cancellations more than 90 days out, you lose the deposit. Less than 90 days, you lose the deposit plus 50% of the venue fee.\n\nOne more thing: we have a noise ordinance. Music has to be at reasonable levels after 10pm, and completely off by 11pm—not midnight. The county is strict about this.",
+            "duration_seconds": 85,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the recommended guest capacity for comfortable spacing?",
+          "question_type": "multiple_choice",
+          "correct_answer": "160",
+          "explanation": "While maximum capacity is 180, the venue recommends 160 for comfortable spacing.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "150",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "The recommendation is 160, not 150. You're being more conservative than needed, potentially cutting 10 guests unnecessarily.",
+                "pattern_tag": "underestimating_capacity",
+                "severity": "low"
+              }
+            },
+            {
+              "option_text": "160",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 160 is the recommended capacity for comfortable spacing, even though max is 180.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "180",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's the MAXIMUM, not the recommendation. Pack in 180 and your guests are cramped all night. There's a reason they recommend 160.",
+                "pattern_tag": "confusing_max_with_recommended",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "200",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "200 is how many chairs they provide, not guest capacity. Max seated capacity is 180, recommended is 160. You're way over.",
+                "pattern_tag": "conflating_metrics",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the total bar minimum including fees and tax?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$2,560",
+          "explanation": "$2,000 minimum + 20% service fee ($400) + 8% tax on total ($192) = $2,592 total.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "$2,000",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's BEFORE fees and tax. Add 20% service + 8% tax = $2,592 total. You just budgeted $592 less than you'll actually pay.",
+                "pattern_tag": "forgetting_fees",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$2,400",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "You got the service fee ($400) but forgot the 8% tax on top. Correct total is $2,592. Still short by $192.",
+                "pattern_tag": "incomplete_calculation",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$2,560",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Close but not quite. $2,000 + 20% ($400) + 8% tax on $2,400 ($192) = $2,592. Tax applies to the total including service fee.",
+                "pattern_tag": "calculation_error",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "$2,592",
+              "is_correct": true,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Correct. $2,000 base + $400 service (20%) + $192 tax (8% of $2,400) = $2,592 total bar minimum.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much do you lose if you cancel 60 days before the event?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$6,750 (deposit + 50% of venue fee)",
+          "explanation": "Less than 90 days out = lose $2,500 deposit + 50% of $8,500 venue fee ($4,250) = $6,750 total.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "$2,500 (deposit only)",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's only if you cancel MORE than 90 days out. At 60 days, you also lose 50% of venue fee ($4,250). Total loss: $6,750.",
+                "pattern_tag": "wrong_timeframe",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$4,250 (50% of venue)",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "That's 50% of the venue fee, but you ALSO lose the $2,500 deposit. Total: $6,750. You're missing $2,500 of exposure.",
+                "pattern_tag": "incomplete_calculation",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$6,750 (deposit + 50% venue)",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Less than 90 days = $2,500 deposit + $4,250 (50% of $8,500) = $6,750 lost. Cancel 2 months out and you're out almost $7K.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$8,500 (full venue fee)",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You lose deposit + 50% of venue, not the full venue fee. That's $6,750, not $8,500. You're overestimating by $1,750.",
+                "pattern_tag": "exaggerating_penalty",
+                "severity": "medium"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "When does the music have to be completely off?",
+          "question_type": "multiple_choice",
+          "correct_answer": "11pm",
+          "explanation": "Music must be completely off by 11pm due to county noise ordinance, NOT midnight when the venue rental ends.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "10pm",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "10pm is when it needs to be at reasonable levels. Completely off is 11pm. You're cutting your party an hour short unnecessarily.",
+                "pattern_tag": "conflating_restrictions",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "11pm",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Music completely off by 11pm, NOT midnight. Your DJ plays until midnight and the venue gets fined—guess who pays?",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "Midnight",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Midnight is when the venue rental ends, but music must stop at 11pm. County noise ordinance. This mistake costs you fines.",
+                "pattern_tag": "conflating_venue_end_with_music_end",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "No specific restriction",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "There IS a restriction—11pm hard stop. County ordinance. Missing this entirely could result in fines and venue liability issues.",
+                "pattern_tag": "missing_restriction",
+                "severity": "critical"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the insurance coverage requirement?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$2 million minimum",
+          "explanation": "Venue requires minimum $2 million liability coverage—bring your own or buy theirs for $400.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "$1 million",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's $2 million minimum, not $1 million. Show up with $1M coverage and you're not getting in. This is non-negotiable.",
+                "pattern_tag": "underestimating_requirement",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "$2 million",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. $2 million minimum coverage required. Budget the $400 to buy it through them if you don't have your own.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$3 million",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Minimum is $2 million, not $3 million. You can get more, but $2M is the requirement. Know the actual threshold.",
+                "pattern_tag": "exaggerating_requirement",
+                "severity": "low"
+              }
+            },
+            {
+              "option_text": "No insurance required",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "$2 million coverage IS required. Either provide your own or pay $400 to buy through venue. Missing this blocks your entire event.",
+                "pattern_tag": "missing_requirement",
+                "severity": "critical"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lesson_number": 10,
+      "skill_level_slug": "facts",
+      "title": "Car Mechanic Diagnosis",
+      "learning_objectives": [
+        "Track multiple repair costs and what they cover",
+        "Distinguish between urgent vs deferrable repairs",
+        "Calculate labor savings from bundled work",
+        "Remember specific timeframes for how long repairs can wait"
+      ],
+      "estimated_duration_minutes": 2,
+      "is_active": true,
+      "content_blocks": [
+        {
+          "block_type": "instruction_text",
+          "sort_order": 1,
+          "content": {
+            "text": "Your car is making a weird noise. The mechanic just diagnosed the problem and gave you options. Get this wrong and you'll either pay for repairs you don't need or drive away with a safety issue."
+          }
+        },
+        {
+          "block_type": "audio",
+          "sort_order": 2,
+          "content": {
+            "title": "Wheel Bearing Diagnosis",
+            "context": "Mechanic explains repair options and urgency levels for multiple issues",
+            "transcript": "Okay, so I've got good news and bad news. The noise you're hearing is definitely your wheel bearings—both front ones need to be replaced. That's $850 for parts and labor. Not terrible, but you can't wait on this. If a bearing seizes while you're driving, you could lose control of the vehicle.\n\nI also noticed your brake pads are at about 20%—you've got maybe 3,000 miles left, maybe 4,000 if you're gentle. Replacing all four is $480. You could wait a month or two, but once you're doing the bearings you might as well do the brakes since we'll have the wheels off anyway. Saves you $120 in labor if you do them together.\n\nYour rear shocks are leaking—see this oil here? Those are $340 each plus $200 labor, so $880 total. That one you can wait on if money's tight. It's affecting your ride quality but it's not a safety issue yet. Give it 6 months max before they need to be done.\n\nI can have everything done by tomorrow afternoon if you authorize it today. Just the bearings is 3 hours of work. Add the brakes and shocks, we're looking at 6 hours total. My shop rate is $140 per hour, but like I said, combining the jobs saves you on labor.\n\nWhat do you want to do?",
+            "duration_seconds": 80,
+            "audio_url": null,
+            "allow_replay": true,
+            "max_replays": 3,
+            "show_transcript_after_questions": true
+          }
+        }
+      ],
+      "questions": [
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the cost to replace just the wheel bearings?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$850",
+          "explanation": "Wheel bearings (both front) cost $850 for parts and labor—this is the urgent safety repair.",
+          "points": 1,
+          "sort_order": 1,
+          "answer_options": [
+            {
+              "option_text": "$480",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "That's the brake job, not bearings. Bearings are $850. Confusing these costs means you can't make an informed budget decision.",
+                "pattern_tag": "conflating_repair_costs",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$850",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. Bearings alone are $850. This is the urgent safety repair that can't wait.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$880",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "That's the rear shocks, not bearings. Bearings are $850. You're $30 off, but more importantly you're pricing the wrong repair.",
+                "pattern_tag": "conflating_repair_costs",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$1,090",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're adding costs together. Bearings ALONE are $850. This inflated number might make you defer a critical safety repair.",
+                "pattern_tag": "combining_separate_costs",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much life is left in your brake pads?",
+          "question_type": "multiple_choice",
+          "correct_answer": "3,000-4,000 miles",
+          "explanation": "Brake pads at 20% means roughly 3,000-4,000 miles left depending on driving style.",
+          "points": 1,
+          "sort_order": 2,
+          "answer_options": [
+            {
+              "option_text": "1,000-2,000 miles",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "You're being too pessimistic. Mechanic said 3,000-4,000 miles at 20% remaining. Thinking it's more urgent means you pay for repairs earlier than needed.",
+                "pattern_tag": "underestimating_life",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "3,000-4,000 miles",
+              "is_correct": true,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Correct. 3,000-4,000 miles left at 20%. You could wait a month or two, but doing it with bearings saves $120 in labor.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "5,000-6,000 miles",
+              "is_correct": false,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "You're overestimating. At 20%, it's 3,000-4,000 miles. Thinking you have more time could mean driving on metal-on-metal brakes.",
+                "pattern_tag": "overestimating_life",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "They need immediate replacement",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "They're at 20% with 3,000-4,000 miles left. Not immediate, though doing them with the bearings makes sense for labor savings.",
+                "pattern_tag": "wrong_urgency",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "How much do you save in labor by combining all repairs?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$120",
+          "explanation": "Doing brakes with bearings saves $120 in labor since wheels are already off.",
+          "points": 1,
+          "sort_order": 3,
+          "answer_options": [
+            {
+              "option_text": "$80",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "It's $120 in labor savings, not $80. This $40 difference affects whether bundling makes financial sense for you.",
+                "pattern_tag": "approximate_recall",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "$100",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "$120, not $100. Close, but $20 off means you can't accurately evaluate the mechanic's bundling pitch.",
+                "pattern_tag": "approximate_recall",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "$120",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. $120 labor savings by doing brakes during the bearing job. This is the mechanic's pitch for bundling.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$140",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "$140 is the hourly shop rate, not the savings. Actual savings is $120. You're conflating two different numbers.",
+                "pattern_tag": "conflating_metrics",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "Which repair can you safely delay for 6 months?",
+          "question_type": "multiple_choice",
+          "correct_answer": "Rear shocks",
+          "explanation": "Rear shocks affect ride quality but aren't a safety issue yet—can wait up to 6 months maximum.",
+          "points": 1,
+          "sort_order": 4,
+          "answer_options": [
+            {
+              "option_text": "Wheel bearings",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "Bearings CAN'T wait—they're a safety issue. Seizing bearing = loss of vehicle control. This is the urgent repair. Only shocks can wait 6 months.",
+                "pattern_tag": "wrong_urgency",
+                "severity": "critical"
+              }
+            },
+            {
+              "option_text": "Brake pads",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Brakes have 3,000-4,000 miles left (1-2 months), not 6 months. Only the rear shocks can wait 6 months. You're confusing timelines.",
+                "pattern_tag": "conflating_timelines",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "Rear shocks",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. Rear shocks can wait up to 6 months max—ride quality issue, not safety. Bearings and brakes are more urgent.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "None—all are urgent",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "Shocks specifically CAN wait 6 months. Only bearings are truly urgent. Treating everything as urgent means overspending unnecessarily.",
+                "pattern_tag": "wrong_urgency",
+                "severity": "high"
+              }
+            }
+          ]
+        },
+        {
+          "skill_level_slug": "facts",
+          "related_block_sort_order": 2,
+          "question_text": "What's the total cost for all three repairs combined?",
+          "question_type": "multiple_choice",
+          "correct_answer": "$2,210",
+          "explanation": "Bearings ($850) + Brakes ($480) + Shocks ($880) = $2,210 total for all repairs.",
+          "points": 1,
+          "sort_order": 5,
+          "answer_options": [
+            {
+              "option_text": "$1,850",
+              "is_correct": false,
+              "sort_order": 1,
+              "feedback": {
+                "feedback_text": "You're about $360 short. It's $850 + $480 + $880 = $2,210. Underestimating by this much could surprise you at checkout.",
+                "pattern_tag": "calculation_error",
+                "severity": "high"
+              }
+            },
+            {
+              "option_text": "$2,090",
+              "is_correct": false,
+              "sort_order": 2,
+              "feedback": {
+                "feedback_text": "Close but $120 short. $850 + $480 + $880 = $2,210. You might be subtracting the labor savings incorrectly.",
+                "pattern_tag": "calculation_error",
+                "severity": "medium"
+              }
+            },
+            {
+              "option_text": "$2,210",
+              "is_correct": true,
+              "sort_order": 3,
+              "feedback": {
+                "feedback_text": "Correct. $850 + $480 + $880 = $2,210 total. This is what you're authorizing if you do all repairs.",
+                "pattern_tag": null,
+                "severity": "correct"
+              }
+            },
+            {
+              "option_text": "$2,350",
+              "is_correct": false,
+              "sort_order": 4,
+              "feedback": {
+                "feedback_text": "You're $140 over. That's exactly the hourly shop rate—are you accidentally adding it? Actual total is $2,210.",
+                "pattern_tag": "adding_extra_cost",
+                "severity": "medium"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
