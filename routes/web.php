@@ -50,6 +50,11 @@ require __DIR__.'/settings.php';
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('questions', AdminQuestionController::class)->except(['show']);
+
+    // Bulk import routes (must be before resource route)
+    Route::get('tracks/bulk-import', [AdminTrackController::class, 'bulkImportForm'])->name('tracks.bulk-import');
+    Route::post('tracks/bulk-import', [AdminTrackController::class, 'bulkImport'])->name('tracks.bulk-import.store');
+
     Route::resource('tracks', AdminTrackController::class)->except(['show']);
     Route::resource('tracks.skill-levels', AdminSkillLevelController::class)->except(['show'])->shallow();
     Route::resource('skill-levels.lessons', AdminLessonController::class)->except(['show'])->shallow();
