@@ -10,6 +10,7 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
     <nav class="bg-white dark:bg-gray-800 shadow-sm">
@@ -25,7 +26,7 @@
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                         <a href="{{ route('admin.tracks.index') }}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
-                                  {{ request()->routeIs('admin.tracks.*') || request()->routeIs('admin.skill-levels.*')
+                                  {{ request()->routeIs('admin.tracks.*') || request()->routeIs('admin.skill-levels.*') || request()->routeIs('admin.lessons.*') || request()->routeIs('admin.content-blocks.*') || request()->routeIs('admin.lesson-questions.*') || request()->routeIs('admin.answer-options.*')
                                      ? 'border-indigo-500 text-gray-900 dark:text-white'
                                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:border-gray-300' }}">
                             Tracks

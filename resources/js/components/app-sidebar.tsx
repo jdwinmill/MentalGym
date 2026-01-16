@@ -52,11 +52,11 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    tooltip={{ children: 'Questions' }}
+                                    tooltip={{ children: 'Tracks' }}
                                 >
-                                    <a href="/admin/questions">
+                                    <a href="/admin/tracks">
                                         <Settings />
-                                        <span>Questions</span>
+                                        <span>Tracks</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

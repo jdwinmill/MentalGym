@@ -135,6 +135,10 @@ class LessonContentBlock extends Model
      */
     public function getMediaUrl(): ?string
     {
+        // Audio blocks use 'audio_url' key
+        if ($this->isAudio()) {
+            return $this->getContentField('audio_url');
+        }
         return $this->getContentField('url');
     }
 

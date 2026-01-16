@@ -3,6 +3,10 @@
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\TrackController as AdminTrackController;
 use App\Http\Controllers\Admin\SkillLevelController as AdminSkillLevelController;
+use App\Http\Controllers\Admin\LessonController as AdminLessonController;
+use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
+use App\Http\Controllers\Admin\LessonQuestionController as AdminLessonQuestionController;
+use App\Http\Controllers\Admin\AnswerOptionController as AdminAnswerOptionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LessonController;
@@ -48,4 +52,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('questions', AdminQuestionController::class)->except(['show']);
     Route::resource('tracks', AdminTrackController::class)->except(['show']);
     Route::resource('tracks.skill-levels', AdminSkillLevelController::class)->except(['show'])->shallow();
+    Route::resource('skill-levels.lessons', AdminLessonController::class)->except(['show'])->shallow();
+    Route::resource('lessons.content-blocks', AdminContentBlockController::class)->except(['show'])->shallow();
+    Route::resource('lessons.lesson-questions', AdminLessonQuestionController::class)->except(['show'])->shallow();
+    Route::resource('lesson-questions.answer-options', AdminAnswerOptionController::class)->except(['show'])->shallow();
 });

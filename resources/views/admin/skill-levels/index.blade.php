@@ -66,6 +66,9 @@
                             {{ $skillLevel->lessons_count }}
                         </td>
                         <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            <a href="{{ route('admin.skill-levels.lessons.index', $skillLevel) }}" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                Lessons
+                            </a>
                             <a href="{{ route('admin.skill-levels.edit', $skillLevel) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                                 Edit
                             </a>
