@@ -12,32 +12,32 @@
     @vite(['resources/css/app.css', 'resources/js/app.tsx'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
-    <nav class="bg-white dark:bg-gray-800 shadow-sm">
+<body class="bg-secondary dark:bg-background min-h-screen">
+    <nav class="bg-card dark:bg-card shadow-sm border-b border-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ route('home') }}" class="text-xl font-bold text-gray-800 dark:text-white">
+                        <a href="{{ route('home') }}" class="text-xl font-bold text-foreground">
                             SharpStack
                         </a>
-                        <span class="ml-2 px-2 py-1 text-xs font-semibold bg-indigo-600 text-white rounded">Admin</span>
+                        <span class="ml-2 px-2 py-1 text-xs font-semibold bg-primary text-primary-foreground rounded">Admin</span>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
                         <a href="{{ route('admin.tracks.index') }}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
                                   {{ request()->routeIs('admin.tracks.*') || request()->routeIs('admin.skill-levels.*') || request()->routeIs('admin.lessons.*') || request()->routeIs('admin.content-blocks.*') || request()->routeIs('admin.lesson-questions.*') || request()->routeIs('admin.answer-options.*')
-                                     ? 'border-indigo-500 text-gray-900 dark:text-white'
-                                     : 'border-transparent text-gray-500 dark:text-gray-300 hover:border-gray-300' }}">
+                                     ? 'border-primary text-foreground'
+                                     : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground' }}">
                             Tracks
                         </a>
                     </div>
                 </div>
                 <div class="flex items-center">
-                    <span class="text-gray-600 dark:text-gray-300 text-sm mr-4">
+                    <span class="text-muted-foreground text-sm mr-4">
                         {{ auth()->user()->name }}
                     </span>
-                    <a href="{{ route('dashboard') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <a href="{{ route('dashboard') }}" class="text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Back to App
                     </a>
                 </div>
