@@ -13,10 +13,29 @@ import AuthLayout from '@/layouts/auth-layout';
 export default function Register() {
     return (
         <AuthLayout
-            title="Create an account"
-            description="Enter your details below to create your account"
+            title="Start training today"
+            description="5-15 minutes daily. Real practice for the skills that count."
         >
-            <Head title="Register" />
+            <Head title="Sign Up - SharpStack" />
+
+            <div className="mb-6 space-y-3 text-center">
+                <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                        <span className="text-primary">&#10003;</span> Think clearer under pressure
+                    </span>
+                </div>
+                <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                        <span className="text-primary">&#10003;</span> Speak with confidence
+                    </span>
+                </div>
+                <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                        <span className="text-primary">&#10003;</span> Read the room faster
+                    </span>
+                </div>
+            </div>
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -25,7 +44,7 @@ export default function Register() {
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -97,7 +116,7 @@ export default function Register() {
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
-                                Create account
+                                Get Started
                             </Button>
                         </div>
 

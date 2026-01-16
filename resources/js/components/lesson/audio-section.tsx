@@ -22,7 +22,6 @@ export function AudioSection({ block, onContinue, onInteraction }: AudioSectionP
     const title = block?.content?.title as string | undefined;
     const context = block?.content?.context as string | undefined;
     const audioUrl = block?.content?.url as string | undefined;
-    const transcript = block?.content?.transcript as string | undefined;
     const durationSeconds = (block?.content?.duration_seconds as number) ?? 0;
     const maxReplays = (block?.content?.max_replays as number) ?? 3;
 
@@ -154,11 +153,8 @@ export function AudioSection({ block, onContinue, onInteraction }: AudioSectionP
                         </>
                     ) : (
                         <div className="text-center py-4">
-                            <p className="text-neutral-500 dark:text-neutral-400 mb-2">
-                                Audio file not yet uploaded
-                            </p>
-                            <p className="text-sm text-neutral-400 dark:text-neutral-500">
-                                Read the transcript below to continue
+                            <p className="text-neutral-500 dark:text-neutral-400">
+                                Audio file not yet available
                             </p>
                         </div>
                     )}
@@ -170,18 +166,6 @@ export function AudioSection({ block, onContinue, onInteraction }: AudioSectionP
                         </span>
                     </div>
                 </div>
-
-                {/* Show transcript for testing (or if no audio) */}
-                {transcript && (
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                        <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                            Transcript {audioUrl ? '(for testing)' : ''}:
-                        </p>
-                        <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
-                            {transcript}
-                        </p>
-                    </div>
-                )}
 
                 <Button
                     onClick={onContinue}

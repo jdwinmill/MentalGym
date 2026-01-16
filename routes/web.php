@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\Admin\TrackController as AdminTrackController;
+use App\Http\Controllers\Admin\SkillLevelController as AdminSkillLevelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LessonController;
@@ -44,4 +46,6 @@ require __DIR__.'/settings.php';
 // Admin routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('questions', AdminQuestionController::class)->except(['show']);
+    Route::resource('tracks', AdminTrackController::class)->except(['show']);
+    Route::resource('tracks.skill-levels', AdminSkillLevelController::class)->except(['show'])->shallow();
 });

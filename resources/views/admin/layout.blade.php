@@ -23,12 +23,12 @@
                         <span class="ml-2 px-2 py-1 text-xs font-semibold bg-indigo-600 text-white rounded">Admin</span>
                     </div>
                     <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ route('admin.questions.index') }}"
+                        <a href="{{ route('admin.tracks.index') }}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
-                                  {{ request()->routeIs('admin.questions.*')
+                                  {{ request()->routeIs('admin.tracks.*') || request()->routeIs('admin.skill-levels.*')
                                      ? 'border-indigo-500 text-gray-900 dark:text-white'
                                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:border-gray-300' }}">
-                            Questions
+                            Tracks
                         </a>
                     </div>
                 </div>

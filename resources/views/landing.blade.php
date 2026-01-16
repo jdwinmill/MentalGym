@@ -82,26 +82,33 @@
         }
     </style>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-background text-foreground">
-    <div x-data="landingPage()" class="min-h-screen">
+    <div class="min-h-screen">
         <!-- Header / Logo -->
-        <header class="px-6 pt-6 md:pt-8 max-w-3xl mx-auto">
+        <header class="px-6 pt-6 md:pt-8 max-w-4xl mx-auto flex items-center justify-between">
             <a href="/" class="inline-block text-2xl md:text-3xl tracking-tight hover:opacity-80 transition-opacity">
                 <span class="font-bold text-foreground">SharpStack</span>
                 <span class="text-muted-foreground font-normal mx-2">|</span>
                 <span class="text-muted-foreground font-medium text-lg md:text-xl">Daily Mental Training</span>
             </a>
+            <nav class="flex items-center gap-4">
+                <a href="{{ route('login') }}" class="text-foreground hover:text-primary transition-colors font-medium">
+                    Log In
+                </a>
+                <a href="{{ route('register') }}" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                    Sign Up
+                </a>
+            </nav>
         </header>
 
         <!-- Hero Section -->
-        <section class="px-6 pt-10 md:pt-14 max-w-3xl mx-auto">
-            <h1 class="text-2xl md:text-4xl font-bold leading-tight mb-4">
+        <section class="px-6 pt-16 md:pt-24 pb-16 max-w-4xl mx-auto">
+            <h1 class="text-3xl md:text-5xl font-bold leading-tight mb-6">
                 You're leaving wins on the table.
             </h1>
 
-            <div class="space-y-4 text-lg md:text-xl text-muted-foreground leading-relaxed mb-10">
+            <div class="space-y-4 text-lg md:text-xl text-muted-foreground leading-relaxed mb-12">
                 <p>
                     In the interview. The negotiation. The conversation that mattered.
                 </p>
@@ -114,7 +121,7 @@
             </div>
 
             <!-- Value Prop - Stands Out -->
-            <div class="border-l-4 border-primary pl-6 py-2 mb-6">
+            <div class="border-l-4 border-primary pl-6 py-2 mb-8">
                 <p class="text-xl md:text-2xl font-bold text-foreground mb-2">
                     SharpStack builds the skills tips can't teach.
                 </p>
@@ -126,128 +133,18 @@
                 </p>
             </div>
 
-            <p class="text-lg md:text-xl text-foreground font-medium leading-relaxed">
+            <p class="text-lg md:text-xl text-foreground font-medium leading-relaxed mb-10">
                 5-15 minutes daily. Measurable improvement in weeks.
             </p>
-        </section>
 
-        <!-- Topic Selection Section -->
-        <section class="px-6 py-12 md:py-16 max-w-3xl mx-auto">
-            <h2 class="text-xl md:text-2xl font-bold text-foreground mb-2">
-                What you'll train:
-            </h2>
-            <p class="text-lg text-muted-foreground mb-2">
-                5-15 minute daily sessions. Each one improves a specific cognitive skill you'll use that same day.
-            </p>
-            <p class="text-sm text-muted-foreground mb-6">
-                <span class="font-medium text-foreground">Select what matters most to you</span> - we'll prioritize building what people actually need:
-            </p>
-
-            <!-- Topic Selection Bubbles -->
-            <div class="flex flex-wrap gap-3 md:gap-4">
-                <template x-for="topic in topics" :key="topic.id">
-                    <button
-                        type="button"
-                        @click="toggleTopic(topic.id)"
-                        :class="[
-                            'px-4 py-3 md:px-5 md:py-4 rounded-xl text-left transition-all duration-200 border-2',
-                            selectedTopics.includes(topic.id)
-                                ? 'bg-primary text-primary-foreground border-primary shadow-lg scale-[1.02]'
-                                : 'bg-card border-border hover:border-primary/50 hover:shadow-md'
-                        ]"
-                    >
-                        <span class="text-xl md:text-2xl mr-2" x-text="topic.emoji"></span>
-                        <span class="font-semibold" x-text="topic.name"></span>
-                        <p
-                            class="text-sm mt-1 opacity-80"
-                            :class="selectedTopics.includes(topic.id) ? 'text-primary-foreground/80' : 'text-muted-foreground'"
-                            x-text="topic.description"
-                        ></p>
-                    </button>
-                </template>
-            </div>
-        </section>
-
-        <!-- Email Signup -->
-        <section class="px-6 pb-16 md:pb-20 max-w-xl mx-auto">
-            <div class="bg-secondary rounded-2xl p-6 md:p-8">
-            <!-- Success State -->
-            <div x-show="submitted" x-cloak class="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center">
-                <div class="text-4xl mb-4">&#10003;</div>
-                <h3 class="text-xl font-bold mb-2 text-green-600 dark:text-green-400" x-text="successMessage"></h3>
-                <template x-if="successTopics.length > 0">
-                    <div>
-                        <p class="text-muted-foreground mb-4">You selected:</p>
-                        <div class="flex flex-wrap justify-center gap-2">
-                            <template x-for="topic in successTopics" :key="topic">
-                                <span class="px-3 py-1 bg-green-500/20 text-green-700 dark:text-green-300 rounded-full text-sm font-medium" x-text="topic"></span>
-                            </template>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Form State -->
-            <form x-show="!submitted" @submit.prevent="submitForm" class="space-y-4">
-                <!-- Selected Topics Display -->
-                <div x-show="selectedTopics.length > 0" class="space-y-2">
-                    <label class="text-sm font-medium text-muted-foreground">Selected training:</label>
-                    <div class="flex flex-wrap gap-2">
-                        <template x-for="topicId in selectedTopics" :key="topicId">
-                            <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
-                                <span x-text="getTopicEmoji(topicId)"></span>
-                                <span x-text="getTopicName(topicId)"></span>
-                                <button
-                                    type="button"
-                                    @click="toggleTopic(topicId)"
-                                    class="ml-1 hover:bg-primary/20 rounded-full p-0.5 transition-colors"
-                                >
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </span>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Email Input -->
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <input
-                        type="email"
-                        x-model="email"
-                        placeholder="your@email.com"
-                        required
-                        class="flex-1 px-5 py-4 text-lg rounded-xl border-2 border-border bg-background focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                        :class="emailError ? 'border-red-500' : ''"
-                    >
-                    <button
-                        type="submit"
-                        :disabled="!isValid || loading"
-                        class="px-6 py-4 text-lg font-bold rounded-xl transition-all duration-200 whitespace-nowrap"
-                        :class="[
-                            isValid && !loading
-                                ? 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl cursor-pointer'
-                                : 'bg-muted text-muted-foreground cursor-not-allowed'
-                        ]"
-                    >
-                        <span x-show="!loading">Get early access</span>
-                        <span x-show="loading" class="inline-flex items-center gap-2">
-                            <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        </span>
-                    </button>
-                </div>
-                <p x-show="emailError" x-text="emailError" class="text-red-500 text-sm"></p>
-                <p x-show="error" x-text="error" class="text-red-500 text-sm"></p>
-
-                <!-- Small Print -->
-                <p class="text-sm text-muted-foreground text-center">
-                    No spam. One email when we launch.
-                </p>
-            </form>
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-primary text-primary-foreground rounded-xl text-lg font-bold hover:opacity-90 transition-opacity text-center shadow-lg">
+                    Get Started
+                </a>
+                <a href="{{ route('login') }}" class="px-8 py-4 border-2 border-border text-foreground rounded-xl text-lg font-semibold hover:border-primary transition-colors text-center">
+                    Log In
+                </a>
             </div>
         </section>
 
@@ -257,125 +154,5 @@
         </footer>
     </div>
 
-    <script>
-        function landingPage() {
-            return {
-                topics: [
-                    { id: 'speaking-with-confidence', emoji: '🗣️', name: 'Speaking With Confidence', description: 'Say what you mean without second-guessing yourself' },
-                    { id: 'handling-conflict', emoji: '🔥', name: 'Handling Conflict', description: 'Keep your cool when conversations get tense' },
-                    { id: 'thinking-under-pressure', emoji: '⚡', name: 'Thinking Clearly Under Pressure', description: 'Stay sharp when stakes are high' },
-                    { id: 'actually-listening', emoji: '👂', name: 'Actually Listening', description: 'Hear what people say (not what you assume)' },
-                    { id: 'breaking-down-problems', emoji: '🧩', name: 'Breaking Down Problems', description: 'Cut through complexity without getting lost' },
-                    { id: 'reading-the-room', emoji: '👀', name: 'Reading the Room', description: 'Pick up on what\'s not being said' },
-                ],
-                selectedTopics: [],
-                email: '',
-                emailError: '',
-                error: '',
-                loading: false,
-                submitted: false,
-                successMessage: '',
-                successTopics: [],
-
-                get isValid() {
-                    return this.email && this.isValidEmail(this.email);
-                },
-
-                isValidEmail(email) {
-                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                },
-
-                toggleTopic(topicId) {
-                    const index = this.selectedTopics.indexOf(topicId);
-                    if (index === -1) {
-                        this.selectedTopics.push(topicId);
-                    } else {
-                        this.selectedTopics.splice(index, 1);
-                    }
-                },
-
-                getTopicName(topicId) {
-                    const topic = this.topics.find(t => t.id === topicId);
-                    return topic ? topic.name : '';
-                },
-
-                getTopicEmoji(topicId) {
-                    const topic = this.topics.find(t => t.id === topicId);
-                    return topic ? topic.emoji : '';
-                },
-
-                getMetadata() {
-                    const params = new URLSearchParams(window.location.search);
-                    return {
-                        referrer: document.referrer || null,
-                        utm_source: params.get('utm_source'),
-                        utm_medium: params.get('utm_medium'),
-                        utm_campaign: params.get('utm_campaign'),
-                        utm_term: params.get('utm_term'),
-                        utm_content: params.get('utm_content'),
-                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                        device_type: window.innerWidth < 768 ? 'mobile' : 'desktop',
-                        locale: navigator.language || navigator.userLanguage,
-                    };
-                },
-
-                async submitForm() {
-                    this.emailError = '';
-                    this.error = '';
-
-                    if (!this.isValidEmail(this.email)) {
-                        this.emailError = 'Please enter a valid email address.';
-                        return;
-                    }
-
-                    this.loading = true;
-
-                    try {
-                        const metadata = this.getMetadata();
-                        const response = await fetch('{{ route("early-access.store") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            },
-                            body: JSON.stringify({
-                                email: this.email.toLowerCase(),
-                                selected_topics: this.selectedTopics,
-                                ...metadata,
-                            }),
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            this.submitted = true;
-                            this.successMessage = data.message;
-                            this.successTopics = data.selected_topics;
-                        } else if (response.status === 422) {
-                            const errors = data.errors || {};
-                            if (errors.email) {
-                                this.emailError = errors.email[0];
-                            } else if (errors.selected_topics) {
-                                this.error = errors.selected_topics[0];
-                            } else {
-                                this.error = data.message || 'Something went wrong. Please try again.';
-                            }
-                        } else {
-                            this.error = data.message || 'Something went wrong. Please try again.';
-                        }
-                    } catch (e) {
-                        this.error = 'Network error. Please check your connection and try again.';
-                    } finally {
-                        this.loading = false;
-                    }
-                }
-            };
-        }
-    </script>
-
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
 </body>
 </html>

@@ -24,10 +24,10 @@ export default function Login({
 }: LoginProps) {
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title="Welcome back"
+            description="Continue your training"
         >
-            <Head title="Log in" />
+            <Head title="Log In - SharpStack" />
 
             <Form
                 {...store.form()}
