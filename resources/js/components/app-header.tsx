@@ -27,6 +27,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import { useInitials } from '@/hooks/use-initials';
 import { useActiveUrl } from '@/hooks/use-active-url';
 import { cn, toUrl } from '@/lib/utils';
@@ -214,6 +215,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 ))}
                             </div>
                         </div>
+                        <AppearanceToggleDropdown />
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
