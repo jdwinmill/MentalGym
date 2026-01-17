@@ -14,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Settings } from 'lucide-react';
+import { LayoutGrid, Settings, CreditCard, Zap } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -57,6 +57,28 @@ export function AppSidebar() {
                                     <a href="/admin/tracks">
                                         <Settings />
                                         <span>Tracks</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Plans' }}
+                                >
+                                    <a href="/admin/plans">
+                                        <CreditCard />
+                                        <span>Plans</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Capabilities' }}
+                                >
+                                    <a href="/admin/capabilities">
+                                        <Zap />
+                                        <span>Capabilities</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
