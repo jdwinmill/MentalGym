@@ -31,6 +31,20 @@
                                      : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground' }}">
                             Tracks
                         </a>
+                        <a href="{{ route('admin.plans.index') }}"
+                           class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
+                                  {{ request()->routeIs('admin.plans.*')
+                                     ? 'border-primary text-foreground'
+                                     : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground' }}">
+                            Plans
+                        </a>
+                        <a href="{{ route('admin.capabilities.index') }}"
+                           class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
+                                  {{ request()->routeIs('admin.capabilities.*')
+                                     ? 'border-primary text-foreground'
+                                     : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground' }}">
+                            Capabilities
+                        </a>
                     </div>
                 </div>
                 <div class="flex items-center">

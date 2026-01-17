@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $track_id
  * @property int|null $current_skill_level_id
  * @property \Illuminate\Support\Carbon $enrolled_at
+ * @property \Illuminate\Support\Carbon|null $activated_at
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property string $status
  * @property \Illuminate\Support\Carbon $created_at
@@ -25,6 +26,7 @@ class UserTrackEnrollment extends Model
         'track_id',
         'current_skill_level_id',
         'enrolled_at',
+        'activated_at',
         'completed_at',
         'status',
     ];
@@ -33,6 +35,7 @@ class UserTrackEnrollment extends Model
     {
         return [
             'enrolled_at' => 'datetime',
+            'activated_at' => 'datetime',
             'completed_at' => 'datetime',
         ];
     }
@@ -172,5 +175,44 @@ class UserTrackEnrollment extends Model
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_ACTIVE);
+    }
+
+    /**
+     * Activate this enrollment (set as current active track).
+     */
+    public function activate(): bool
+    {
+        $this->status = self::STATUS_ACTIVE;
+        $this->activated_at = now();
+        return $this->save();
+    }
+
+    /**
+     * Pause this enrollment.
+     */
+    public function pause(): bool
+    {
+        $this->status = self::STATUS_PAUSED;
+        return $this->save();
+    }
+
+    /**
+     * Check if this track is currently activated (active and has activated_at).
+     */
+    public function isActivated(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE && $this->activated_at !== null;
+    }
+
+    /**
+     * Get days since activation.
+     */
+    public function daysSinceActivation(): ?int
+    {
+        if (!$this->activated_at) {
+            return null;
+        }
+
+        return (int) $this->activated_at->diffInDays(now());
     }
 }

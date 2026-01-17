@@ -1,15 +1,18 @@
 <?php
 
-use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
-use App\Http\Controllers\Admin\TrackController as AdminTrackController;
-use App\Http\Controllers\Admin\SkillLevelController as AdminSkillLevelController;
-use App\Http\Controllers\Admin\LessonController as AdminLessonController;
-use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
-use App\Http\Controllers\Admin\LessonQuestionController as AdminLessonQuestionController;
 use App\Http\Controllers\Admin\AnswerOptionController as AdminAnswerOptionController;
+use App\Http\Controllers\Admin\CapabilityController as AdminCapabilityController;
+use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
+use App\Http\Controllers\Admin\LessonController as AdminLessonController;
+use App\Http\Controllers\Admin\LessonQuestionController as AdminLessonQuestionController;
+use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\Admin\SkillLevelController as AdminSkillLevelController;
+use App\Http\Controllers\Admin\TrackController as AdminTrackController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\TrackController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,6 +30,11 @@ Route::get('/app', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Track activation routes
+    Route::post('tracks/{track}/activate', [TrackController::class, 'activate'])->name('tracks.activate');
+    Route::post('tracks/{track}/pause', [TrackController::class, 'pause'])->name('tracks.pause');
+    Route::get('tracks/{track}/check-activation', [TrackController::class, 'checkActivation'])->name('tracks.check-activation');
 
     // Lesson routes
     Route::get('lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
@@ -61,4 +69,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('lessons.content-blocks', AdminContentBlockController::class)->except(['show'])->shallow();
     Route::resource('lessons.lesson-questions', AdminLessonQuestionController::class)->except(['show'])->shallow();
     Route::resource('lesson-questions.answer-options', AdminAnswerOptionController::class)->except(['show'])->shallow();
+
+    // Plans and capabilities management
+    Route::get('plans/feature-matrix', [AdminPlanController::class, 'featureMatrix'])->name('plans.feature-matrix');
+    Route::resource('plans', AdminPlanController::class);
+    Route::resource('capabilities', AdminCapabilityController::class);
 });

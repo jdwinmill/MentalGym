@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -76,6 +77,52 @@ class Track extends Model
     public function weaknessPatterns(): HasMany
     {
         return $this->hasMany(UserWeaknessPattern::class);
+    }
+
+    /**
+     * Get the capabilities required to access this track.
+     */
+    public function capabilityRequirements(): BelongsToMany
+    {
+        return $this->belongsToMany(Capability::class, 'track_capability_requirements')
+            ->withPivot('required_value')
+            ->withTimestamps();
+    }
+
+    /**
+     * Require a capability for this track.
+     */
+    public function requireCapability(string|Capability $capability, mixed $value = null): void
+    {
+        $capabilityModel = $capability instanceof Capability
+            ? $capability
+            : Capability::where('key', $capability)->firstOrFail();
+
+        $this->capabilityRequirements()->syncWithoutDetaching([
+            $capabilityModel->id => ['required_value' => $value],
+        ]);
+    }
+
+    /**
+     * Remove a capability requirement from this track.
+     */
+    public function removeCapabilityRequirement(string|Capability $capability): void
+    {
+        $capabilityModel = $capability instanceof Capability
+            ? $capability
+            : Capability::where('key', $capability)->first();
+
+        if ($capabilityModel) {
+            $this->capabilityRequirements()->detach($capabilityModel->id);
+        }
+    }
+
+    /**
+     * Check if a user can access this track based on capabilities.
+     */
+    public function userCanAccess(User $user): bool
+    {
+        return $user->canAccessTrack($this);
     }
 
     /**

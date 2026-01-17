@@ -21,11 +21,12 @@ class LessonController extends Controller
      */
     public function show(Lesson $lesson): Response
     {
-        // TODO: Re-enable enrollment check in Phase 3
-        // $user = auth()->user();
-        // if (!$lesson->track->isAccessibleBy($user)) {
-        //     abort(403, 'You must be enrolled in this track to access this lesson.');
-        // }
+        $user = auth()->user();
+
+        // Check max_track_lessons capability
+        if ($this->isLessonLocked($lesson, $user)) {
+            abort(403, 'Upgrade your plan to access this lesson.');
+        }
 
         $lesson->load([
             'track',
@@ -68,10 +69,10 @@ class LessonController extends Controller
     {
         $user = auth()->user();
 
-        // TODO: Re-enable enrollment check after Phase 3
-        // if (!$lesson->track->isAccessibleBy($user)) {
-        //     return response()->json(['error' => 'Not enrolled in track'], 403);
-        // }
+        // Check max_track_lessons capability
+        if ($this->isLessonLocked($lesson, $user)) {
+            return response()->json(['error' => 'Upgrade your plan to access this lesson.'], 403);
+        }
 
         $attempt = UserLessonAttempt::create([
             'user_id' => $user->id,
@@ -222,6 +223,55 @@ class LessonController extends Controller
         );
 
         $pattern->recordOccurrence();
+    }
+
+    /**
+     * Check if a lesson is locked based on capabilities.
+     */
+    private function isLessonLocked(Lesson $lesson, $user): bool
+    {
+        // Admins bypass limits
+        if ($user->isAdmin()) {
+            return false;
+        }
+
+        // Check if user is limited to a single active track
+        $maxActiveTracks = $user->capabilityValue('max_active_tracks') ?? 1;
+
+        if ($maxActiveTracks === 1) {
+            // Get user's enrollment for this lesson's track
+            $enrollment = $user->trackEnrollments()
+                ->where('track_id', $lesson->track_id)
+                ->first();
+
+            // No enrollment or enrollment is not active (paused/completed/etc) → locked
+            if (!$enrollment || $enrollment->status !== 'active') {
+                return true;
+            }
+        }
+
+        // Check max_track_lessons capability (limits lessons within a track)
+        $maxLessons = $user->capabilityValue('max_track_lessons') ?? 0;
+
+        // 0 = unlimited
+        if ($maxLessons === 0) {
+            return false;
+        }
+
+        // Count lesson position within track
+        $track = $lesson->track;
+        $lessonPosition = 0;
+
+        foreach ($track->skillLevels()->orderBy('level_number')->get() as $level) {
+            foreach ($level->lessons()->active()->orderBy('lesson_number')->get() as $trackLesson) {
+                $lessonPosition++;
+                if ($trackLesson->id === $lesson->id) {
+                    return $lessonPosition > $maxLessons;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

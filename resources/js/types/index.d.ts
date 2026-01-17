@@ -50,8 +50,28 @@ export interface TrackWithDetails {
     session_duration_minutes: number;
     is_active: boolean;
     is_enrolled: boolean;
-    enrollment: UserTrackEnrollment | null;
+    is_activated: boolean;
+    enrollment: TrackEnrollmentSummary | null;
+    can_activate: boolean;
+    activation_blocked_reason: string | null;
     skill_levels: SkillLevelWithLessons[];
+}
+
+export interface TrackEnrollmentSummary {
+    id: number;
+    status: 'active' | 'paused' | 'completed' | 'abandoned';
+    enrolled_at: string | null;
+    activated_at: string | null;
+}
+
+export interface CooldownInfo {
+    has_cooldown: boolean;
+    cooldown_days?: number;
+    can_switch: boolean;
+    days_remaining?: number;
+    last_switch?: string;
+    cooldown_ends_at?: string;
+    current_track_id?: number;
 }
 
 export interface SkillLevelWithLessons {
@@ -70,6 +90,7 @@ export interface LessonSummary {
     lesson_number: number;
     title: string;
     is_completed: boolean;
+    is_locked: boolean;
 }
 
 export interface UserTrackEnrollment {
@@ -78,6 +99,7 @@ export interface UserTrackEnrollment {
     track_id: number;
     current_skill_level_id: number | null;
     enrolled_at: string;
+    activated_at: string | null;
     completed_at: string | null;
     status: 'active' | 'paused' | 'completed' | 'abandoned';
 }
