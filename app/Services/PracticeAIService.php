@@ -166,32 +166,59 @@ class PracticeAIService
     }
 
     /**
-     * Inject user's level into instruction set
+     * Prepare the full system prompt with JSON formatting requirements
      */
     private function prepareInstructionSet(PracticeMode $mode, int $level): string
     {
-        return str_replace('{{level}}', (string) $level, $mode->instruction_set);
+        $modeInstructions = str_replace('{{level}}', (string) $level, $mode->instruction_set);
+
+        return <<<PROMPT
+You are an AI training assistant. You must ALWAYS respond with a single valid JSON object (no markdown, no extra text).
+
+## Response Format
+
+Every response must be a JSON object with this structure:
+{
+  "type": "<card_type>",
+  "content": "<your message>",
+  "options": ["option1", "option2", ...] // ONLY for multiple_choice type
+}
+
+## Card Types
+
+Use these card types based on context:
+- "scenario": Present a situation, context, or information. Use when setting up an exercise or providing background.
+- "prompt": Ask the user to write or explain something. Use when you need a text response.
+- "multiple_choice": Present options for the user to choose from. Include an "options" array with 2-4 choices.
+- "insight": Provide feedback, coaching, or analysis of the user's response. Use after they submit something.
+- "reflection": Ask the user to reflect briefly on what they learned or noticed.
+
+## Rules
+1. Output ONLY the JSON object - no markdown code blocks, no explanations before/after
+2. The "content" field should contain your actual message/question/feedback
+3. Keep responses concise and focused
+4. Progress through exercises naturally based on user responses
+
+## Training Program Instructions
+
+{$modeInstructions}
+
+Remember: Respond with raw JSON only. No markdown formatting around the JSON.
+PROMPT;
     }
 
     /**
-     * Build messages array for API call with caching
+     * Build messages array for API call
      */
     private function buildMessages(array $history, ?string $userInput = null): array
     {
         $messages = [];
 
-        foreach ($history as $index => $msg) {
-            $message = [
+        foreach ($history as $msg) {
+            $messages[] = [
                 'role' => $msg['role'],
                 'content' => $msg['content'],
             ];
-
-            $messages[] = $message;
-        }
-
-        // Add cache control to last history message
-        if (count($messages) > 0) {
-            $messages[count($messages) - 1]['cache_control'] = ['type' => 'ephemeral'];
         }
 
         if ($userInput) {
@@ -209,9 +236,17 @@ class PracticeAIService
      */
     private function parseResponse(string $responseText): array
     {
-        $parsed = json_decode($responseText, true);
+        // Try to extract JSON from the response (handle markdown code blocks, extra text, etc.)
+        $json = $this->extractJson($responseText);
+
+        $parsed = json_decode($json, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::warning('Failed to parse AI response', [
+                'raw_response' => substr($responseText, 0, 500),
+                'extracted_json' => substr($json, 0, 500),
+                'error' => json_last_error_msg(),
+            ]);
             throw new \RuntimeException('Invalid JSON from AI: ' . json_last_error_msg());
         }
 
@@ -226,6 +261,47 @@ class PracticeAIService
         }
 
         return $parsed;
+    }
+
+    /**
+     * Extract JSON from response text (handles markdown code blocks, extra text, etc.)
+     */
+    private function extractJson(string $text): string
+    {
+        $text = trim($text);
+
+        // If it's already valid JSON, return as-is
+        if ($this->isValidJson($text)) {
+            return $text;
+        }
+
+        // Try to extract from markdown code block: ```json ... ``` or ``` ... ```
+        if (preg_match('/```(?:json)?\s*(\{[\s\S]*?\})\s*```/', $text, $matches)) {
+            return trim($matches[1]);
+        }
+
+        // Try to find JSON object in the text (first { to last })
+        $firstBrace = strpos($text, '{');
+        $lastBrace = strrpos($text, '}');
+
+        if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
+            $extracted = substr($text, $firstBrace, $lastBrace - $firstBrace + 1);
+            if ($this->isValidJson($extracted)) {
+                return $extracted;
+            }
+        }
+
+        // Return original text if extraction fails
+        return $text;
+    }
+
+    /**
+     * Check if string is valid JSON
+     */
+    private function isValidJson(string $string): bool
+    {
+        json_decode($string);
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     /**
@@ -264,8 +340,8 @@ class PracticeAIService
     private function getFallbackCard(): array
     {
         return [
-            'type' => 'insight',
-            'content' => "Let's continue. What's on your mind?",
+            'type' => 'prompt',
+            'content' => "I'd like to hear your thoughts. What's on your mind right now?",
         ];
     }
 
