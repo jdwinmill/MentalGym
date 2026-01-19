@@ -13,13 +13,17 @@ class UserModeProgress extends Model
         'user_id',
         'practice_mode_id',
         'current_level',
+        'total_exchanges',
+        'exchanges_at_current_level',
         'total_sessions',
         'total_time_seconds',
         'last_session_at',
+        'last_trained_at',
     ];
 
     protected $casts = [
         'last_session_at' => 'datetime',
+        'last_trained_at' => 'datetime',
     ];
 
     // ─────────────────────────────────────────────────────────────

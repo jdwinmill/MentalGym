@@ -30,8 +30,8 @@ class PracticeModePolicy
             return false;
         }
 
-        // Check can-train-mode gate
-        return Gate::allows('can-train-mode', $mode);
+        // Check can-train-mode gate (use forUser to check against the policy's user, not Auth::user())
+        return Gate::forUser($user)->allows('can-train-mode', $mode);
     }
 
     public function create(User $user): bool

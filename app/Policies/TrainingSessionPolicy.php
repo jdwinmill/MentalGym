@@ -23,7 +23,7 @@ class TrainingSessionPolicy
             return false;
         }
 
-        return Gate::allows('can-train-mode', $session->practiceMode);
+        return Gate::forUser($user)->allows('can-train-mode', $session->practiceMode);
     }
 
     public function resume(User $user, TrainingSession $session): bool

@@ -16,6 +16,7 @@ class TrainingSession extends Model
         'user_id',
         'practice_mode_id',
         'level_at_start',
+        'exchange_count',
         'started_at',
         'ended_at',
         'duration_seconds',

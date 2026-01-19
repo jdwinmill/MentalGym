@@ -14,8 +14,10 @@ class SessionMessage extends Model
         'training_session_id',
         'role',
         'content',
+        'parsed_type',
         'metadata',
         'sequence',
+        'created_at',
     ];
 
     protected $casts = [

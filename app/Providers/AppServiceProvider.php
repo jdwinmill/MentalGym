@@ -11,6 +11,8 @@ use App\Models\UserModeProgress;
 use App\Policies\PracticeModePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TrainingSessionPolicy;
+use App\Services\PracticeAIService;
+use App\Services\TrainingSessionService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PracticeAIService::class);
+        $this->app->singleton(TrainingSessionService::class);
     }
 
     /**
@@ -47,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
         // User can train AND their current level in the mode doesn't exceed plan's max level
         Gate::define('can-train-mode', function (User $user, PracticeMode $mode) {
-            if (! Gate::allows('can-train')) {
+            if (! Gate::forUser($user)->allows('can-train')) {
                 return false;
             }
 

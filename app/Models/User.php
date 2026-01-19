@@ -199,6 +199,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get progress for a specific practice mode (without creating).
+     */
+    public function progressInMode(PracticeMode $mode): ?UserModeProgress
+    {
+        return $this->modeProgress()
+            ->where('practice_mode_id', $mode->id)
+            ->first();
+    }
+
+    /**
      * Get or create the user's streak record.
      */
     public function getOrCreateStreak(): UserStreak
