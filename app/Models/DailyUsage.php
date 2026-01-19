@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class DailyUsage extends Model
+{
+    protected $table = 'daily_usage';
+
+    protected $fillable = [
+        'user_id',
+        'date',
+        'exchange_count',
+        'sessions_count',
+        'total_time_seconds',
+        'messages_count',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
+
+    // ─────────────────────────────────────────────────────────────
+    // Relationships
+    // ─────────────────────────────────────────────────────────────
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Get or create today's usage record for a user.
+     */
+    public static function forUserToday(User $user): self
+    {
+        return static::firstOrCreate(
+            ['user_id' => $user->id, 'date' => today()],
+            ['exchange_count' => 0, 'sessions_count' => 0, 'total_time_seconds' => 0, 'messages_count' => 0]
+        );
+    }
+
+    /**
+     * Record activity for today.
+     */
+    public static function recordActivity(int $userId, int $timeSeconds = 0, int $messages = 0, bool $newSession = false): self
+    {
+        $usage = static::firstOrCreate(
+            ['user_id' => $userId, 'date' => today()],
+            ['exchange_count' => 0, 'sessions_count' => 0, 'total_time_seconds' => 0, 'messages_count' => 0]
+        );
+
+        if ($newSession) {
+            $usage->sessions_count++;
+        }
+
+        $usage->total_time_seconds += $timeSeconds;
+        $usage->messages_count += $messages;
+        $usage->save();
+
+        return $usage;
+    }
+
+    /**
+     * Get formatted time.
+     */
+    public function getFormattedTime(): string
+    {
+        $hours = floor($this->total_time_seconds / 3600);
+        $minutes = floor(($this->total_time_seconds % 3600) / 60);
+
+        if ($hours > 0) {
+            return "{$hours}h {$minutes}m";
+        }
+
+        return "{$minutes}m";
+    }
+}

@@ -14,7 +14,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Settings, CreditCard, Zap } from 'lucide-react';
+import { LayoutGrid, CreditCard, Users, Dumbbell, Tags, Activity } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -52,11 +52,33 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    tooltip={{ children: 'Tracks' }}
+                                    tooltip={{ children: 'Practice Modes' }}
                                 >
-                                    <a href="/admin/tracks">
-                                        <Settings />
-                                        <span>Tracks</span>
+                                    <a href="/admin/practice-modes">
+                                        <Dumbbell />
+                                        <span>Practice Modes</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Tags' }}
+                                >
+                                    <a href="/admin/tags">
+                                        <Tags />
+                                        <span>Tags</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Users' }}
+                                >
+                                    <a href="/admin/users">
+                                        <Users />
+                                        <span>Users</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -74,11 +96,11 @@ export function AppSidebar() {
                             <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
-                                    tooltip={{ children: 'Capabilities' }}
+                                    tooltip={{ children: 'API Metrics' }}
                                 >
-                                    <a href="/admin/capabilities">
-                                        <Zap />
-                                        <span>Capabilities</span>
+                                    <a href="/admin/api-metrics">
+                                        <Activity />
+                                        <span>API Metrics</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

@@ -1,18 +1,13 @@
 <?php
 
-use App\Http\Controllers\Admin\AnswerOptionController as AdminAnswerOptionController;
-use App\Http\Controllers\Admin\CapabilityController as AdminCapabilityController;
-use App\Http\Controllers\Admin\ContentBlockController as AdminContentBlockController;
-use App\Http\Controllers\Admin\LessonController as AdminLessonController;
-use App\Http\Controllers\Admin\LessonQuestionController as AdminLessonQuestionController;
+use App\Http\Controllers\Admin\ApiMetricsController as AdminApiMetricsController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
+use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
-use App\Http\Controllers\Admin\SkillLevelController as AdminSkillLevelController;
-use App\Http\Controllers\Admin\TrackController as AdminTrackController;
+use App\Http\Controllers\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
-use App\Http\Controllers\LessonController;
-use App\Http\Controllers\TrackController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,29 +23,8 @@ Route::get('/app', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
+    // Dashboard - accessible to all authenticated users
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Track activation routes
-    Route::post('tracks/{track}/activate', [TrackController::class, 'activate'])->name('tracks.activate');
-    Route::post('tracks/{track}/pause', [TrackController::class, 'pause'])->name('tracks.pause');
-    Route::get('tracks/{track}/check-activation', [TrackController::class, 'checkActivation'])->name('tracks.check-activation');
-
-    // Lesson routes
-    Route::get('lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
-    Route::post('lessons/{lesson}/attempts', [LessonController::class, 'startAttempt'])
-        ->name('lessons.attempts.start');
-    Route::post('attempts/{attempt}/interactions', [LessonController::class, 'recordInteraction'])
-        ->name('attempts.interactions.store');
-    Route::post('attempts/{attempt}/answers', [LessonController::class, 'submitAnswer'])
-        ->name('attempts.answers.store');
-    Route::post('attempts/{attempt}/complete', [LessonController::class, 'completeAttempt'])
-        ->name('attempts.complete');
-
-    // Media streaming from S3
-    Route::get('media/{path}', [LessonController::class, 'streamAudio'])
-        ->where('path', '.*')
-        ->name('media.stream');
 });
 
 require __DIR__.'/settings.php';
@@ -59,19 +33,19 @@ require __DIR__.'/settings.php';
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('questions', AdminQuestionController::class)->except(['show']);
 
-    // Bulk import routes (must be before resource route)
-    Route::get('tracks/bulk-import', [AdminTrackController::class, 'bulkImportForm'])->name('tracks.bulk-import');
-    Route::post('tracks/bulk-import', [AdminTrackController::class, 'bulkImport'])->name('tracks.bulk-import.store');
+    // Plans management (read-only, config-based)
+    Route::get('plans', [AdminPlanController::class, 'index'])->name('plans.index');
 
-    Route::resource('tracks', AdminTrackController::class)->except(['show']);
-    Route::resource('tracks.skill-levels', AdminSkillLevelController::class)->except(['show'])->shallow();
-    Route::resource('skill-levels.lessons', AdminLessonController::class)->except(['show'])->shallow();
-    Route::resource('lessons.content-blocks', AdminContentBlockController::class)->except(['show'])->shallow();
-    Route::resource('lessons.lesson-questions', AdminLessonQuestionController::class)->except(['show'])->shallow();
-    Route::resource('lesson-questions.answer-options', AdminAnswerOptionController::class)->except(['show'])->shallow();
+    // User management
+    Route::resource('users', AdminUserController::class)->only(['index', 'edit', 'update']);
+    Route::post('users/{user}/extend-trial', [AdminUserController::class, 'extendTrial'])->name('users.extend-trial');
 
-    // Plans and capabilities management
-    Route::get('plans/feature-matrix', [AdminPlanController::class, 'featureMatrix'])->name('plans.feature-matrix');
-    Route::resource('plans', AdminPlanController::class);
-    Route::resource('capabilities', AdminCapabilityController::class);
+    // Practice Mode management
+    Route::resource('practice-modes', AdminPracticeModeController::class)->except(['show']);
+
+    // Tag management
+    Route::resource('tags', AdminTagController::class)->except(['show']);
+
+    // API Metrics
+    Route::get('api-metrics', [AdminApiMetricsController::class, 'index'])->name('api-metrics.index');
 });

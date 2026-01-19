@@ -18,19 +18,12 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="{{ route('admin.tracks.index') }}" class="text-xl font-bold text-foreground">
+                        <a href="{{ route('admin.plans.index') }}" class="text-xl font-bold text-foreground">
                             SharpStack
                         </a>
                         <span class="ml-2 px-2 py-1 text-xs font-semibold bg-primary text-primary-foreground rounded">Admin</span>
                     </div>
                     <div class="ml-6 flex space-x-4 sm:space-x-8">
-                        <a href="{{ route('admin.tracks.index') }}"
-                           class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
-                                  {{ request()->routeIs('admin.tracks.*') || request()->routeIs('admin.skill-levels.*') || request()->routeIs('admin.lessons.*') || request()->routeIs('admin.content-blocks.*') || request()->routeIs('admin.lesson-questions.*') || request()->routeIs('admin.answer-options.*')
-                                     ? 'border-primary text-foreground'
-                                     : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground' }}">
-                            Tracks
-                        </a>
                         <a href="{{ route('admin.plans.index') }}"
                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium
                                   {{ request()->routeIs('admin.plans.*')

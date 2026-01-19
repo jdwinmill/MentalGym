@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             QuestionSeeder::class,
             PlansAndCapabilitiesSeeder::class,
-            // TrackContentSeeder::class, // Use: php artisan track:import storage/seeds/file.json
+            TagSeeder::class,
         ]);
 
         User::factory()->create([
