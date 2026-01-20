@@ -1,6 +1,71 @@
 # Card Types
 
-AI responses are JSON objects with a `type` field. The frontend parses and renders the appropriate Vue component. This creates a structured training experience, not a chat interface.
+AI responses are delivered via the `display_card` tool. The API enforces the schema, guaranteeing valid structure. The frontend renders the appropriate Vue component based on `card_type`.
+
+---
+
+## Tool Schema
+
+The `display_card` tool is defined in the API call and forces Claude to output structured data:
+
+```php
+[
+    'name' => 'display_card',
+    'description' => 'Display a training card to the user. You MUST call this tool for every response.',
+    'input_schema' => [
+        'type' => 'object',
+        'required' => ['card_type', 'content'],
+        'properties' => [
+            'card_type' => [
+                'type' => 'string',
+                'enum' => ['scenario', 'prompt', 'insight', 'reflection', 'multiple_choice'],
+            ],
+            'content' => [
+                'type' => 'string',
+            ],
+            'input_config' => [
+                'type' => 'object',
+                'properties' => [
+                    'max_length' => ['type' => 'integer'],
+                    'placeholder' => ['type' => 'string'],
+                ],
+            ],
+            'options' => [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'object',
+                    'required' => ['id', 'label'],
+                    'properties' => [
+                        'id' => ['type' => 'string'],
+                        'label' => ['type' => 'string'],
+                    ],
+                ],
+            ],
+            'drill_phase' => ['type' => 'string'],
+            'is_iteration' => ['type' => 'boolean'],
+        ],
+    ],
+]
+```
+
+---
+
+## Tool Output → Frontend Card Mapping
+
+The service layer normalizes tool output to frontend card format:
+
+| Tool Output | Frontend Card |
+|-------------|---------------|
+| `card_type: "scenario"` | `type: "scenario"` |
+| `card_type: "prompt"` + `input_config` | `type: "prompt"` + `input` |
+| `card_type: "multiple_choice"` + `options` | `type: "multiple_choice"` + `options` |
+| `card_type: "insight"` | `type: "insight"` |
+| `card_type: "reflection"` + `input_config` | `type: "reflection"` + `input` |
+
+Backend-injected (not from AI):
+| Injected | Frontend Card |
+|----------|---------------|
+| Level up detected | `type: "level_up"` |
 
 ---
 
@@ -8,11 +73,21 @@ AI responses are JSON objects with a `type` field. The frontend parses and rende
 
 Sets the scene. No user input required.
 
-### JSON Structure
+### Tool Call
+```json
+{
+  "card_type": "scenario",
+  "content": "You're two weeks into a new VP role. Your first big initiative is stalling because a peer VP keeps missing commitments. You've mentioned it twice in 1:1s. Today, they missed another deadline.",
+  "drill_phase": "Problem-Solving"
+}
+```
+
+### Frontend Format
 ```json
 {
   "type": "scenario",
-  "content": "You're two weeks into a new VP role. Your first big initiative is stalling because a peer VP keeps missing commitments. You've mentioned it twice in 1:1s. Today, they missed another deadline."
+  "content": "You're two weeks into a new VP role...",
+  "drill_phase": "Problem-Solving"
 }
 ```
 
@@ -20,8 +95,14 @@ Sets the scene. No user input required.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| type | string | "scenario" |
+| card_type | string | "scenario" |
 | content | string | The scene description |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| drill_phase | string | Current drill name (for structured modes) |
 
 ### UI Behavior
 
@@ -40,16 +121,32 @@ Sets the scene. No user input required.
 
 Asks for a text response from the user.
 
-### JSON Structure
+### Tool Call
+```json
+{
+  "card_type": "prompt",
+  "content": "The CEO just asked in the leadership Slack channel: 'What's the holdup?' The channel has 20 leaders watching. What do you type?",
+  "input_config": {
+    "max_length": 500,
+    "placeholder": "Type your response..."
+  },
+  "drill_phase": "Executive Communication",
+  "is_iteration": false
+}
+```
+
+### Frontend Format
 ```json
 {
   "type": "prompt",
-  "content": "The CEO just asked in the leadership Slack channel: 'What's the holdup?' The channel has 20 leaders watching. What do you type?",
+  "content": "The CEO just asked in the leadership Slack channel...",
   "input": {
     "type": "text",
     "max_length": 500,
     "placeholder": "Type your response..."
-  }
+  },
+  "drill_phase": "Executive Communication",
+  "is_iteration": false
 }
 ```
 
@@ -57,16 +154,17 @@ Asks for a text response from the user.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| type | string | "prompt" |
+| card_type | string | "prompt" |
 | content | string | The question/prompt |
-| input.type | string | "text" |
-| input.max_length | int | Character limit |
+| input_config.max_length | int | Character limit |
 
 ### Optional Fields
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| input.placeholder | string | "" | Textarea placeholder text |
+| input_config.placeholder | string | "" | Textarea placeholder text |
+| drill_phase | string | — | Current drill name |
+| is_iteration | boolean | false | True if this is a required second attempt |
 
 ### UI Behavior
 
@@ -74,6 +172,7 @@ Asks for a text response from the user.
 - Textarea with character counter
 - "Submit" button (disabled until input)
 - Enforce max_length in UI
+- If `is_iteration: true`, may show visual indicator of "second attempt"
 
 ### User Response Format
 
@@ -93,7 +192,21 @@ Store as plain text:
 
 Presents options. User selects one.
 
-### JSON Structure
+### Tool Call
+```json
+{
+  "card_type": "multiple_choice",
+  "content": "What's your primary concern right now?",
+  "options": [
+    {"id": "a", "label": "How this makes me look to the CEO"},
+    {"id": "b", "label": "Protecting my peer from public embarrassment"},
+    {"id": "c", "label": "Getting the project unblocked"},
+    {"id": "d", "label": "Understanding why they keep missing deadlines"}
+  ]
+}
+```
+
+### Frontend Format
 ```json
 {
   "type": "multiple_choice",
@@ -111,7 +224,7 @@ Presents options. User selects one.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| type | string | "multiple_choice" |
+| card_type | string | "multiple_choice" |
 | content | string | The question |
 | options | array | Array of option objects |
 | options[].id | string | Unique identifier (a, b, c, d) |
@@ -142,11 +255,21 @@ Store as JSON:
 
 Feedback on user's response. No input required.
 
-### JSON Structure
+### Tool Call
+```json
+{
+  "card_type": "insight",
+  "content": "Notice what you just did. You framed this as a political problem, not a decision quality problem. You optimized for relationship preservation over clarity. That's a pattern worth examining.",
+  "drill_phase": "Problem-Solving"
+}
+```
+
+### Frontend Format
 ```json
 {
   "type": "insight",
-  "content": "Notice what you just did. You framed this as a political problem, not a decision quality problem. You optimized for relationship preservation over clarity. That's a pattern worth examining."
+  "content": "Notice what you just did. You framed this as a political problem...",
+  "drill_phase": "Problem-Solving"
 }
 ```
 
@@ -154,8 +277,14 @@ Feedback on user's response. No input required.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| type | string | "insight" |
+| card_type | string | "insight" |
 | content | string | The feedback/observation |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| drill_phase | string | Current drill name |
 
 ### UI Behavior
 
@@ -175,11 +304,23 @@ Feedback on user's response. No input required.
 
 Short prompted response. Smaller input than prompt.
 
-### JSON Structure
+### Tool Call
+```json
+{
+  "card_type": "reflection",
+  "content": "What's the one principle from today's session you want to carry forward?",
+  "input_config": {
+    "max_length": 200,
+    "placeholder": "Be honest with yourself..."
+  }
+}
+```
+
+### Frontend Format
 ```json
 {
   "type": "reflection",
-  "content": "Why did protecting your peer feel more urgent than answering the CEO's question directly?",
+  "content": "What's the one principle from today's session you want to carry forward?",
   "input": {
     "type": "text",
     "max_length": 200,
@@ -192,16 +333,15 @@ Short prompted response. Smaller input than prompt.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| type | string | "reflection" |
+| card_type | string | "reflection" |
 | content | string | The reflection prompt |
-| input.type | string | "text" |
-| input.max_length | int | Character limit (typically 200) |
+| input_config.max_length | int | Character limit (typically 200) |
 
 ### Optional Fields
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| input.placeholder | string | "" | Textarea placeholder text |
+| input_config.placeholder | string | "" | Textarea placeholder text |
 
 ### UI Behavior
 
@@ -225,7 +365,7 @@ Store as plain text.
 
 **NOT returned by AI.** Injected by backend when level-up condition is met.
 
-### JSON Structure
+### Frontend Format (Backend-Generated)
 ```json
 {
   "type": "level_up",
@@ -259,7 +399,7 @@ Store as plain text.
 
 ## Frontend Component Mapping
 
-| JSON type | Vue Component | Input? |
+| card_type | Vue Component | Input? |
 |-----------|---------------|--------|
 | scenario | ScenarioCard.vue | No |
 | prompt | PromptCard.vue | Yes (textarea) |
@@ -285,7 +425,8 @@ Store as plain text.
 
 ## Validation
 
-Frontend should validate incoming JSON:
+Frontend validates incoming cards after backend normalization:
+
 ```javascript
 const validators = {
   scenario: (card) => {
@@ -335,7 +476,7 @@ function validateCard(card) {
 
 ## Fallback Handling
 
-If JSON is malformed or type is unknown:
+With tool use, malformed JSON is rare. However, if the tool call fails or returns unexpected data:
 
 1. Log the error with full response for debugging
 2. Show a fallback insight card:
@@ -350,30 +491,36 @@ This keeps the session alive rather than crashing.
 
 ---
 
-## Example Session Flow
+## Example Session Flow (Tool Use)
+
 ```
-AI: {"type": "scenario", "content": "You're in a board meeting..."}
+Backend sends: messages=[{role: "user", content: "Begin training."}]
+AI calls: display_card(card_type="scenario", content="You're in a board meeting...")
 User: [clicks Continue]
 
-AI: {"type": "prompt", "content": "The CFO interrupts...", "input": {...}}
+Backend sends: messages=[...history..., {role: "user", content: "[Continue]"}]
+AI calls: display_card(card_type="prompt", content="The CFO interrupts...", input_config={max_length: 500, placeholder: "..."})
 User: "I would acknowledge their point and..."
 
-AI: {"type": "insight", "content": "Notice how you led with accommodation..."}
+Backend sends: messages=[...history..., {role: "user", content: "I would acknowledge their point and..."}]
+AI calls: display_card(card_type="insight", content="Notice how you led with accommodation...")
 User: [clicks Continue]
 
-AI: {"type": "multiple_choice", "content": "What drove that response?", "options": [...]}
+Backend sends: messages=[...history..., {role: "user", content: "[Continue]"}]
+AI calls: display_card(card_type="multiple_choice", content="What drove that response?", options=[...])
 User: [selects option B]
 
-AI: {"type": "reflection", "content": "Why did that feel safer?", "input": {...}}
+Backend sends: messages=[...history..., {role: "user", content: "{\"selected\": \"b\"}"}]
+AI calls: display_card(card_type="reflection", content="Why did that feel safer?", input_config={max_length: 200, ...})
 User: "Because I wasn't confident in..."
 
-AI: {"type": "insight", "content": "That's the pattern. When uncertain..."}
+Backend sends: messages=[...history..., {role: "user", content: "Because I wasn't confident in..."}]
+AI calls: display_card(card_type="insight", content="That's the pattern. When uncertain...")
 User: [clicks Continue]
 
-[Backend detects level-up condition]
-Backend injects: {"type": "level_up", "new_level": 2, "message": "..."}
+[Backend detects level-up condition, injects level_up card before next AI call]
+Backend shows: {type: "level_up", new_level: 2, message: "..."}
 User: [clicks Continue Training]
 
-AI: {"type": "scenario", "content": "[Level 2 complexity scenario]..."}
-...continues
+[Session continues with Level 2 scenarios]
 ```

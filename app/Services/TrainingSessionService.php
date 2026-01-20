@@ -98,17 +98,13 @@ class TrainingSessionService
         // Store user message
         $this->storeMessage($session, 'user', $userInput);
 
-        // Build message history for AI (rolling window)
-        $messageHistory = $this->buildMessageHistoryForAI($session);
-
-        // Get AI response
+        // Get AI response (message history built internally by PracticeAIService)
         $aiResponse = $this->aiService->getResponse(
             $mode,
             $progress->current_level,
-            $messageHistory,
+            $session,
             $userInput,
-            $user,
-            $session
+            $user
         );
 
         // Store AI message
@@ -196,28 +192,6 @@ class TrainingSessionService
 
                 return $data;
             });
-    }
-
-    /**
-     * Build message history for AI context (rolling window)
-     */
-    private function buildMessageHistoryForAI(TrainingSession $session): array
-    {
-        $maxExchanges = $session->practiceMode->config['max_history_exchanges'] ?? 10;
-        $maxMessages = $maxExchanges * 2;
-
-        return $session->messages()
-            ->orderBy('created_at', 'desc')
-            ->orderBy('sequence', 'desc')
-            ->take($maxMessages)
-            ->get()
-            ->reverse()
-            ->map(fn(SessionMessage $m) => [
-                'role' => $m->role,
-                'content' => $m->content,
-            ])
-            ->values()
-            ->toArray();
     }
 
     /**

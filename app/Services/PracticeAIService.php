@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Anthropic\Client;
 use Anthropic\Messages\Message;
+use App\Exceptions\MalformedResponseException;
 use App\Models\ApiLog;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
@@ -37,6 +38,8 @@ class PracticeAIService
                 $this->client->messages->create([
                     'model' => $model,
                     'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
+                    'tools' => $this->getToolDefinition(),
+                    'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
                     'system' => [
                         [
                             'type' => 'text',
@@ -47,7 +50,7 @@ class PracticeAIService
                     'messages' => [
                         [
                             'role' => 'user',
-                            'content' => 'Begin.',
+                            'content' => 'Begin training.',
                         ]
                     ],
                 ])
@@ -65,9 +68,17 @@ class PracticeAIService
                 $response
             );
 
-            $responseText = $response->content[0]->text;
+            return $this->extractCardFromResponse($response);
 
-            return $this->parseResponse($responseText);
+        } catch (MalformedResponseException $e) {
+            Log::error("AI first response malformed", [
+                'mode' => $mode->slug,
+                'level' => $userLevel,
+                'error' => $e->getMessage(),
+                'raw_response' => $e->getRawResponseSummary(),
+            ]);
+
+            return $this->getFallbackCard();
 
         } catch (\Exception $e) {
             $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
@@ -99,13 +110,12 @@ class PracticeAIService
     public function getResponse(
         PracticeMode $mode,
         int $userLevel,
-        array $messageHistory,
+        TrainingSession $session,
         string $userInput,
-        ?User $user = null,
-        ?TrainingSession $session = null
+        ?User $user = null
     ): array {
         $instructionSet = $this->prepareInstructionSet($mode, $userLevel);
-        $messages = $this->buildMessages($messageHistory, $userInput);
+        $messages = $this->buildMessageHistory($session, $userInput);
         $model = $mode->config['model'] ?? 'claude-sonnet-4-20250514';
         $startTime = microtime(true);
 
@@ -114,6 +124,8 @@ class PracticeAIService
                 $this->client->messages->create([
                     'model' => $model,
                     'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
+                    'tools' => $this->getToolDefinition(),
+                    'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
                     'system' => [
                         [
                             'type' => 'text',
@@ -137,9 +149,17 @@ class PracticeAIService
                 $response
             );
 
-            $responseText = $response->content[0]->text;
+            return $this->extractCardFromResponse($response);
 
-            return $this->parseResponse($responseText);
+        } catch (MalformedResponseException $e) {
+            Log::error("AI response malformed", [
+                'mode' => $mode->slug,
+                'level' => $userLevel,
+                'error' => $e->getMessage(),
+                'raw_response' => $e->getRawResponseSummary(),
+            ]);
+
+            return $this->getFallbackCard();
 
         } catch (\Exception $e) {
             $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
@@ -166,142 +186,240 @@ class PracticeAIService
     }
 
     /**
-     * Prepare the full system prompt with JSON formatting requirements
+     * Get the tool definition for display_card
      */
-    private function prepareInstructionSet(PracticeMode $mode, int $level): string
+    private function getToolDefinition(): array
     {
-        $modeInstructions = str_replace('{{level}}', (string) $level, $mode->instruction_set);
-
-        return <<<PROMPT
-You are an AI training assistant. You must ALWAYS respond with a single valid JSON object (no markdown, no extra text).
-
-## Response Format
-
-Every response must be a JSON object with this structure:
-{
-  "type": "<card_type>",
-  "content": "<your message>",
-  "options": ["option1", "option2", ...] // ONLY for multiple_choice type
-}
-
-## Card Types
-
-Use these card types based on context:
-- "scenario": Present a situation, context, or information. Use when setting up an exercise or providing background.
-- "prompt": Ask the user to write or explain something. Use when you need a text response.
-- "multiple_choice": Present options for the user to choose from. Include an "options" array with 2-4 choices.
-- "insight": Provide feedback, coaching, or analysis of the user's response. Use after they submit something.
-- "reflection": Ask the user to reflect briefly on what they learned or noticed.
-
-## Rules
-1. Output ONLY the JSON object - no markdown code blocks, no explanations before/after
-2. The "content" field should contain your actual message/question/feedback
-3. Keep responses concise and focused
-4. Progress through exercises naturally based on user responses
-
-## Training Program Instructions
-
-{$modeInstructions}
-
-Remember: Respond with raw JSON only. No markdown formatting around the JSON.
-PROMPT;
+        return [
+            [
+                'name' => 'display_card',
+                'description' => 'Display a training card to the user. You MUST call this tool for every response. Never respond without using this tool.',
+                'input_schema' => [
+                    'type' => 'object',
+                    'required' => ['card_type', 'content'],
+                    'properties' => [
+                        'card_type' => [
+                            'type' => 'string',
+                            'enum' => ['scenario', 'prompt', 'insight', 'reflection', 'multiple_choice'],
+                            'description' => 'The type of card to display',
+                        ],
+                        'content' => [
+                            'type' => 'string',
+                            'description' => 'The main text content of the card',
+                        ],
+                        'input_config' => [
+                            'type' => 'object',
+                            'description' => 'Configuration for input fields (prompt and reflection cards only)',
+                            'properties' => [
+                                'max_length' => [
+                                    'type' => 'integer',
+                                    'description' => 'Maximum character length for input',
+                                ],
+                                'placeholder' => [
+                                    'type' => 'string',
+                                    'description' => 'Placeholder text for input field',
+                                ],
+                            ],
+                        ],
+                        'options' => [
+                            'type' => 'array',
+                            'description' => 'Options for multiple_choice cards only',
+                            'items' => [
+                                'type' => 'object',
+                                'required' => ['id', 'label'],
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'string',
+                                        'description' => 'Unique option identifier (a, b, c, d)',
+                                    ],
+                                    'label' => [
+                                        'type' => 'string',
+                                        'description' => 'Display text for the option',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'drill_phase' => [
+                            'type' => 'string',
+                            'description' => 'Current drill name for structured training modes',
+                        ],
+                        'is_iteration' => [
+                            'type' => 'boolean',
+                            'description' => 'True if this is a required second attempt at a drill',
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     /**
-     * Build messages array for API call
+     * Extract the card from a tool_use response block
      */
-    private function buildMessages(array $history, ?string $userInput = null): array
+    private function extractCardFromResponse(Message $response): array
     {
+        foreach ($response->content as $block) {
+            if ($block->type === 'tool_use' && $block->name === 'display_card') {
+                return $this->normalizeCard((array) $block->input);
+            }
+        }
+
+        // No tool call found - this shouldn't happen with tool_choice forcing it
+        throw new MalformedResponseException(
+            'No display_card tool call in response',
+            json_encode($response->content)
+        );
+    }
+
+    /**
+     * Normalize tool input to frontend card format
+     */
+    private function normalizeCard(array $toolInput): array
+    {
+        // Convert tool input to card format expected by frontend
+        $card = [
+            'type' => $toolInput['card_type'],
+            'content' => $toolInput['content'],
+        ];
+
+        // Add input config for prompt/reflection cards
+        if (isset($toolInput['input_config'])) {
+            $card['input'] = [
+                'type' => 'text',
+                'max_length' => $toolInput['input_config']['max_length'] ?? 500,
+                'placeholder' => $toolInput['input_config']['placeholder'] ?? '',
+            ];
+        }
+
+        // Add options for multiple choice
+        if (isset($toolInput['options'])) {
+            $card['options'] = $toolInput['options'];
+        }
+
+        // Pass through drill metadata if present
+        if (isset($toolInput['drill_phase'])) {
+            $card['drill_phase'] = $toolInput['drill_phase'];
+        }
+        if (isset($toolInput['is_iteration'])) {
+            $card['is_iteration'] = $toolInput['is_iteration'];
+        }
+
+        return $card;
+    }
+
+    /**
+     * Build message history with tool_use and tool_result blocks for API call
+     */
+    public function buildMessageHistory(TrainingSession $session, string $newUserInput): array
+    {
+        $maxExchanges = $session->practiceMode->config['max_history_exchanges'] ?? 10;
+
         $messages = [];
+        $previousMessages = $session->messages()
+            ->orderBy('created_at', 'desc')
+            ->orderBy('sequence', 'desc')
+            ->take($maxExchanges * 2)
+            ->get()
+            ->reverse()
+            ->values();
 
-        foreach ($history as $msg) {
-            $messages[] = [
-                'role' => $msg['role'],
-                'content' => $msg['content'],
-            ];
+        foreach ($previousMessages as $msg) {
+            if ($msg->role === 'assistant') {
+                // Assistant messages were tool calls - reconstruct them
+                $parsed = json_decode($msg->content, true);
+
+                $messages[] = [
+                    'role' => 'assistant',
+                    'content' => [
+                        [
+                            'type' => 'tool_use',
+                            'id' => 'toolu_' . $msg->id,
+                            'name' => 'display_card',
+                            'input' => $this->cardToToolInput($parsed),
+                        ]
+                    ],
+                ];
+
+                // Add tool result (user saw the card)
+                $messages[] = [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            'type' => 'tool_result',
+                            'tool_use_id' => 'toolu_' . $msg->id,
+                            'content' => 'Card displayed to user.',
+                        ]
+                    ],
+                ];
+            } else {
+                // User messages are plain text or choice JSON
+                $messages[] = [
+                    'role' => 'user',
+                    'content' => $msg->content,
+                ];
+            }
         }
 
-        if ($userInput) {
-            $messages[] = [
-                'role' => 'user',
-                'content' => $userInput,
-            ];
+        // Add cache control to last message before new input
+        if (count($messages) > 0) {
+            $lastIndex = count($messages) - 1;
+            if (is_array($messages[$lastIndex]['content'])) {
+                $lastContentIndex = count($messages[$lastIndex]['content']) - 1;
+                $messages[$lastIndex]['content'][$lastContentIndex]['cache_control'] = ['type' => 'ephemeral'];
+            }
         }
+
+        // Add new user input
+        $messages[] = [
+            'role' => 'user',
+            'content' => $newUserInput,
+        ];
 
         return $messages;
     }
 
     /**
-     * Parse and validate AI response JSON
+     * Convert frontend card format back to tool input format
      */
-    private function parseResponse(string $responseText): array
+    private function cardToToolInput(array $card): array
     {
-        // Try to extract JSON from the response (handle markdown code blocks, extra text, etc.)
-        $json = $this->extractJson($responseText);
+        $input = [
+            'card_type' => $card['type'],
+            'content' => $card['content'],
+        ];
 
-        $parsed = json_decode($json, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::warning('Failed to parse AI response', [
-                'raw_response' => substr($responseText, 0, 500),
-                'extracted_json' => substr($json, 0, 500),
-                'error' => json_last_error_msg(),
-            ]);
-            throw new \RuntimeException('Invalid JSON from AI: ' . json_last_error_msg());
+        if (isset($card['input'])) {
+            $input['input_config'] = [
+                'max_length' => $card['input']['max_length'] ?? 500,
+                'placeholder' => $card['input']['placeholder'] ?? '',
+            ];
         }
 
-        if (!isset($parsed['type'])) {
-            throw new \RuntimeException('Missing type field in AI response');
+        if (isset($card['options'])) {
+            $input['options'] = $card['options'];
         }
 
-        $validTypes = ['scenario', 'prompt', 'multiple_choice', 'insight', 'reflection'];
-
-        if (!in_array($parsed['type'], $validTypes)) {
-            throw new \RuntimeException("Unknown card type: {$parsed['type']}");
+        if (isset($card['drill_phase'])) {
+            $input['drill_phase'] = $card['drill_phase'];
         }
 
-        return $parsed;
+        if (isset($card['is_iteration'])) {
+            $input['is_iteration'] = $card['is_iteration'];
+        }
+
+        return $input;
     }
 
     /**
-     * Extract JSON from response text (handles markdown code blocks, extra text, etc.)
+     * Prepare the instruction set with level injected
      */
-    private function extractJson(string $text): string
+    private function prepareInstructionSet(PracticeMode $mode, int $level): string
     {
-        $text = trim($text);
-
-        // If it's already valid JSON, return as-is
-        if ($this->isValidJson($text)) {
-            return $text;
-        }
-
-        // Try to extract from markdown code block: ```json ... ``` or ``` ... ```
-        if (preg_match('/```(?:json)?\s*(\{[\s\S]*?\})\s*```/', $text, $matches)) {
-            return trim($matches[1]);
-        }
-
-        // Try to find JSON object in the text (first { to last })
-        $firstBrace = strpos($text, '{');
-        $lastBrace = strrpos($text, '}');
-
-        if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
-            $extracted = substr($text, $firstBrace, $lastBrace - $firstBrace + 1);
-            if ($this->isValidJson($extracted)) {
-                return $extracted;
-            }
-        }
-
-        // Return original text if extraction fails
-        return $text;
-    }
-
-    /**
-     * Check if string is valid JSON
-     */
-    private function isValidJson(string $string): bool
-    {
-        json_decode($string);
-        return json_last_error() === JSON_ERROR_NONE;
+        return str_replace(
+            '{{level}}',
+            (string) $level,
+            $mode->instruction_set
+        );
     }
 
     /**
@@ -335,13 +453,13 @@ PROMPT;
     }
 
     /**
-     * Return safe fallback card when response can't be parsed
+     * Return safe fallback card when response can't be processed
      */
     private function getFallbackCard(): array
     {
         return [
-            'type' => 'prompt',
-            'content' => "I'd like to hear your thoughts. What's on your mind right now?",
+            'type' => 'insight',
+            'content' => "Let's continue. What's on your mind?",
         ];
     }
 
