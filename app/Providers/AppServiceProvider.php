@@ -8,6 +8,7 @@ use App\Models\Tag;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Models\UserModeProgress;
+use App\Http\Responses\LogoutResponse;
 use App\Policies\PracticeModePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TrainingSessionPolicy;
@@ -15,6 +16,7 @@ use App\Services\PracticeAIService;
 use App\Services\TrainingSessionService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(PracticeAIService::class);
         $this->app->singleton(TrainingSessionService::class);
+        $this->app->singleton(LogoutResponseContract::class, LogoutResponse::class);
     }
 
     /**

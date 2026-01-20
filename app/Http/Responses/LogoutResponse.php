@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Http\Responses;
+
+use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
+use Symfony\Component\HttpFoundation\Response;
+
+class LogoutResponse implements LogoutResponseContract
+{
+    public function toResponse($request): Response
+    {
+        // Standard redirect to landing page
+        // The frontend now uses a traditional form submission (bypassing Inertia)
+        // so a standard redirect works correctly
+        return redirect('/');
+    }
+}

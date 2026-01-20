@@ -11,18 +11,12 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, CreditCard, Users, Dumbbell, Tags, Activity } from 'lucide-react';
+import { CreditCard, Users, Dumbbell, Tags, Activity } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
     {
         title: 'Practice',
         href: '/practice-modes',
@@ -39,7 +33,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href="/practice-modes" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

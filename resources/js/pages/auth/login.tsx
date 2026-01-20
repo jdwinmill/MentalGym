@@ -27,7 +27,7 @@ export default function Login({
             title="Welcome back"
             description="Continue your training"
         >
-            <Head title="Log In - SharpStack" />
+            <Head title="Log In" />
 
             <Form
                 {...store.form()}

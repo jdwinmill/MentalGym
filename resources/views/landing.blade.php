@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- SEO Meta Tags -->
-    <title>SharpStack - Daily Practice for the Skills That Count</title>
+    <title>SharpStack | Daily Mental Training</title>
     <meta name="description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice that shows you where you stumble.">
     <meta name="keywords" content="speaking with confidence, handling conflict, thinking under pressure, active listening, problem solving, reading the room, communication skills, mental training">
     <meta name="author" content="SharpStack">
@@ -15,14 +15,14 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url('/') }}">
-    <meta property="og:title" content="SharpStack - Daily Practice for the Skills That Count">
+    <meta property="og:title" content="SharpStack | Daily Mental Training">
     <meta property="og:description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice.">
     <meta property="og:site_name" content="SharpStack">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{{ url('/') }}">
-    <meta name="twitter:title" content="SharpStack - Daily Practice for the Skills That Count">
+    <meta name="twitter:title" content="SharpStack | Daily Mental Training">
     <meta name="twitter:description" content="Daily practice sessions that actually make you better at the skills that count: how you think, speak, read a room. Not tips. Real practice.">
 
     <!-- Canonical URL -->
@@ -36,7 +36,8 @@
         })();
     </script>
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.svg?v={{ time() }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v={{ time() }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
 
@@ -149,7 +150,12 @@
         </section>
 
         <!-- Footer -->
-        <footer class="px-6 py-8 text-center text-sm text-muted-foreground">
+        <footer class="px-6 py-12 text-center text-sm text-muted-foreground">
+            <p class="mb-4">
+                <span class="text-foreground font-medium">Questions? Ideas? Just want to say hi?</span>
+                <br class="sm:hidden">
+                <a href="mailto:hello@sharpstack.io" class="text-primary hover:underline font-medium ml-0 sm:ml-2">hello@sharpstack.io</a>
+            </p>
             <p>&copy; {{ date('Y') }} SharpStack - a product of Outpost AI Labs LLC. All rights reserved.</p>
         </footer>
     </div>

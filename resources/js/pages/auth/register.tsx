@@ -16,7 +16,7 @@ export default function Register() {
             title="Start training today"
             description="5-15 minutes daily. Real practice for the skills that count."
         >
-            <Head title="Sign Up - SharpStack" />
+            <Head title="Sign Up" />
 
             <div className="mb-6 space-y-3 text-center">
                 <div className="flex justify-center gap-4 text-sm text-muted-foreground">
