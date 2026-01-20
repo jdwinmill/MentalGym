@@ -140,7 +140,7 @@ class TrainingSessionService
      */
     public function endSession(TrainingSession $session): bool
     {
-        $user = $session->user;
+        $user = auth()->user();
 
         if ($user->cannot('end', $session)) {
             throw new AuthorizationException('Cannot end this session.');
