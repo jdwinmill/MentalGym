@@ -268,11 +268,11 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                                 id="max_history_exchanges"
                                 type="number"
                                 min={5}
-                                max={20}
+                                max={24}
                                 value={form.data.config.max_history_exchanges}
                                 onChange={(e) => updateConfig('max_history_exchanges', parseInt(e.target.value) || 10)}
                             />
-                            <p className="text-xs text-neutral-500">5-20 exchanges kept in context</p>
+                            <p className="text-xs text-neutral-500">5-24 exchanges kept in context</p>
                         </div>
                         <div className="space-y-2 col-span-2">
                             <Label htmlFor="model">Model</Label>

@@ -136,7 +136,7 @@ class PracticeModeController extends Controller
             'config.input_character_limit' => ['nullable', 'integer', 'min:100', 'max:2000'],
             'config.reflection_character_limit' => ['nullable', 'integer', 'min:50', 'max:500'],
             'config.max_response_tokens' => ['nullable', 'integer', 'min:200', 'max:2000'],
-            'config.max_history_exchanges' => ['nullable', 'integer', 'min:5', 'max:20'],
+            'config.max_history_exchanges' => ['nullable', 'integer', 'min:5', 'max:24'],
             'config.model' => ['nullable', 'string', 'in:claude-sonnet-4-20250514,claude-haiku-4-20250414'],
             // Tags
             'tags' => ['array'],
