@@ -94,6 +94,9 @@
                 <span class="text-muted-foreground font-medium text-lg md:text-xl">Daily Mental Training</span>
             </a>
             <nav class="flex items-center gap-4">
+                <a href="{{ route('pricing') }}" class="text-foreground hover:text-primary transition-colors font-medium">
+                    Pricing
+                </a>
                 <a href="{{ route('login') }}" class="text-foreground hover:text-primary transition-colors font-medium">
                     Log In
                 </a>

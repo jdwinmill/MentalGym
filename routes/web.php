@@ -22,6 +22,11 @@ Route::post('/early-access', [LandingController::class, 'store'])
     ->middleware('throttle:5,1') // 5 attempts per minute
     ->name('early-access.store');
 
+// Pricing page (public)
+Route::get('/pricing', function () {
+    return Inertia::render('pricing');
+})->name('pricing');
+
 // Mental Gym app (moved to /app)
 Route::get('/app', function () {
     return Inertia::render('mental-gym');
