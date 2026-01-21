@@ -107,9 +107,9 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
                 )}
             </CardContent>
 
-            <CardFooter className="pt-0">
+            <CardFooter className="pt-0 justify-end">
                 {mode.can_access ? (
-                    <Button asChild className="w-full">
+                    <Button asChild>
                         <Link href={`/practice-modes/${mode.slug}/train`}>
                             {mode.has_active_session ? (
                                 <>
@@ -125,7 +125,7 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
                         </Link>
                     </Button>
                 ) : (
-                    <Button variant="outline" className="w-full" disabled>
+                    <Button variant="outline" disabled>
                         <Lock className="h-4 w-4 mr-2" />
                         Upgrade to Access
                     </Button>

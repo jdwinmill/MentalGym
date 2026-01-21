@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CreditCard, Users, Dumbbell, Tags, Activity, Eye } from 'lucide-react';
+import { CreditCard, Users, Dumbbell, Tags, Activity, Eye, MessageCircle } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -106,6 +106,17 @@ export function AppSidebar() {
                                     <a href="/admin/api-metrics">
                                         <Activity />
                                         <span>API Metrics</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Feedback' }}
+                                >
+                                    <a href="/admin/feedback">
+                                        <MessageCircle />
+                                        <span>Feedback</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

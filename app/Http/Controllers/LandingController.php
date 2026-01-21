@@ -5,17 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EarlyAccessSignupRequest;
 use App\Models\EarlyAccessSignup;
 use Illuminate\Http\JsonResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class LandingController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        $signupCount = EarlyAccessSignup::count();
-
-        return view('landing', [
-            'signupCount' => $signupCount,
-        ]);
+        return Inertia::render('landing');
     }
 
     public function store(EarlyAccessSignupRequest $request): JsonResponse

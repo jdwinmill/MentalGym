@@ -1,4 +1,4 @@
-import { landing } from '@/routes';
+import { PublicHeader } from '@/components/public-header';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Check, Lock } from 'lucide-react';
@@ -77,33 +77,7 @@ export default function Pricing() {
             <Head title="Pricing" />
 
             <div className="flex min-h-svh flex-col bg-background">
-                {/* Header */}
-                <header className="border-b border-border">
-                    <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-                        <Link
-                            href={landing()}
-                            className="text-xl tracking-tight hover:opacity-80 transition-opacity"
-                        >
-                            <span className="font-bold text-foreground">SharpStack</span>
-                        </Link>
-                        <nav className="flex items-center gap-4">
-                            {isLoggedIn ? (
-                                <Button asChild variant="ghost" size="sm">
-                                    <Link href="/dashboard">Dashboard</Link>
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button asChild variant="ghost" size="sm">
-                                        <Link href="/login">Log in</Link>
-                                    </Button>
-                                    <Button asChild size="sm">
-                                        <Link href="/register">Sign up</Link>
-                                    </Button>
-                                </>
-                            )}
-                        </nav>
-                    </div>
-                </header>
+                <PublicHeader />
 
                 {/* Main Content */}
                 <main className="flex-1">

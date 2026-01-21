@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\ApiMetricsController as AdminApiMetricsController;
+use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\BlindSpotController;
+use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\TrainingApiController;
 use App\Http\Controllers\BlindSpotDashboardController;
 use App\Http\Controllers\DashboardController;
@@ -54,6 +56,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/status', [BlindSpotController::class, 'status'])->name('api.blind-spots.status');
     });
 
+    // Feedback API
+    Route::post('api/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
+
     // Blind Spots Dashboard
     Route::get('blind-spots', [BlindSpotDashboardController::class, 'index'])->name('blind-spots.index');
 });
@@ -84,4 +89,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     // API Metrics
     Route::get('api-metrics', [AdminApiMetricsController::class, 'index'])->name('api-metrics.index');
+
+    // Feedback management
+    Route::get('feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
+    Route::delete('feedback/{feedback}', [AdminFeedbackController::class, 'destroy'])->name('feedback.destroy');
 });
