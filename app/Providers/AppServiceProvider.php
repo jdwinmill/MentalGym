@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\SessionCompleted;
+use App\Listeners\CheckBlindSpotTeaserTrigger;
 use App\Models\DailyUsage;
 use App\Models\PracticeMode;
 use App\Models\Tag;
@@ -14,6 +16,7 @@ use App\Policies\TagPolicy;
 use App\Policies\TrainingSessionPolicy;
 use App\Services\PracticeAIService;
 use App\Services\TrainingSessionService;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Contracts\LogoutResponse as LogoutResponseContract;
@@ -37,6 +40,18 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerGates();
         $this->registerPolicies();
+        $this->registerEvents();
+    }
+
+    /**
+     * Register event listeners.
+     */
+    protected function registerEvents(): void
+    {
+        Event::listen(
+            SessionCompleted::class,
+            CheckBlindSpotTeaserTrigger::class
+        );
     }
 
     /**

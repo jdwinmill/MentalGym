@@ -6,8 +6,11 @@ use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeContro
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\BlindSpotController;
 use App\Http\Controllers\Api\TrainingApiController;
+use App\Http\Controllers\BlindSpotDashboardController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailPreferenceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PracticeModeController;
 use Illuminate\Support\Facades\Route;
@@ -38,9 +41,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('continue/{session}', [TrainingApiController::class, 'continue'])->name('api.training.continue');
         Route::post('end/{session}', [TrainingApiController::class, 'end'])->name('api.training.end');
     });
+
+    // Blind Spots API
+    Route::prefix('api/blind-spots')->group(function () {
+        Route::get('/', [BlindSpotController::class, 'index'])->name('api.blind-spots.index');
+        Route::get('/teaser', [BlindSpotController::class, 'teaser'])->name('api.blind-spots.teaser');
+        Route::get('/status', [BlindSpotController::class, 'status'])->name('api.blind-spots.status');
+    });
+
+    // Blind Spots Dashboard
+    Route::get('blind-spots', [BlindSpotDashboardController::class, 'index'])->name('blind-spots.index');
 });
 
 require __DIR__.'/settings.php';
+
+// Email preferences (signed routes)
+Route::get('/email/unsubscribe/{type}', [EmailPreferenceController::class, 'unsubscribe'])
+    ->name('email.unsubscribe')
+    ->middleware(['signed', 'auth']);
 
 // Admin routes
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

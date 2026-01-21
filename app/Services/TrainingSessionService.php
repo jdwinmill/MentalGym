@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Events\SessionCompleted;
+use App\Jobs\ScoreDrillResponse;
 use App\Models\DailyUsage;
 use App\Models\PracticeMode;
 use App\Models\SessionMessage;
@@ -95,8 +97,14 @@ class TrainingSessionService
         // Get progress record
         $progress = $this->getOrCreateProgress($user, $mode);
 
+        // Get the previous card to know what drill the user was responding to
+        $previousCard = $this->getLastAssistantCard($session);
+
         // Store user message
         $this->storeMessage($session, 'user', $userInput);
+
+        // Dispatch async scoring job if this was a drill response
+        $this->dispatchDrillScoring($session, $userInput, $previousCard);
 
         // Get AI response (message history built internally by PracticeAIService)
         $aiResponse = $this->aiService->getResponse(
@@ -151,6 +159,9 @@ class TrainingSessionService
             'status' => TrainingSession::STATUS_COMPLETED,
             'duration_seconds' => $session->started_at->diffInSeconds(now()),
         ]);
+
+        // Dispatch session completed event for blind spot teaser emails
+        SessionCompleted::dispatch($session);
 
         return true;
     }
@@ -359,5 +370,61 @@ class TrainingSessionService
             'sequence' => $nextSequence,
             'created_at' => now(),
         ]);
+    }
+
+    /**
+     * Get the last assistant card from session history
+     */
+    private function getLastAssistantCard(TrainingSession $session): ?array
+    {
+        $lastAssistantMessage = $session->messages()
+            ->where('role', 'assistant')
+            ->orderBy('sequence', 'desc')
+            ->first();
+
+        if (!$lastAssistantMessage) {
+            return null;
+        }
+
+        return json_decode($lastAssistantMessage->content, true);
+    }
+
+    /**
+     * Dispatch drill scoring job if applicable
+     */
+    private function dispatchDrillScoring(
+        TrainingSession $session,
+        string $userInput,
+        ?array $previousCard
+    ): void {
+        // Skip if no previous card or no drill_phase
+        if (!$previousCard || empty($previousCard['drill_phase'])) {
+            return;
+        }
+
+        $drillPhase = $previousCard['drill_phase'];
+
+        // Map drill_phase to drill_type using config
+        $drillType = config("drill_types.phase_mapping.{$drillPhase}");
+
+        // Skip non-scorable phases (like reflections)
+        if ($drillType === null) {
+            return;
+        }
+
+        // Skip if card type is not a prompt (we only score prompt responses)
+        if (!in_array($previousCard['type'] ?? '', ['prompt', 'scenario'])) {
+            return;
+        }
+
+        ScoreDrillResponse::dispatch(
+            $session->user_id,
+            $session->id,
+            $session->practice_mode_id,
+            $drillType,
+            $drillPhase,
+            $userInput,
+            $previousCard['is_iteration'] ?? false
+        );
     }
 }

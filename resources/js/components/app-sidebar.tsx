@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CreditCard, Users, Dumbbell, Tags, Activity } from 'lucide-react';
+import { CreditCard, Users, Dumbbell, Tags, Activity, Eye } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +21,12 @@ const mainNavItems: NavItem[] = [
         title: 'Practice',
         href: '/practice-modes',
         icon: Dumbbell,
+    },
+    {
+        title: 'Blind Spots',
+        href: '/blind-spots',
+        icon: Eye,
+        badge: 'Pro',
     },
 ];
 

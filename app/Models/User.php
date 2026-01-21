@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'plan',
         'is_admin',
         'trial_ends_at',
+        'email_preferences',
     ];
 
     public function isAdmin(): bool
@@ -246,6 +247,36 @@ class User extends Authenticatable implements MustVerifyEmail
             'two_factor_confirmed_at' => 'datetime',
             'trial_ends_at' => 'datetime',
             'is_admin' => 'boolean',
+            'email_preferences' => 'array',
         ];
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Email Preferences
+    // ─────────────────────────────────────────────────────────────
+
+    public function blindSpotEmails(): HasMany
+    {
+        return $this->hasMany(BlindSpotEmail::class);
+    }
+
+    /**
+     * Check if a specific email type is enabled.
+     */
+    public function wantsEmail(string $type): bool
+    {
+        $preferences = $this->email_preferences ?? [];
+
+        // Default to true if not explicitly set to false
+        return ($preferences[$type] ?? true) !== false;
+    }
+
+    /**
+     * Get the user's first name for personalization.
+     */
+    public function getFirstNameAttribute(): string
+    {
+        $nameParts = explode(' ', $this->name);
+        return $nameParts[0] ?? $this->name;
     }
 }
