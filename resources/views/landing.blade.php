@@ -87,20 +87,20 @@
 <body class="font-sans antialiased bg-background text-foreground">
     <div class="min-h-screen">
         <!-- Header / Logo -->
-        <header class="px-6 pt-6 md:pt-8 max-w-4xl mx-auto flex items-center justify-between">
-            <a href="/" class="inline-block text-2xl md:text-3xl tracking-tight hover:opacity-80 transition-opacity">
+        <header class="px-4 md:px-6 pt-6 md:pt-8 max-w-4xl mx-auto flex items-center justify-between gap-4 md:gap-6">
+            <a href="/" class="inline-block text-xl md:text-3xl tracking-tight hover:opacity-80 transition-opacity min-w-0">
                 <span class="font-bold text-foreground">SharpStack</span>
-                <span class="text-muted-foreground font-normal mx-2">|</span>
-                <span class="text-muted-foreground font-medium text-lg md:text-xl">Daily Mental Training</span>
+                <span class="text-muted-foreground font-normal mx-2 hidden md:inline">|</span>
+                <span class="text-muted-foreground font-medium text-lg md:text-xl hidden md:inline">Daily Mental Training</span>
             </a>
-            <nav class="flex items-center gap-4">
-                <a href="{{ route('pricing') }}" class="text-foreground hover:text-primary transition-colors font-medium">
+            <nav class="flex items-center gap-3 md:gap-6 shrink-0">
+                <a href="{{ route('pricing') }}" class="text-sm md:text-base text-foreground hover:text-primary transition-colors font-medium">
                     Pricing
                 </a>
-                <a href="{{ route('login') }}" class="text-foreground hover:text-primary transition-colors font-medium">
+                <a href="{{ route('login') }}" class="text-sm md:text-base text-foreground hover:text-primary transition-colors font-medium">
                     Log In
                 </a>
-                <a href="{{ route('register') }}" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                <a href="{{ route('register') }}" class="px-3 py-1.5 md:px-4 md:py-2 text-sm md:text-base bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity">
                     Sign Up
                 </a>
             </nav>
