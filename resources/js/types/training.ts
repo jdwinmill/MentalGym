@@ -66,6 +66,7 @@ export interface ScenarioCard extends BaseCard {
 
 export interface PromptCard extends BaseCard {
     type: 'prompt';
+    scenarioContext?: string;
 }
 
 export interface MultipleChoiceCard extends BaseCard {
@@ -79,6 +80,7 @@ export interface InsightCard extends BaseCard {
 
 export interface ReflectionCard extends BaseCard {
     type: 'reflection';
+    scenarioContext?: string;
 }
 
 export type Card = ScenarioCard | PromptCard | MultipleChoiceCard | InsightCard | ReflectionCard;

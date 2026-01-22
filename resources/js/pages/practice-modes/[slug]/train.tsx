@@ -31,6 +31,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
     const [isLoading, setIsLoading] = useState(false);
     const [isStarting, setIsStarting] = useState(true);
     const [isEnding, setIsEnding] = useState(false);
+    const [isFetchingFollowUp, setIsFetchingFollowUp] = useState(false);
     const [levelUpCard, setLevelUpCard] = useState<LevelUpCardType | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +89,98 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
     useEffect(() => {
         startSession();
     }, [startSession]);
+
+    // Auto-fetch follow-up card when scenario card is received
+    const fetchFollowUpCard = useCallback(async (scenarioContent: string) => {
+        if (!session) return;
+
+        setIsFetchingFollowUp(true);
+
+        try {
+            const response = await fetch(`/api/training/continue/${session.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                },
+                body: JSON.stringify({ input: 'continue' }),
+            });
+
+            const data: ContinueSessionResponse = await response.json();
+
+            if (!data.success) {
+                // Fall back to showing scenario with Continue button
+                setIsFetchingFollowUp(false);
+                return;
+            }
+
+            // Add scenario to message history (the auto-continue)
+            const scenarioMessage: Message = {
+                id: Date.now(),
+                role: 'assistant',
+                card: currentCard!,
+                type: 'scenario',
+                created_at: new Date().toISOString(),
+            };
+            const continueMessage: Message = {
+                id: Date.now() + 1,
+                role: 'user',
+                content: 'continue',
+                created_at: new Date().toISOString(),
+            };
+            setMessages(prev => [...prev, scenarioMessage, continueMessage]);
+
+            // Check if we can consolidate
+            const consolidatableTypes = ['prompt', 'reflection'];
+            if (data.card && consolidatableTypes.includes(data.card.type)) {
+                // Consolidate: add scenario context to the prompt/reflection
+                const consolidatedCard = {
+                    ...data.card,
+                    scenarioContext: scenarioContent,
+                };
+
+                // Add the prompt as assistant message
+                const assistantMessage: Message = {
+                    id: Date.now() + 2,
+                    role: 'assistant',
+                    card: consolidatedCard,
+                    type: data.card.type,
+                    created_at: new Date().toISOString(),
+                };
+                setMessages(prev => [...prev, assistantMessage]);
+                setCurrentCard(consolidatedCard as Card);
+            } else if (data.card) {
+                // Can't consolidate - show the fetched card directly
+                const assistantMessage: Message = {
+                    id: Date.now() + 2,
+                    role: 'assistant',
+                    card: data.card,
+                    type: data.card.type,
+                    created_at: new Date().toISOString(),
+                };
+                setMessages(prev => [...prev, assistantMessage]);
+                setCurrentCard(data.card);
+            }
+
+            // Update session/progress
+            if (data.session) setSession(data.session);
+            if (data.progress) setProgress(data.progress);
+            if (data.levelUp) setLevelUpCard(data.levelUp);
+
+        } catch (err) {
+            console.error('Follow-up fetch error:', err);
+            // Fall back to showing scenario with Continue button
+        } finally {
+            setIsFetchingFollowUp(false);
+        }
+    }, [session, currentCard]);
+
+    // Auto-fetch when scenario card is received
+    useEffect(() => {
+        if (currentCard?.type === 'scenario' && !isFetchingFollowUp && session && !isStarting) {
+            fetchFollowUpCard(currentCard.content);
+        }
+    }, [currentCard, session, isFetchingFollowUp, isStarting, fetchFollowUpCard]);
 
     // Submit user input (for prompt, reflection, or choice cards)
     const handleSubmit = async (input: string) => {
@@ -261,7 +354,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                         {/* Current card */}
                         {!levelUpCard && currentCard && !isStarting && (
                             <>
-                                {isLoading ? (
+                                {isLoading || isFetchingFollowUp ? (
                                     <LoadingCard />
                                 ) : (
                                     <CardRenderer

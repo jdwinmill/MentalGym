@@ -35,14 +35,34 @@ export function ReflectionCard({ card, onSubmit, characterLimit, isLoading }: Re
     return (
         <Card className="w-full max-w-2xl mx-auto border-purple-200 dark:border-purple-800">
             <CardContent className="pt-6 space-y-4">
-                <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 shrink-0">
-                        <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div className="prose prose-neutral dark:prose-invert max-w-none">
-                        <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
-                            {card.content}
+                {/* Scenario context if consolidated */}
+                {card.scenarioContext && (
+                    <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg border-l-4 border-primary">
+                        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wide">
+                            Scenario
                         </p>
+                        <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+                            {card.scenarioContext}
+                        </p>
+                    </div>
+                )}
+
+                {/* Reflection prompt */}
+                <div>
+                    {card.scenarioContext && (
+                        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wide">
+                            Reflect
+                        </p>
+                    )}
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 shrink-0">
+                            <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div className="prose prose-neutral dark:prose-invert max-w-none">
+                            <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+                                {card.content}
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <div className="space-y-2">
