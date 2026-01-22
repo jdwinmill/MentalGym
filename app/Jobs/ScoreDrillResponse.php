@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\DrillScoringService;
@@ -36,11 +35,12 @@ class ScoreDrillResponse implements ShouldQueue
         $user = User::find($this->userId);
         $session = TrainingSession::find($this->trainingSessionId);
 
-        if (!$user || !$session) {
+        if (! $user || ! $session) {
             Log::warning('ScoreDrillResponse: User or session not found', [
                 'user_id' => $this->userId,
                 'session_id' => $this->trainingSessionId,
             ]);
+
             return;
         }
 
@@ -66,8 +66,8 @@ class ScoreDrillResponse implements ShouldQueue
     {
         return [
             'drill-scoring',
-            'user:' . $this->userId,
-            'drill:' . $this->drillType,
+            'user:'.$this->userId,
+            'drill:'.$this->drillType,
         ];
     }
 }

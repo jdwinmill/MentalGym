@@ -16,7 +16,6 @@ export function GatedView({
     totalSessions,
     hasEnoughData,
     sessionsUntilInsights,
-    gateReason,
 }: GatedViewProps) {
     if (!hasEnoughData) {
         return (

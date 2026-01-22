@@ -39,7 +39,9 @@ class UserContentInteraction extends Model
      * Interaction type constants.
      */
     public const TYPE_AUDIO_PLAYED = 'audio_played';
+
     public const TYPE_VIDEO_WATCHED = 'video_watched';
+
     public const TYPE_CONTENT_VIEWED = 'content_viewed';
 
     /**

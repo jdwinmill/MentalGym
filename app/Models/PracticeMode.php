@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PracticeMode extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'slug',
         'name',

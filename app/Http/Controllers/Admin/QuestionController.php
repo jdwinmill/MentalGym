@@ -12,12 +12,14 @@ class QuestionController extends Controller
     public function index()
     {
         $questions = Question::with('tags')->latest()->paginate(20);
+
         return view('admin.questions.index', compact('questions'));
     }
 
     public function create()
     {
         $allTags = Tag::orderBy('name')->pluck('name');
+
         return view('admin.questions.create', compact('allTags'));
     }
 
@@ -49,6 +51,7 @@ class QuestionController extends Controller
     {
         $question->load('tags');
         $allTags = Tag::orderBy('name')->pluck('name');
+
         return view('admin.questions.edit', compact('question', 'allTags'));
     }
 
@@ -88,6 +91,7 @@ class QuestionController extends Controller
     {
         if (empty($tagsInput)) {
             $question->tags()->detach();
+
             return;
         }
 

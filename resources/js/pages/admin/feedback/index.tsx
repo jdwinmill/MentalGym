@@ -125,8 +125,6 @@ export default function FeedbackIndex({ feedback }: Props) {
     }
 
     const bugCount = feedback.data.filter(f => f.type === 'bug').length;
-    const ideaCount = feedback.data.filter(f => f.type === 'idea').length;
-    const otherCount = feedback.data.filter(f => f.type === 'other').length;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

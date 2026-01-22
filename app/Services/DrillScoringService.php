@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Anthropic\Client;
 use App\Models\DrillScore;
-use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
@@ -132,6 +131,7 @@ PROMPT;
         foreach ($criteria as $key => $config) {
             $lines[] = "- {$key}: {$config['description']}";
         }
+
         return implode("\n", $lines);
     }
 
@@ -142,6 +142,7 @@ PROMPT;
             $type = $config['type'] === 'boolean' ? 'boolean' : 'integer';
             $fields[] = "  \"{$key}\": {$type}";
         }
+
         return implode(",\n", $fields);
     }
 
@@ -160,11 +161,12 @@ PROMPT;
 
         $scores = json_decode($json, true);
 
-        if (!is_array($scores)) {
+        if (! is_array($scores)) {
             Log::warning('Failed to parse drill scoring response', [
                 'drill_type' => $drillType,
                 'response' => $aiResponse,
             ]);
+
             return null;
         }
 

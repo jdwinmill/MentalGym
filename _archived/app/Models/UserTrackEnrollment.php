@@ -44,8 +44,11 @@ class UserTrackEnrollment extends Model
      * Status constants.
      */
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_PAUSED = 'paused';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_ABANDONED = 'abandoned';
 
     /**
@@ -77,12 +80,12 @@ class UserTrackEnrollment extends Model
      */
     public function canAdvanceLevel(): bool
     {
-        if (!$this->current_skill_level_id) {
+        if (! $this->current_skill_level_id) {
             return false;
         }
 
         $currentLevel = $this->currentSkillLevel;
-        if (!$currentLevel || $currentLevel->isLastLevel()) {
+        if (! $currentLevel || $currentLevel->isLastLevel()) {
             return false;
         }
 
@@ -122,16 +125,17 @@ class UserTrackEnrollment extends Model
     public function advanceToNextLevel(): bool
     {
         $currentLevel = $this->currentSkillLevel;
-        if (!$currentLevel) {
+        if (! $currentLevel) {
             return false;
         }
 
         $nextLevel = $currentLevel->getNextLevel();
-        if (!$nextLevel) {
+        if (! $nextLevel) {
             return false;
         }
 
         $this->current_skill_level_id = $nextLevel->id;
+
         return $this->save();
     }
 
@@ -142,6 +146,7 @@ class UserTrackEnrollment extends Model
     {
         $this->status = self::STATUS_COMPLETED;
         $this->completed_at = now();
+
         return $this->save();
     }
 
@@ -184,6 +189,7 @@ class UserTrackEnrollment extends Model
     {
         $this->status = self::STATUS_ACTIVE;
         $this->activated_at = now();
+
         return $this->save();
     }
 
@@ -193,6 +199,7 @@ class UserTrackEnrollment extends Model
     public function pause(): bool
     {
         $this->status = self::STATUS_PAUSED;
+
         return $this->save();
     }
 
@@ -209,7 +216,7 @@ class UserTrackEnrollment extends Model
      */
     public function daysSinceActivation(): ?int
     {
-        if (!$this->activated_at) {
+        if (! $this->activated_at) {
             return null;
         }
 

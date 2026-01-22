@@ -19,7 +19,7 @@ import { CardRenderer, LevelUpRenderer } from '@/components/training/cards/CardR
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function TrainPage({ mode, progress: initialProgress, has_active_session }: TrainPageProps) {
+export default function TrainPage({ mode, progress: initialProgress }: TrainPageProps) {
     const [session, setSession] = useState<Session | null>(null);
     const [currentCard, setCurrentCard] = useState<Card | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);

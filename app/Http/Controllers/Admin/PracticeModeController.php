@@ -19,7 +19,7 @@ class PracticeModeController extends Controller
         $modes = PracticeMode::orderBy('sort_order')
             ->orderBy('name')
             ->get()
-            ->map(fn($mode) => [
+            ->map(fn ($mode) => [
                 'id' => $mode->id,
                 'name' => $mode->name,
                 'slug' => $mode->slug,

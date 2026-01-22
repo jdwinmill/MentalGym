@@ -52,14 +52,14 @@ class DrillScoreFactory extends Factory
 
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }
 
     public function forSession(TrainingSession $session): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $session->user_id,
             'training_session_id' => $session->id,
             'practice_mode_id' => $session->practice_mode_id,
@@ -71,6 +71,7 @@ class DrillScoreFactory extends Factory
         return $this->state(function (array $attributes) use ($hedging) {
             $scores = $attributes['scores'] ?? [];
             $scores['hedging'] = $hedging;
+
             return ['scores' => $scores];
         });
     }
@@ -83,6 +84,7 @@ class DrillScoreFactory extends Factory
             $scores['declarative_sentences'] = false;
             $scores['authority_tone'] = false;
             $scores['clear_position'] = false;
+
             return [
                 'scores' => $scores,
                 'drill_type' => 'executive_communication',
@@ -98,6 +100,7 @@ class DrillScoreFactory extends Factory
             $scores['core_point_captured'] = false;
             $scores['jargon_removed'] = false;
             $scores['clarity'] = false;
+
             return [
                 'scores' => $scores,
                 'drill_type' => 'compression',
@@ -113,6 +116,7 @@ class DrillScoreFactory extends Factory
             $scores['star_structure'] = false;
             $scores['logical_flow'] = false;
             $scores['structure_followed'] = false;
+
             return [
                 'scores' => $scores,
                 'drill_type' => 'story_compression',
@@ -144,14 +148,14 @@ class DrillScoreFactory extends Factory
 
     public function iteration(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_iteration' => true,
         ]);
     }
 
     public function createdDaysAgo(int $days): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'created_at' => now()->subDays($days),
             'updated_at' => now()->subDays($days),
         ]);

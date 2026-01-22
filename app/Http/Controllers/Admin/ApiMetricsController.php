@@ -40,6 +40,7 @@ class ApiMetricsController extends Controller
             ->get()
             ->map(function ($item) {
                 $item->load('practiceMode:id,name,slug');
+
                 return [
                     'practice_mode_id' => $item->practice_mode_id,
                     'mode_name' => $item->practiceMode?->name ?? 'Unknown',

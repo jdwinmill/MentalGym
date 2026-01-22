@@ -50,7 +50,9 @@ class LessonQuestion extends Model
      * Question type constants.
      */
     public const TYPE_MULTIPLE_CHOICE = 'multiple_choice';
+
     public const TYPE_TRUE_FALSE = 'true_false';
+
     public const TYPE_OPEN_ENDED = 'open_ended';
 
     /**

@@ -14,7 +14,7 @@ class WeeklyEmailContent
 
     public function hasImprovements(): bool
     {
-        return !empty($this->improving);
+        return ! empty($this->improving);
     }
 
     public function toArray(): array

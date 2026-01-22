@@ -124,11 +124,11 @@ class GatedBlindSpotAnalysis
             'gateReason' => $this->gateReason,
             'sessionsUntilInsights' => $this->sessionsUntilInsights,
 
-            'blindSpots' => is_array($this->blindSpots) ? array_map(fn($s) => $s->toArray(), $this->blindSpots) : null,
-            'improving' => is_array($this->improving) ? array_map(fn($s) => $s->toArray(), $this->improving) : null,
-            'slipping' => is_array($this->slipping) ? array_map(fn($s) => $s->toArray(), $this->slipping) : null,
-            'stable' => is_array($this->stable) ? array_map(fn($s) => $s->toArray(), $this->stable) : null,
-            'universalPatterns' => is_array($this->universalPatterns) ? array_map(fn($p) => $p->toArray(), $this->universalPatterns) : null,
+            'blindSpots' => is_array($this->blindSpots) ? array_map(fn ($s) => $s->toArray(), $this->blindSpots) : null,
+            'improving' => is_array($this->improving) ? array_map(fn ($s) => $s->toArray(), $this->improving) : null,
+            'slipping' => is_array($this->slipping) ? array_map(fn ($s) => $s->toArray(), $this->slipping) : null,
+            'stable' => is_array($this->stable) ? array_map(fn ($s) => $s->toArray(), $this->stable) : null,
+            'universalPatterns' => is_array($this->universalPatterns) ? array_map(fn ($p) => $p->toArray(), $this->universalPatterns) : null,
             'biggestGap' => $this->biggestGap,
             'biggestWin' => $this->biggestWin,
 

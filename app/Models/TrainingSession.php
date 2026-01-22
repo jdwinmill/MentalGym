@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TrainingSession extends Model
 {
     use HasFactory;
+
     public const STATUS_ACTIVE = 'active';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_ABANDONED = 'abandoned';
 
     protected $fillable = [
@@ -102,7 +105,7 @@ class TrainingSession extends Model
      */
     public function getFormattedDuration(): string
     {
-        if (!$this->duration_seconds) {
+        if (! $this->duration_seconds) {
             return '-';
         }
 

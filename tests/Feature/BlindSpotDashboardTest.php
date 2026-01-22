@@ -47,10 +47,9 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->component('blind-spots/index')
-                ->has('analysis')
-                ->has('isPro')
+        $response->assertInertia(fn (AssertableInertia $page) => $page->component('blind-spots/index')
+            ->has('analysis')
+            ->has('isPro')
         );
     });
 
@@ -60,11 +59,10 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->component('blind-spots/index')
-                ->where('analysis.isUnlocked', true)
-                ->where('isPro', true)
-                ->has('history')
+        $response->assertInertia(fn (AssertableInertia $page) => $page->component('blind-spots/index')
+            ->where('analysis.isUnlocked', true)
+            ->where('isPro', true)
+            ->has('history')
         );
     });
 
@@ -74,12 +72,11 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->component('blind-spots/index')
-                ->where('analysis.isUnlocked', false)
-                ->where('analysis.gateReason', 'requires_upgrade')
-                ->where('isPro', false)
-                ->where('history', null)
+        $response->assertInertia(fn (AssertableInertia $page) => $page->component('blind-spots/index')
+            ->where('analysis.isUnlocked', false)
+            ->where('analysis.gateReason', 'requires_upgrade')
+            ->where('isPro', false)
+            ->where('history', null)
         );
     });
 
@@ -89,10 +86,9 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->component('blind-spots/index')
-                ->where('analysis.hasEnoughData', false)
-                ->where('analysis.gateReason', 'insufficient_data')
+        $response->assertInertia(fn (AssertableInertia $page) => $page->component('blind-spots/index')
+            ->where('analysis.hasEnoughData', false)
+            ->where('analysis.gateReason', 'insufficient_data')
         );
     });
 
@@ -102,9 +98,8 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->has('history', 8) // 8 weeks of trend data
-                ->has('history.0.week')
+        $response->assertInertia(fn (AssertableInertia $page) => $page->has('history', 8) // 8 weeks of trend data
+            ->has('history.0.week')
         );
     });
 
@@ -114,8 +109,7 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->where('history', null)
+        $response->assertInertia(fn (AssertableInertia $page) => $page->where('history', null)
         );
     });
 
@@ -125,9 +119,8 @@ describe('GET /blind-spots', function () {
         $response = $this->actingAs($user)->get('/blind-spots');
 
         $response->assertOk();
-        $response->assertInertia(fn(AssertableInertia $page) =>
-            $page->where('isPro', true)
-                ->where('analysis.isUnlocked', true)
+        $response->assertInertia(fn (AssertableInertia $page) => $page->where('isPro', true)
+            ->where('analysis.isUnlocked', true)
         );
     });
 });
@@ -163,7 +156,7 @@ describe('BlindSpotService historical trends', function () {
         expect($trends[3]['week'])->not->toBeEmpty();
 
         // At least one week should have data
-        $hasData = collect($trends)->some(fn($t) => $t['data'] !== null);
+        $hasData = collect($trends)->some(fn ($t) => $t['data'] !== null);
         expect($hasData)->toBeTrue();
     });
 });

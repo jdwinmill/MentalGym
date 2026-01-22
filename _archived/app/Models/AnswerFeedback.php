@@ -33,7 +33,9 @@ class AnswerFeedback extends Model
      * Severity level constants.
      */
     public const SEVERITY_CRITICAL_MISS = 'critical_miss';
+
     public const SEVERITY_MINOR_MISS = 'minor_miss';
+
     public const SEVERITY_CORRECT = 'correct';
 
     /**
@@ -81,6 +83,6 @@ class AnswerFeedback extends Model
      */
     public function hasPatternTag(): bool
     {
-        return !empty($this->pattern_tag);
+        return ! empty($this->pattern_tag);
     }
 }

@@ -47,8 +47,11 @@ class UserWeaknessPattern extends Model
      * Severity thresholds.
      */
     public const SEVERITY_LOW = 1;
+
     public const SEVERITY_MEDIUM = 2;
+
     public const SEVERITY_HIGH = 3;
+
     public const SEVERITY_CRITICAL = 4;
 
     /**

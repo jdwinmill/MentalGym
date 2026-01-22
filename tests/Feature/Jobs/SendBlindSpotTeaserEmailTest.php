@@ -89,7 +89,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         $fifthSession->update(['status' => TrainingSession::STATUS_COMPLETED]);
 
         // Trigger event
-        $listener = new CheckBlindSpotTeaserTrigger();
+        $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($fifthSession));
 
         // Job should have been dispatched - check by running it directly
@@ -104,7 +104,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         $user = createFreeUserWithSessions(4);
         $session = $user->trainingSessions()->latest()->first();
 
-        $listener = new CheckBlindSpotTeaserTrigger();
+        $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($session));
 
         Mail::assertNothingSent();
@@ -114,7 +114,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         $user = createFreeUserWithSessions(6);
         $session = $user->trainingSessions()->latest()->first();
 
-        $listener = new CheckBlindSpotTeaserTrigger();
+        $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($session));
 
         Mail::assertNothingSent();
@@ -139,7 +139,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
                 ->create();
         }
 
-        $listener = new CheckBlindSpotTeaserTrigger();
+        $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($sessions->last()));
 
         Mail::assertNothingSent();
@@ -216,7 +216,7 @@ describe('SendBlindSpotTeaserEmail job', function () {
 
         $session = $user->trainingSessions()->latest()->first();
 
-        $listener = new CheckBlindSpotTeaserTrigger();
+        $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($session));
 
         Mail::assertNothingSent();
@@ -243,6 +243,7 @@ describe('SendBlindSpotTeaserEmail job', function () {
 
         Mail::assertSent(BlindSpotTeaserEmail::class, function ($mail) {
             $subject = $mail->envelope()->subject;
+
             // Should contain "pattern" (singular or plural)
             return str_contains($subject, 'pattern');
         });

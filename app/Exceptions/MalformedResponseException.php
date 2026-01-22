@@ -28,6 +28,6 @@ class MalformedResponseException extends Exception
             return $this->rawResponse;
         }
 
-        return substr($this->rawResponse, 0, $maxLength) . '...';
+        return substr($this->rawResponse, 0, $maxLength).'...';
     }
 }

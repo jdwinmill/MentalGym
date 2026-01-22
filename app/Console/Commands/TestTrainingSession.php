@@ -10,6 +10,7 @@ use Illuminate\Console\Command;
 class TestTrainingSession extends Command
 {
     protected $signature = 'training:test {user_id} {mode_slug}';
+
     protected $description = 'Test training session flow';
 
     public function handle(TrainingSessionService $service): int

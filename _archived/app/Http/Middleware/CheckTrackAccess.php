@@ -23,7 +23,7 @@ class CheckTrackAccess
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return $this->denyAccess($request, 'Authentication required');
         }
 
@@ -35,7 +35,7 @@ class CheckTrackAccess
         // Get the track from the route
         $track = $request->route('track');
 
-        if (!$track instanceof Track) {
+        if (! $track instanceof Track) {
             // Try to find track by slug or ID
             $trackParam = $request->route('track');
             $track = is_numeric($trackParam)
@@ -43,11 +43,11 @@ class CheckTrackAccess
                 : Track::where('slug', $trackParam)->first();
         }
 
-        if (!$track) {
+        if (! $track) {
             return $next($request); // Let the controller handle 404
         }
 
-        if (!$user->canAccessTrack($track)) {
+        if (! $user->canAccessTrack($track)) {
             $missingCapabilities = $user->getMissingCapabilitiesForTrack($track);
             $recommendedPlan = $this->capabilityService->getRecommendedPlanForTrack($track);
 

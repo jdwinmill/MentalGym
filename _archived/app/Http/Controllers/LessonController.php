@@ -25,9 +25,9 @@ class LessonController extends Controller
         $lesson->load([
             'track',
             'skillLevel',
-            'contentBlocks' => fn($q) => $q->orderBy('sort_order'),
-            'questions' => fn($q) => $q->orderBy('sort_order'),
-            'questions.answerOptions' => fn($q) => $q->orderBy('sort_order'),
+            'contentBlocks' => fn ($q) => $q->orderBy('sort_order'),
+            'questions' => fn ($q) => $q->orderBy('sort_order'),
+            'questions.answerOptions' => fn ($q) => $q->orderBy('sort_order'),
         ]);
 
         // Load feedback separately for each answer option
@@ -137,7 +137,7 @@ class LessonController extends Controller
             ->first();
 
         // Track weakness pattern if incorrect and has pattern tag
-        if (!$isCorrect && $feedback && $feedback->pattern_tag) {
+        if (! $isCorrect && $feedback && $feedback->pattern_tag) {
             $this->recordWeaknessPattern($attempt, $feedback->pattern_tag);
         }
 
@@ -165,7 +165,7 @@ class LessonController extends Controller
         $attempt->markCompleted();
 
         $lesson = $attempt->lesson->load([
-            'contentBlocks' => fn($q) => $q->where('block_type', 'audio'),
+            'contentBlocks' => fn ($q) => $q->where('block_type', 'audio'),
         ]);
 
         // Get transcript from audio block
@@ -179,7 +179,7 @@ class LessonController extends Controller
             ->orderByDesc('occurrence_count')
             ->limit(5)
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'pattern_tag' => $p->pattern_tag,
                 'occurrence_count' => $p->occurrence_count,
                 'severity_label' => $p->getSeverityLabel(),
@@ -219,12 +219,12 @@ class LessonController extends Controller
     public function streamAudio(string $path): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         // Validate the path is an audio file
-        if (!preg_match('/\.(mp3|wav|ogg|m4a)$/i', $path)) {
+        if (! preg_match('/\.(mp3|wav|ogg|m4a)$/i', $path)) {
             abort(404);
         }
 
         // Check if file exists
-        if (!Storage::disk('s3')->exists($path)) {
+        if (! Storage::disk('s3')->exists($path)) {
             abort(404);
         }
 

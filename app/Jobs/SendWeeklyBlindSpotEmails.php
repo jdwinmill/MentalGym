@@ -95,8 +95,9 @@ class SendWeeklyBlindSpotEmails implements ShouldQueue
         int $year,
     ): void {
         // Check if user has enough data
-        if (!$analyzer->hasEnoughData($user)) {
+        if (! $analyzer->hasEnoughData($user)) {
             Log::debug('Skipping user - insufficient data', ['user_id' => $user->id]);
+
             return;
         }
 
@@ -104,8 +105,9 @@ class SendWeeklyBlindSpotEmails implements ShouldQueue
         $analysis = $analyzer->analyze($user);
 
         // Skip if no meaningful data
-        if (!$analysis->hasBlindSpots() && empty($analysis->improving) && empty($analysis->slipping)) {
+        if (! $analysis->hasBlindSpots() && empty($analysis->improving) && empty($analysis->slipping)) {
             Log::debug('Skipping user - no meaningful patterns', ['user_id' => $user->id]);
+
             return;
         }
 

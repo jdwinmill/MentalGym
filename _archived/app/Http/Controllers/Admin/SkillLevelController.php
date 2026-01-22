@@ -111,6 +111,6 @@ class SkillLevelController extends Controller
         $skillLevel->delete();
 
         return redirect()->route('admin.tracks.skill-levels.index', $track)
-            ->with('success', "Skill level deleted successfully." . ($lessonCount > 0 ? " {$lessonCount} lesson(s) were also removed." : ''));
+            ->with('success', 'Skill level deleted successfully.'.($lessonCount > 0 ? " {$lessonCount} lesson(s) were also removed." : ''));
     }
 }

@@ -34,26 +34,25 @@ class PracticeAIService
         $startTime = microtime(true);
 
         try {
-            $response = $this->callWithRetry(fn () =>
-                $this->client->messages->create([
-                    'model' => $model,
-                    'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
-                    'tools' => $this->getToolDefinition(),
-                    'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
-                    'system' => [
-                        [
-                            'type' => 'text',
-                            'text' => $instructionSet,
-                            'cache_control' => ['type' => 'ephemeral'],
-                        ]
+            $response = $this->callWithRetry(fn () => $this->client->messages->create([
+                'model' => $model,
+                'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
+                'tools' => $this->getToolDefinition(),
+                'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
+                'system' => [
+                    [
+                        'type' => 'text',
+                        'text' => $instructionSet,
+                        'cache_control' => ['type' => 'ephemeral'],
                     ],
-                    'messages' => [
-                        [
-                            'role' => 'user',
-                            'content' => 'Begin training.',
-                        ]
+                ],
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => 'Begin training.',
                     ],
-                ])
+                ],
+            ])
             );
 
             $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
@@ -71,7 +70,7 @@ class PracticeAIService
             return $this->extractCardFromResponse($response);
 
         } catch (MalformedResponseException $e) {
-            Log::error("AI first response malformed", [
+            Log::error('AI first response malformed', [
                 'mode' => $mode->slug,
                 'level' => $userLevel,
                 'error' => $e->getMessage(),
@@ -94,7 +93,7 @@ class PracticeAIService
                 $e->getMessage()
             );
 
-            Log::error("AI first response failed", [
+            Log::error('AI first response failed', [
                 'mode' => $mode->slug,
                 'level' => $userLevel,
                 'error' => $e->getMessage(),
@@ -120,21 +119,20 @@ class PracticeAIService
         $startTime = microtime(true);
 
         try {
-            $response = $this->callWithRetry(fn () =>
-                $this->client->messages->create([
-                    'model' => $model,
-                    'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
-                    'tools' => $this->getToolDefinition(),
-                    'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
-                    'system' => [
-                        [
-                            'type' => 'text',
-                            'text' => $instructionSet,
-                            'cache_control' => ['type' => 'ephemeral'],
-                        ]
+            $response = $this->callWithRetry(fn () => $this->client->messages->create([
+                'model' => $model,
+                'max_tokens' => $mode->config['max_response_tokens'] ?? 800,
+                'tools' => $this->getToolDefinition(),
+                'tool_choice' => ['type' => 'tool', 'name' => 'display_card'],
+                'system' => [
+                    [
+                        'type' => 'text',
+                        'text' => $instructionSet,
+                        'cache_control' => ['type' => 'ephemeral'],
                     ],
-                    'messages' => $messages,
-                ])
+                ],
+                'messages' => $messages,
+            ])
             );
 
             $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
@@ -152,7 +150,7 @@ class PracticeAIService
             return $this->extractCardFromResponse($response);
 
         } catch (MalformedResponseException $e) {
-            Log::error("AI response malformed", [
+            Log::error('AI response malformed', [
                 'mode' => $mode->slug,
                 'level' => $userLevel,
                 'error' => $e->getMessage(),
@@ -175,7 +173,7 @@ class PracticeAIService
                 $e->getMessage()
             );
 
-            Log::error("AI response failed", [
+            Log::error('AI response failed', [
                 'mode' => $mode->slug,
                 'level' => $userLevel,
                 'error' => $e->getMessage(),
@@ -333,10 +331,10 @@ class PracticeAIService
                     'content' => [
                         [
                             'type' => 'tool_use',
-                            'id' => 'toolu_' . $msg->id,
+                            'id' => 'toolu_'.$msg->id,
                             'name' => 'display_card',
                             'input' => $this->cardToToolInput($parsed),
-                        ]
+                        ],
                     ],
                 ];
 
@@ -346,9 +344,9 @@ class PracticeAIService
                     'content' => [
                         [
                             'type' => 'tool_result',
-                            'tool_use_id' => 'toolu_' . $msg->id,
+                            'tool_use_id' => 'toolu_'.$msg->id,
                             'content' => 'Card displayed to user.',
-                        ]
+                        ],
                     ],
                 ];
             } else {
@@ -440,7 +438,7 @@ class PracticeAIService
                 $attempts++;
 
                 if ($attempts <= $maxRetries) {
-                    Log::warning("AI API call failed, retrying...", [
+                    Log::warning('AI API call failed, retrying...', [
                         'attempt' => $attempts,
                         'error' => $e->getMessage(),
                     ]);

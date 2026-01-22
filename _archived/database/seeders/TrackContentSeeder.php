@@ -33,7 +33,6 @@ use RuntimeException;
  * @example
  * $seeder = new TrackContentSeeder();
  * $seeder->seedFromFile(storage_path('seeds/active-listening.json'));
- *
  * @example
  * $seeder = new TrackContentSeeder();
  * $seeder->seedFromArray($jsonDecodedData);
@@ -57,6 +56,7 @@ class TrackContentSeeder extends Seeder
      * Lookup maps for slug -> id resolution.
      */
     protected array $skillLevelMap = [];
+
     protected array $contentBlockMap = [];
 
     /**
@@ -92,13 +92,14 @@ class TrackContentSeeder extends Seeder
     /**
      * Seed content from a JSON file.
      *
-     * @param string $filePath Absolute path to the JSON file
+     * @param  string  $filePath  Absolute path to the JSON file
+     *
      * @throws InvalidArgumentException If file doesn't exist or is invalid JSON
      * @throws RuntimeException If seeding fails
      */
     public function seedFromFile(string $filePath): Track
     {
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             throw new InvalidArgumentException("Seed file not found: {$filePath}");
         }
 
@@ -106,7 +107,7 @@ class TrackContentSeeder extends Seeder
         $data = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
+            throw new InvalidArgumentException('Invalid JSON: '.json_last_error_msg());
         }
 
         return $this->seedFromArray($data);
@@ -115,7 +116,8 @@ class TrackContentSeeder extends Seeder
     /**
      * Seed content from a decoded JSON array.
      *
-     * @param array $data The decoded JSON data
+     * @param  array  $data  The decoded JSON data
+     *
      * @throws InvalidArgumentException If required data is missing
      * @throws RuntimeException If seeding fails
      */
@@ -166,12 +168,13 @@ class TrackContentSeeder extends Seeder
     /**
      * Validate the top-level structure of the input data.
      *
-     * @param array $data The input data to validate
+     * @param  array  $data  The input data to validate
+     *
      * @throws InvalidArgumentException If validation fails
      */
     protected function validateStructure(array $data): void
     {
-        if (!isset($data['track'])) {
+        if (! isset($data['track'])) {
             throw new InvalidArgumentException('Missing required "track" key in JSON structure');
         }
 
@@ -185,7 +188,7 @@ class TrackContentSeeder extends Seeder
         // Validate skill levels if present
         if (isset($data['skill_levels'])) {
             foreach ($data['skill_levels'] as $index => $level) {
-                if (empty($level['slug']) || empty($level['name']) || !isset($level['level_number'])) {
+                if (empty($level['slug']) || empty($level['name']) || ! isset($level['level_number'])) {
                     throw new InvalidArgumentException(
                         "Skill level at index {$index} is missing required fields (slug, name, level_number)"
                     );
@@ -196,7 +199,7 @@ class TrackContentSeeder extends Seeder
         // Validate lessons if present
         if (isset($data['lessons'])) {
             foreach ($data['lessons'] as $index => $lesson) {
-                if (!isset($lesson['lesson_number']) || empty($lesson['title']) || empty($lesson['skill_level_slug'])) {
+                if (! isset($lesson['lesson_number']) || empty($lesson['title']) || empty($lesson['skill_level_slug'])) {
                     throw new InvalidArgumentException(
                         "Lesson at index {$index} is missing required fields (lesson_number, title, skill_level_slug)"
                     );
@@ -208,7 +211,7 @@ class TrackContentSeeder extends Seeder
     /**
      * Create or update the track record.
      *
-     * @param array $trackData Track data from JSON
+     * @param  array  $trackData  Track data from JSON
      * @return Track The created or updated track
      */
     protected function createTrack(array $trackData): Track
@@ -258,7 +261,7 @@ class TrackContentSeeder extends Seeder
     /**
      * Create skill levels for the track.
      *
-     * @param array $skillLevelsData Array of skill level data
+     * @param  array  $skillLevelsData  Array of skill level data
      */
     protected function createSkillLevels(array $skillLevelsData): void
     {
@@ -283,7 +286,7 @@ class TrackContentSeeder extends Seeder
     /**
      * Create lessons with their content blocks and questions.
      *
-     * @param array $lessonsData Array of lesson data
+     * @param  array  $lessonsData  Array of lesson data
      */
     protected function createLessons(array $lessonsData): void
     {
@@ -307,12 +310,12 @@ class TrackContentSeeder extends Seeder
             $this->contentBlockMap = [];
 
             // Create content blocks
-            if (!empty($lessonData['content_blocks'])) {
+            if (! empty($lessonData['content_blocks'])) {
                 $this->createContentBlocks($lesson, $lessonData['content_blocks']);
             }
 
             // Create questions
-            if (!empty($lessonData['questions'])) {
+            if (! empty($lessonData['questions'])) {
                 $this->createQuestions($lesson, $lessonData['questions']);
             }
         }
@@ -321,8 +324,8 @@ class TrackContentSeeder extends Seeder
     /**
      * Create content blocks for a lesson.
      *
-     * @param Lesson $lesson The parent lesson
-     * @param array $blocksData Array of content block data
+     * @param  Lesson  $lesson  The parent lesson
+     * @param  array  $blocksData  Array of content block data
      */
     protected function createContentBlocks(Lesson $lesson, array $blocksData): void
     {
@@ -345,8 +348,8 @@ class TrackContentSeeder extends Seeder
     /**
      * Create questions for a lesson.
      *
-     * @param Lesson $lesson The parent lesson
-     * @param array $questionsData Array of question data
+     * @param  Lesson  $lesson  The parent lesson
+     * @param  array  $questionsData  Array of question data
      */
     protected function createQuestions(Lesson $lesson, array $questionsData): void
     {
@@ -367,10 +370,10 @@ class TrackContentSeeder extends Seeder
             ]);
 
             $this->counts['questions']++;
-            $this->info("    Question {$questionData['sort_order']}: " . substr($questionData['question_text'], 0, 50) . '...');
+            $this->info("    Question {$questionData['sort_order']}: ".substr($questionData['question_text'], 0, 50).'...');
 
             // Create answer options with feedback
-            if (!empty($questionData['answer_options'])) {
+            if (! empty($questionData['answer_options'])) {
                 $this->createAnswerOptions($question, $questionData['answer_options']);
             }
         }
@@ -379,8 +382,8 @@ class TrackContentSeeder extends Seeder
     /**
      * Create answer options and their feedback for a question.
      *
-     * @param LessonQuestion $question The parent question
-     * @param array $optionsData Array of answer option data
+     * @param  LessonQuestion  $question  The parent question
+     * @param  array  $optionsData  Array of answer option data
      */
     protected function createAnswerOptions(LessonQuestion $question, array $optionsData): void
     {
@@ -395,7 +398,7 @@ class TrackContentSeeder extends Seeder
             $this->counts['answer_options']++;
 
             // Create feedback if provided
-            if (!empty($optionData['feedback'])) {
+            if (! empty($optionData['feedback'])) {
                 $this->createAnswerFeedback($question, $option, $optionData['feedback']);
             }
         }
@@ -404,9 +407,9 @@ class TrackContentSeeder extends Seeder
     /**
      * Create feedback for an answer option.
      *
-     * @param LessonQuestion $question The parent question
-     * @param AnswerOption $option The answer option
-     * @param array $feedbackData Feedback data
+     * @param  LessonQuestion  $question  The parent question
+     * @param  AnswerOption  $option  The answer option
+     * @param  array  $feedbackData  Feedback data
      */
     protected function createAnswerFeedback(LessonQuestion $question, AnswerOption $option, array $feedbackData): void
     {
@@ -424,13 +427,14 @@ class TrackContentSeeder extends Seeder
     /**
      * Resolve a skill level slug to its ID.
      *
-     * @param string $slug The skill level slug
+     * @param  string  $slug  The skill level slug
      * @return int The skill level ID
+     *
      * @throws InvalidArgumentException If the slug is not found
      */
     protected function resolveSkillLevelId(string $slug): int
     {
-        if (!isset($this->skillLevelMap[$slug])) {
+        if (! isset($this->skillLevelMap[$slug])) {
             throw new InvalidArgumentException("Unknown skill level slug: {$slug}");
         }
 
@@ -440,7 +444,7 @@ class TrackContentSeeder extends Seeder
     /**
      * Resolve a content block sort_order to its ID within the current lesson.
      *
-     * @param int|null $sortOrder The content block sort_order
+     * @param  int|null  $sortOrder  The content block sort_order
      * @return int|null The content block ID or null
      */
     protected function resolveRelatedBlockId(?int $sortOrder): ?int
@@ -461,7 +465,7 @@ class TrackContentSeeder extends Seeder
         $this->success('Seeding Complete!');
         $this->command->newLine();
 
-        $this->info("Summary:");
+        $this->info('Summary:');
         $this->info("  Tracks:         {$this->counts['tracks']}");
         $this->info("  Skill Levels:   {$this->counts['skill_levels']}");
         $this->info("  Lessons:        {$this->counts['lessons']}");
@@ -511,6 +515,7 @@ class TrackContentSeeder extends Seeder
     public function setVerbose(bool $verbose): self
     {
         $this->verbose = $verbose;
+
         return $this;
     }
 

@@ -142,7 +142,7 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
     );
 }
 
-export default function Dashboard({ modes, hasAccess, subscriptionStatus }: DashboardProps) {
+export default function Dashboard({ modes, hasAccess }: DashboardProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

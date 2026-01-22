@@ -21,7 +21,7 @@ class TagController extends Controller
             ->ordered()
             ->get()
             ->groupBy('category')
-            ->map(fn($tags) => $tags->map(fn($tag) => [
+            ->map(fn ($tags) => $tags->map(fn ($tag) => [
                 'id' => $tag->id,
                 'name' => $tag->name,
                 'slug' => $tag->slug,

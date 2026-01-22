@@ -161,7 +161,7 @@ class SimulationService
             if ($entry['role'] === 'assistant' && isset($entry['card'])) {
                 $contextText .= "AI Card ({$entry['card']['type']}): {$entry['card']['content']}\n";
                 if (isset($entry['card']['options'])) {
-                    $contextText .= "Options: " . json_encode($entry['card']['options']) . "\n";
+                    $contextText .= 'Options: '.json_encode($entry['card']['options'])."\n";
                 }
             } elseif ($entry['role'] === 'user') {
                 $contextText .= "User: {$entry['content']}\n";
@@ -223,9 +223,9 @@ MSG;
 
         $issuesText = empty($issues)
             ? 'No issues detected.'
-            : implode("\n", array_map(fn($i) => "- [{$i['type']}] {$i['description']}", $issues));
+            : implode("\n", array_map(fn ($i) => "- [{$i['type']}] {$i['description']}", $issues));
 
-        $systemPrompt = <<<PROMPT
+        $systemPrompt = <<<'PROMPT'
 You are an expert at writing AI instruction sets (system prompts) for mental training exercises.
 
 Your task is to analyze a simulation transcript and the detected issues, then produce an improved version of the instruction set that addresses the problems found.
@@ -271,7 +271,7 @@ MSG;
                 'error' => $e->getMessage(),
             ]);
 
-            return $originalInstructionSet . "\n\n[Error: Could not generate improvements]";
+            return $originalInstructionSet."\n\n[Error: Could not generate improvements]";
         }
     }
 
@@ -280,7 +280,7 @@ MSG;
         // Check for repeated card (same type + similar content within last 3 exchanges)
         $recentCards = array_filter(
             array_slice($transcript, -7, 6),
-            fn($e) => $e['role'] === 'assistant' && isset($e['card'])
+            fn ($e) => $e['role'] === 'assistant' && isset($e['card'])
         );
 
         foreach ($recentCards as $entry) {
@@ -314,7 +314,7 @@ MSG;
         }
 
         // Check for missing input_config on prompt/reflection cards
-        if (in_array($card['type'], ['prompt', 'reflection']) && !isset($card['input'])) {
+        if (in_array($card['type'], ['prompt', 'reflection']) && ! isset($card['input'])) {
             $issues[] = [
                 'type' => 'missing_input_config',
                 'severity' => 'error',
@@ -374,7 +374,7 @@ MSG;
 
     private function addAssistantMessage(array $messageHistory, array $card): array
     {
-        $toolUseId = 'toolu_sim_' . uniqid();
+        $toolUseId = 'toolu_sim_'.uniqid();
 
         // Add assistant message with tool use
         $messageHistory[] = [

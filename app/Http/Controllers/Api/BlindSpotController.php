@@ -34,7 +34,7 @@ class BlindSpotController extends Controller
         $user = $request->user();
         $showTeaser = $this->blindSpotService->shouldShowTeaser($user);
 
-        if (!$showTeaser) {
+        if (! $showTeaser) {
             return response()->json([
                 'success' => true,
                 'showTeaser' => false,

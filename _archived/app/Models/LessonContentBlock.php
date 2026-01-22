@@ -38,9 +38,13 @@ class LessonContentBlock extends Model
      * Block type constants for consistency.
      */
     public const TYPE_PRINCIPLE_TEXT = 'principle_text';
+
     public const TYPE_AUDIO = 'audio';
+
     public const TYPE_VIDEO = 'video';
+
     public const TYPE_IMAGE = 'image';
+
     public const TYPE_INSTRUCTION_TEXT = 'instruction_text';
 
     /**
@@ -139,6 +143,7 @@ class LessonContentBlock extends Model
         if ($this->isAudio()) {
             return $this->getContentField('audio_url');
         }
+
         return $this->getContentField('url');
     }
 

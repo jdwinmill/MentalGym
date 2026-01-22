@@ -43,11 +43,11 @@ class BlindSpotAnalysis
             'hasEnoughData' => $this->hasEnoughData,
             'totalSessions' => $this->totalSessions,
             'totalResponses' => $this->totalResponses,
-            'blindSpots' => array_map(fn($s) => $s->toArray(), $this->blindSpots),
-            'improving' => array_map(fn($s) => $s->toArray(), $this->improving),
-            'stable' => array_map(fn($s) => $s->toArray(), $this->stable),
-            'slipping' => array_map(fn($s) => $s->toArray(), $this->slipping),
-            'universalPatterns' => array_map(fn($p) => $p->toArray(), $this->universalPatterns),
+            'blindSpots' => array_map(fn ($s) => $s->toArray(), $this->blindSpots),
+            'improving' => array_map(fn ($s) => $s->toArray(), $this->improving),
+            'stable' => array_map(fn ($s) => $s->toArray(), $this->stable),
+            'slipping' => array_map(fn ($s) => $s->toArray(), $this->slipping),
+            'universalPatterns' => array_map(fn ($p) => $p->toArray(), $this->universalPatterns),
             'biggestGap' => $this->biggestGap,
             'biggestWin' => $this->biggestWin,
             'analyzedAt' => $this->analyzedAt->toIso8601String(),
@@ -76,6 +76,6 @@ class BlindSpotAnalysis
 
     public function getProblematicUniversalPatterns(): array
     {
-        return array_filter($this->universalPatterns, fn($p) => $p->isProblematic());
+        return array_filter($this->universalPatterns, fn ($p) => $p->isProblematic());
     }
 }

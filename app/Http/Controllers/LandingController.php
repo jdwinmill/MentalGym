@@ -33,7 +33,7 @@ class LandingController extends Controller
             'email' => $validated['email'],
             'selected_topics' => $selectedTopics,
             'referrer' => $request->input('referrer'),
-            'utm_params' => !empty($utmParams) ? $utmParams : null,
+            'utm_params' => ! empty($utmParams) ? $utmParams : null,
             'timezone' => $request->input('timezone'),
             'device_type' => $request->input('device_type'),
             'locale' => $request->input('locale'),
@@ -49,7 +49,7 @@ class LandingController extends Controller
         ];
 
         $selectedLabels = array_map(
-            fn($topic) => $topicLabels[$topic] ?? $topic,
+            fn ($topic) => $topicLabels[$topic] ?? $topic,
             $selectedTopics
         );
 

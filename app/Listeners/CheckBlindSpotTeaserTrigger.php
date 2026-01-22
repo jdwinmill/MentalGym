@@ -40,7 +40,7 @@ class CheckBlindSpotTeaserTrigger
         }
 
         // Must have teaser emails enabled
-        if (!$user->wantsEmail('teaser_emails')) {
+        if (! $user->wantsEmail('teaser_emails')) {
             return false;
         }
 

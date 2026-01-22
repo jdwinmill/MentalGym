@@ -49,7 +49,7 @@ class ArticleRecommender
 
     public function recommend(?string $skill): ?array
     {
-        if (!$skill || !isset($this->articles[$skill])) {
+        if (! $skill || ! isset($this->articles[$skill])) {
             return $this->getDefault();
         }
 

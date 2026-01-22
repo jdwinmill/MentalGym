@@ -17,7 +17,7 @@ class TrainingSessionFactory extends Factory
     public function definition(): array
     {
         $startedAt = fake()->dateTimeBetween('-30 days', 'now');
-        $endedAt = (clone $startedAt)->modify('+' . fake()->numberBetween(5, 30) . ' minutes');
+        $endedAt = (clone $startedAt)->modify('+'.fake()->numberBetween(5, 30).' minutes');
 
         return [
             'user_id' => User::factory(),
@@ -33,7 +33,7 @@ class TrainingSessionFactory extends Factory
 
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'ended_at' => null,
             'duration_seconds' => null,
             'status' => TrainingSession::STATUS_ACTIVE,
@@ -42,28 +42,28 @@ class TrainingSessionFactory extends Factory
 
     public function completed(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => TrainingSession::STATUS_COMPLETED,
         ]);
     }
 
     public function abandoned(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => TrainingSession::STATUS_ABANDONED,
         ]);
     }
 
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }
 
     public function forMode(PracticeMode $mode): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'practice_mode_id' => $mode->id,
         ]);
     }

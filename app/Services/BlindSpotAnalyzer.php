@@ -13,11 +13,17 @@ use Illuminate\Support\Collection;
 class BlindSpotAnalyzer
 {
     private float $blindSpotThreshold;
+
     private float $improvementThreshold;
+
     private float $regressionThreshold;
+
     private int $minimumResponses;
+
     private int $minimumSessions;
+
     private int $recentDays;
+
     private int $baselineDays;
 
     public function __construct()
@@ -36,7 +42,7 @@ class BlindSpotAnalyzer
         $totalSessions = $this->getSessionCount($user);
         $totalResponses = $this->getResponseCount($user);
 
-        if (!$this->hasEnoughData($user)) {
+        if (! $this->hasEnoughData($user)) {
             return BlindSpotAnalysis::insufficient($totalSessions, $totalResponses);
         }
 
@@ -56,10 +62,10 @@ class BlindSpotAnalyzer
             }
         }
 
-        $blindSpots = array_values(array_filter($skillAnalyses, fn($s) => $s->isBlindSpot()));
-        $improving = array_values(array_filter($skillAnalyses, fn($s) => $s->isImproving() && !$s->isBlindSpot()));
-        $slipping = array_values(array_filter($skillAnalyses, fn($s) => $s->isSlipping()));
-        $stable = array_values(array_filter($skillAnalyses, fn($s) => $s->trend === 'stable' && !$s->isBlindSpot()));
+        $blindSpots = array_values(array_filter($skillAnalyses, fn ($s) => $s->isBlindSpot()));
+        $improving = array_values(array_filter($skillAnalyses, fn ($s) => $s->isImproving() && ! $s->isBlindSpot()));
+        $slipping = array_values(array_filter($skillAnalyses, fn ($s) => $s->isSlipping()));
+        $stable = array_values(array_filter($skillAnalyses, fn ($s) => $s->trend === 'stable' && ! $s->isBlindSpot()));
 
         $biggestGap = $this->findBiggestGap($skillAnalyses);
         $biggestWin = $this->findBiggestWin($skillAnalyses);
@@ -140,7 +146,7 @@ class BlindSpotAnalyzer
         Collection $baselineScores
     ): ?SkillAnalysis {
         $criteria = config("skills.skill_criteria.{$skill}");
-        if (!$criteria) {
+        if (! $criteria) {
             return null;
         }
 
@@ -173,7 +179,7 @@ class BlindSpotAnalyzer
         if ($primaryIssue) {
             $context = $this->findContext($user, $primaryIssue);
         }
-        if (!$context && $currentRate >= $this->blindSpotThreshold) {
+        if (! $context && $currentRate >= $this->blindSpotThreshold) {
             $context = $this->findContextForSkill($user, $positiveCriteria, $negativeCriteria);
         }
 
@@ -199,7 +205,7 @@ class BlindSpotAnalyzer
 
         foreach ($scores as $score) {
             $scoreData = $score->scores;
-            if (!is_array($scoreData)) {
+            if (! is_array($scoreData)) {
                 continue;
             }
 
@@ -278,6 +284,7 @@ class BlindSpotAnalyzer
         }
 
         arsort($criteriaFailures);
+
         return array_keys($criteriaFailures);
     }
 
@@ -293,6 +300,7 @@ class BlindSpotAnalyzer
             if ($delta >= $this->improvementThreshold) {
                 return 'improving';
             }
+
             return 'stuck';
         }
 
@@ -340,7 +348,7 @@ class BlindSpotAnalyzer
             );
         }
 
-        usort($patterns, fn($a, $b) => $b->rate <=> $a->rate);
+        usort($patterns, fn ($a, $b) => $b->rate <=> $a->rate);
 
         return $patterns;
     }
@@ -352,7 +360,7 @@ class BlindSpotAnalyzer
 
         foreach ($scores as $score) {
             $scoreData = $score->scores;
-            if (!is_array($scoreData) || !array_key_exists($criterion, $scoreData)) {
+            if (! is_array($scoreData) || ! array_key_exists($criterion, $scoreData)) {
                 continue;
             }
 
@@ -384,6 +392,7 @@ class BlindSpotAnalyzer
             if ($delta >= $this->improvementThreshold) {
                 return 'improving';
             }
+
             return 'stuck';
         }
 
@@ -405,13 +414,14 @@ class BlindSpotAnalyzer
             ->get()
             ->filter(function ($score) use ($criteria) {
                 $scoreData = $score->scores;
-                if (!is_array($scoreData) || !array_key_exists($criteria, $scoreData)) {
+                if (! is_array($scoreData) || ! array_key_exists($criteria, $scoreData)) {
                     return false;
                 }
+
                 return $scoreData[$criteria] === true || $scoreData[$criteria] === false;
             })
             ->groupBy('drill_phase')
-            ->map(fn($group) => $group->count())
+            ->map(fn ($group) => $group->count())
             ->sortDesc()
             ->keys()
             ->first();
@@ -421,7 +431,7 @@ class BlindSpotAnalyzer
 
     private function mapContextToPracticeMode(?string $drillPhase): ?string
     {
-        if (!$drillPhase) {
+        if (! $drillPhase) {
             return null;
         }
 
@@ -439,7 +449,7 @@ class BlindSpotAnalyzer
             ->get()
             ->filter(function ($score) use ($positiveCriteria, $negativeCriteria) {
                 $scoreData = $score->scores;
-                if (!is_array($scoreData)) {
+                if (! is_array($scoreData)) {
                     return false;
                 }
 
@@ -458,7 +468,7 @@ class BlindSpotAnalyzer
                 return false;
             })
             ->groupBy('drill_phase')
-            ->map(fn($group) => $group->count())
+            ->map(fn ($group) => $group->count())
             ->sortDesc()
             ->keys()
             ->first();
@@ -544,7 +554,7 @@ class BlindSpotAnalyzer
 
         foreach ($scores as $score) {
             $scoreData = $score->scores;
-            if (!is_array($scoreData)) {
+            if (! is_array($scoreData)) {
                 continue;
             }
 
@@ -555,7 +565,7 @@ class BlindSpotAnalyzer
 
                     if ($isUniversalNegative && $value === true) {
                         $totalFailures++;
-                    } elseif (!$isUniversalNegative && $value === false) {
+                    } elseif (! $isUniversalNegative && $value === false) {
                         $totalFailures++;
                     }
                 }

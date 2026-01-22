@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\DTOs\BlindSpotAnalysis;
 use App\DTOs\WeeklyEmailContent;
 use App\Models\User;
 use Illuminate\Bus\Queueable;

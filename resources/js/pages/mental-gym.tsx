@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect, useCallback } from 'react';
 
 interface Question {
     id: number;
@@ -12,6 +13,51 @@ interface Question {
 
 type AppState = 'loading' | 'principle' | 'question' | 'rating' | 'complete' | 'done';
 
+interface StarRatingProps {
+    rating: number | null;
+    hoveredStar: number | null;
+    onRate: (star: number) => void;
+    onHover: (star: number | null) => void;
+}
+
+function StarRating({ rating, hoveredStar, onRate, onHover }: StarRatingProps) {
+    return (
+        <div className="flex gap-2 justify-center">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                    key={star}
+                    type="button"
+                    onClick={() => onRate(star)}
+                    onMouseEnter={() => onHover(star)}
+                    onMouseLeave={() => onHover(null)}
+                    className="transition-transform hover:scale-110"
+                >
+                    <svg
+                        className={`w-12 h-12 transition-colors ${
+                            (hoveredStar !== null ? star <= hoveredStar : rating !== null && star <= rating)
+                                ? 'fill-amber-400 text-amber-400'
+                                : 'fill-none text-gray-300'
+                        }`}
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                </button>
+            ))}
+        </div>
+    );
+}
+
+function generateSessionId() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
 export default function MentalGym() {
     const [state, setState] = useState<AppState>('loading');
     const [question, setQuestion] = useState<Question | null>(null);
@@ -21,11 +67,7 @@ export default function MentalGym() {
     const [feedbackText, setFeedbackText] = useState('');
     const [hoveredStar, setHoveredStar] = useState<number | null>(null);
 
-    useEffect(() => {
-        loadQuestion();
-    }, []);
-
-    const loadQuestion = async () => {
+    const loadQuestion = useCallback(async () => {
         setState('loading');
         setResponseText('');
         setRating(null);
@@ -48,15 +90,11 @@ export default function MentalGym() {
         } catch (error) {
             console.error('Error loading question:', error);
         }
-    };
+    }, []);
 
-    const generateSessionId = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = (Math.random() * 16) | 0;
-            const v = c === 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
-    };
+    useEffect(() => {
+        void loadQuestion();
+    }, [loadQuestion]);
 
     const handleReadyForQuestion = () => {
         setState('question');
@@ -93,34 +131,6 @@ export default function MentalGym() {
             console.error('Error submitting response:', error);
         }
     };
-
-    const StarRating = () => (
-        <div className="flex gap-2 justify-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    onMouseEnter={() => setHoveredStar(star)}
-                    onMouseLeave={() => setHoveredStar(null)}
-                    className="transition-transform hover:scale-110"
-                >
-                    <svg
-                        className={`w-12 h-12 transition-colors ${
-                            (hoveredStar !== null ? star <= hoveredStar : rating !== null && star <= rating)
-                                ? 'fill-amber-400 text-amber-400'
-                                : 'fill-none text-gray-300'
-                        }`}
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                    >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                </button>
-            ))}
-        </div>
-    );
 
     if (state === 'loading') {
         return (
@@ -215,7 +225,12 @@ export default function MentalGym() {
                             <p className="text-xl text-neutral-800 mb-6 text-center">
                                 Did this question help you think differently?
                             </p>
-                            <StarRating />
+                            <StarRating
+                                rating={rating}
+                                hoveredStar={hoveredStar}
+                                onRate={setRating}
+                                onHover={setHoveredStar}
+                            />
                             <textarea
                                 value={feedbackText}
                                 onChange={(e) => setFeedbackText(e.target.value)}

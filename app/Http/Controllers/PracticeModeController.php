@@ -45,7 +45,7 @@ class PracticeModeController extends Controller
                     'tagline' => $mode->tagline,
                     'icon' => $mode->icon,
                     'required_plan' => $mode->required_plan,
-                    'tags' => $mode->tags->map(fn($tag) => [
+                    'tags' => $mode->tags->map(fn ($tag) => [
                         'id' => $tag->id,
                         'name' => $tag->name,
                         'color' => $tag->color,

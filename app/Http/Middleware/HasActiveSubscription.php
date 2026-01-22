@@ -17,7 +17,7 @@ class HasActiveSubscription
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'Unauthorized',
@@ -28,7 +28,7 @@ class HasActiveSubscription
             return redirect()->route('login');
         }
 
-        if (!$user->hasAccess()) {
+        if (! $user->hasAccess()) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'Subscription required',

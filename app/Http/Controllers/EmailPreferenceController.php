@@ -11,13 +11,13 @@ class EmailPreferenceController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Please log in to manage your email preferences.');
         }
 
         $validTypes = ['weekly_report', 'teaser_emails', 'product_updates'];
 
-        if (!in_array($type, $validTypes)) {
+        if (! in_array($type, $validTypes)) {
             abort(404);
         }
 

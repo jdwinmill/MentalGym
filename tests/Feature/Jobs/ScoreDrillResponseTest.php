@@ -206,7 +206,7 @@ describe('ScoreDrillResponse job', function () {
 
 describe('DrillScoringService', function () {
     it('returns correct criteria for drill types', function () {
-        $service = new DrillScoringService();
+        $service = new DrillScoringService;
 
         $compressionCriteria = $service->getCriteriaForDrillType('compression');
 
@@ -220,7 +220,7 @@ describe('DrillScoringService', function () {
     });
 
     it('returns universal criteria', function () {
-        $service = new DrillScoringService();
+        $service = new DrillScoringService;
 
         $universalCriteria = $service->getUniversalCriteria();
 
@@ -235,7 +235,7 @@ describe('DrillScoringService', function () {
     });
 
     it('maps drill phase to drill type correctly', function () {
-        $service = new DrillScoringService();
+        $service = new DrillScoringService;
 
         expect($service->getDrillTypeFromPhase('Compression'))->toBe('compression');
         expect($service->getDrillTypeFromPhase('Executive Communication'))->toBe('executive_communication');

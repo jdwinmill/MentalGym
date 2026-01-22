@@ -11,7 +11,6 @@ use App\Models\SkillLevel;
 use App\Models\Track;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class TrackController extends Controller
@@ -89,7 +88,7 @@ class TrackController extends Controller
         $track->delete();
 
         return redirect()->route('admin.tracks.index')
-            ->with('success', "Track deleted successfully." . ($skillCount > 0 ? " {$skillCount} skill level(s) were also removed." : ''));
+            ->with('success', 'Track deleted successfully.'.($skillCount > 0 ? " {$skillCount} skill level(s) were also removed." : ''));
     }
 
     public function bulkImportForm()
@@ -106,7 +105,7 @@ class TrackController extends Controller
         try {
             $data = json_decode($request->json_data, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            return back()->withInput()->withErrors(['json_data' => 'Invalid JSON: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['json_data' => 'Invalid JSON: '.$e->getMessage()]);
         }
 
         // Validate required track fields
@@ -224,7 +223,8 @@ class TrackController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['json_data' => 'Import failed: ' . $e->getMessage()]);
+
+            return back()->withInput()->withErrors(['json_data' => 'Import failed: '.$e->getMessage()]);
         }
     }
 

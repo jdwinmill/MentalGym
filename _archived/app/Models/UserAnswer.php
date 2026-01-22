@@ -69,7 +69,7 @@ class UserAnswer extends Model
      */
     public function getFeedback(): ?AnswerFeedback
     {
-        if (!$this->answer_option_id) {
+        if (! $this->answer_option_id) {
             return null;
         }
 
@@ -99,12 +99,12 @@ class UserAnswer extends Model
      */
     public function getTimeFormatted(): string
     {
-        if (!$this->time_to_answer_seconds) {
+        if (! $this->time_to_answer_seconds) {
             return '0s';
         }
 
         if ($this->time_to_answer_seconds < 60) {
-            return $this->time_to_answer_seconds . 's';
+            return $this->time_to_answer_seconds.'s';
         }
 
         $minutes = floor($this->time_to_answer_seconds / 60);

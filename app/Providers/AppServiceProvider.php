@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\SessionCompleted;
+use App\Http\Responses\LogoutResponse;
 use App\Listeners\CheckBlindSpotTeaserTrigger;
 use App\Models\DailyUsage;
 use App\Models\PracticeMode;
@@ -10,7 +11,6 @@ use App\Models\Tag;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Models\UserModeProgress;
-use App\Http\Responses\LogoutResponse;
 use App\Policies\PracticeModePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TrainingSessionPolicy;
@@ -63,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('can-train', function (User $user) {
             $usage = DailyUsage::forUserToday($user);
             $limit = $user->planConfig()['daily_exchanges'];
+
             return $usage->exchange_count < $limit;
         });
 

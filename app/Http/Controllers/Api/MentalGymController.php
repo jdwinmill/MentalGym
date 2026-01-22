@@ -23,7 +23,7 @@ class MentalGymController extends Controller
             ->inRandomOrder()
             ->first();
 
-        if (!$question) {
+        if (! $question) {
             $request->session()->forget('recent_questions');
             $question = Question::where('active', true)
                 ->inRandomOrder()

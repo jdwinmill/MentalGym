@@ -46,7 +46,7 @@ class PracticeModeFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -56,7 +56,7 @@ class PracticeModeFactory extends Factory
      */
     public function requiresPlan(string $plan): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'required_plan' => $plan,
         ]);
     }

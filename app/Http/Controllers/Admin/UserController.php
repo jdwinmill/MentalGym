@@ -15,7 +15,7 @@ class UserController extends Controller
     {
         $users = User::orderBy('created_at', 'desc')
             ->paginate(20)
-            ->through(fn($user) => [
+            ->through(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,

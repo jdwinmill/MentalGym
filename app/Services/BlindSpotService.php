@@ -17,8 +17,9 @@ class BlindSpotService
     {
         $minimumSessions = $this->analyzer->getMinimumSessions();
 
-        if (!$this->analyzer->hasEnoughData($user)) {
+        if (! $this->analyzer->hasEnoughData($user)) {
             $analysis = $this->analyzer->analyze($user);
+
             return GatedBlindSpotAnalysis::insufficientData(
                 $analysis->totalSessions,
                 $analysis->totalResponses,
@@ -28,7 +29,7 @@ class BlindSpotService
 
         $analysis = $this->analyzer->analyze($user);
 
-        if (!$this->hasProAccess($user)) {
+        if (! $this->hasProAccess($user)) {
             return GatedBlindSpotAnalysis::locked($analysis, $minimumSessions);
         }
 
@@ -46,17 +47,18 @@ class BlindSpotService
             return false;
         }
 
-        if (!$this->analyzer->hasEnoughData($user)) {
+        if (! $this->analyzer->hasEnoughData($user)) {
             return false;
         }
 
         $analysis = $this->analyzer->analyze($user);
+
         return $analysis->hasBlindSpots();
     }
 
     public function getTeaserData(User $user): ?array
     {
-        if (!$this->shouldShowTeaser($user)) {
+        if (! $this->shouldShowTeaser($user)) {
             return null;
         }
 
@@ -115,6 +117,7 @@ class BlindSpotService
                     'sessions' => 0,
                     'responses' => 0,
                 ];
+
                 continue;
             }
 
@@ -137,13 +140,13 @@ class BlindSpotService
 
     private function calculateFailureRate(Collection $scores, string $criteria, bool $invert = false): ?float
     {
-        $relevant = $scores->filter(fn($s) => isset($s->scores[$criteria]));
+        $relevant = $scores->filter(fn ($s) => isset($s->scores[$criteria]));
 
         if ($relevant->isEmpty()) {
             return null;
         }
 
-        $failures = $relevant->filter(fn($s) => $invert
+        $failures = $relevant->filter(fn ($s) => $invert
             ? $s->scores[$criteria] === false
             : $s->scores[$criteria] === true
         )->count();

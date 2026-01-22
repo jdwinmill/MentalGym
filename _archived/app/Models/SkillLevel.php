@@ -111,7 +111,7 @@ class SkillLevel extends Model
      */
     public function isLastLevel(): bool
     {
-        return !$this->getNextLevel();
+        return ! $this->getNextLevel();
     }
 
     /**

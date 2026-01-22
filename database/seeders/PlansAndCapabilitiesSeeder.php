@@ -194,7 +194,7 @@ class PlansAndCapabilitiesSeeder extends Seeder
         $essentials = Plan::where('key', 'essentials')->first();
         $allAccess = Plan::where('key', 'all_access')->first();
 
-        if (!$essentials || !$allAccess) {
+        if (! $essentials || ! $allAccess) {
             return;
         }
 

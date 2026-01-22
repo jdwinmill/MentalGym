@@ -67,7 +67,7 @@ class UserStreak extends Model
      */
     public function isActive(): bool
     {
-        if (!$this->last_activity_date) {
+        if (! $this->last_activity_date) {
             return false;
         }
 
@@ -81,7 +81,7 @@ class UserStreak extends Model
      */
     public function getEffectiveStreak(): int
     {
-        if (!$this->isActive()) {
+        if (! $this->isActive()) {
             return 0;
         }
 

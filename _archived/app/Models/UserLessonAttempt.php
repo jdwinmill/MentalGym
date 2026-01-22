@@ -133,7 +133,7 @@ class UserLessonAttempt extends Model
      */
     public function getDurationFormatted(): string
     {
-        if (!$this->duration_seconds) {
+        if (! $this->duration_seconds) {
             return '0:00';
         }
 
@@ -148,7 +148,7 @@ class UserLessonAttempt extends Model
      */
     public function passed(): bool
     {
-        if (!$this->isCompleted() || $this->accuracy_percentage === null) {
+        if (! $this->isCompleted() || $this->accuracy_percentage === null) {
             return false;
         }
 

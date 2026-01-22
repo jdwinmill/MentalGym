@@ -93,7 +93,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function isOnTrial(): bool
     {
-        if (!$this->trial_ends_at) {
+        if (! $this->trial_ends_at) {
             return false;
         }
 
@@ -105,7 +105,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function trialDaysRemaining(): ?int
     {
-        if (!$this->isOnTrial()) {
+        if (! $this->isOnTrial()) {
             return null;
         }
 
@@ -119,6 +119,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         if ($this->isOnTrial()) {
             $days = $this->trialDaysRemaining();
+
             return "Trial ({$days} days left)";
         }
 
@@ -277,6 +278,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFirstNameAttribute(): string
     {
         $nameParts = explode(' ', $this->name);
+
         return $nameParts[0] ?? $this->name;
     }
 }

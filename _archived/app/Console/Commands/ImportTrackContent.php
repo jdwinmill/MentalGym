@@ -47,7 +47,7 @@ class ImportTrackContent extends Command
         $filePath = $this->argument('file');
 
         // Resolve relative paths
-        if (!str_starts_with($filePath, '/')) {
+        if (! str_starts_with($filePath, '/')) {
             $filePath = base_path($filePath);
         }
 
@@ -55,8 +55,9 @@ class ImportTrackContent extends Command
         $this->newLine();
 
         // Check if file exists
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             $this->error("File not found: {$filePath}");
+
             return Command::FAILURE;
         }
 
@@ -66,6 +67,7 @@ class ImportTrackContent extends Command
             $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             $this->error("Invalid JSON: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
 
@@ -75,6 +77,7 @@ class ImportTrackContent extends Command
             $this->success('JSON structure is valid');
         } catch (InvalidArgumentException $e) {
             $this->error("Validation failed: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
 
@@ -84,6 +87,7 @@ class ImportTrackContent extends Command
         // If validate-only, stop here
         if ($this->option('validate-only')) {
             $this->info('Validation complete. Use --dry-run or remove --validate-only to proceed.');
+
             return Command::SUCCESS;
         }
 
@@ -91,20 +95,22 @@ class ImportTrackContent extends Command
         if ($this->option('dry-run')) {
             $this->showDryRunSummary($data);
             $this->info('Dry run complete. Remove --dry-run to actually import.');
+
             return Command::SUCCESS;
         }
 
         // Confirm import
-        if (!$this->option('force')) {
-            if (!$this->confirm('Do you want to import this track content?')) {
+        if (! $this->option('force')) {
+            if (! $this->confirm('Do you want to import this track content?')) {
                 $this->info('Import cancelled.');
+
                 return Command::SUCCESS;
             }
         }
 
         // Run the seeder
         try {
-            $seeder = new TrackContentSeeder();
+            $seeder = new TrackContentSeeder;
             $seeder->setCommand($this);
             $track = $seeder->seedFromArray($data);
 
@@ -116,6 +122,7 @@ class ImportTrackContent extends Command
             return Command::SUCCESS;
         } catch (RuntimeException $e) {
             $this->error("Import failed: {$e->getMessage()}");
+
             return Command::FAILURE;
         }
     }
@@ -126,7 +133,7 @@ class ImportTrackContent extends Command
     protected function validateStructure(array $data): void
     {
         // Required top-level keys
-        if (!isset($data['track'])) {
+        if (! isset($data['track'])) {
             throw new InvalidArgumentException('Missing required "track" key');
         }
 
@@ -139,7 +146,7 @@ class ImportTrackContent extends Command
         }
 
         // Validate slug format
-        if (!preg_match('/^[a-z0-9-]+$/', $data['track']['slug'])) {
+        if (! preg_match('/^[a-z0-9-]+$/', $data['track']['slug'])) {
             throw new InvalidArgumentException(
                 'Track slug must contain only lowercase letters, numbers, and hyphens'
             );
@@ -157,7 +164,7 @@ class ImportTrackContent extends Command
                 if (empty($level['name'])) {
                     throw new InvalidArgumentException("Skill level at index {$index} is missing 'name'");
                 }
-                if (!isset($level['level_number'])) {
+                if (! isset($level['level_number'])) {
                     throw new InvalidArgumentException("Skill level at index {$index} is missing 'level_number'");
                 }
 
@@ -179,7 +186,7 @@ class ImportTrackContent extends Command
             $skillLevelSlugs = array_column($data['skill_levels'] ?? [], 'slug');
 
             foreach ($data['lessons'] as $index => $lesson) {
-                if (!isset($lesson['lesson_number'])) {
+                if (! isset($lesson['lesson_number'])) {
                     throw new InvalidArgumentException("Lesson at index {$index} is missing 'lesson_number'");
                 }
                 if (empty($lesson['title'])) {
@@ -190,7 +197,7 @@ class ImportTrackContent extends Command
                 }
 
                 // Check skill level reference
-                if (!in_array($lesson['skill_level_slug'], $skillLevelSlugs)) {
+                if (! in_array($lesson['skill_level_slug'], $skillLevelSlugs)) {
                     throw new InvalidArgumentException(
                         "Lesson at index {$index} references unknown skill level: {$lesson['skill_level_slug']}"
                     );
@@ -222,7 +229,7 @@ class ImportTrackContent extends Command
                     "Content block at lesson {$lessonIndex}, block {$blockIndex} is missing 'block_type'"
                 );
             }
-            if (!isset($block['content'])) {
+            if (! isset($block['content'])) {
                 throw new InvalidArgumentException(
                     "Content block at lesson {$lessonIndex}, block {$blockIndex} is missing 'content'"
                 );
@@ -259,7 +266,7 @@ class ImportTrackContent extends Command
             }
 
             // Check skill level reference
-            if (!in_array($question['skill_level_slug'], $skillLevelSlugs)) {
+            if (! in_array($question['skill_level_slug'], $skillLevelSlugs)) {
                 throw new InvalidArgumentException(
                     "Question at lesson {$lessonIndex}, question {$qIndex} references unknown skill level: {$question['skill_level_slug']}"
                 );
@@ -267,7 +274,7 @@ class ImportTrackContent extends Command
 
             // Check related block reference if provided
             if (isset($question['related_block_sort_order']) && $question['related_block_sort_order'] !== null) {
-                if (!in_array($question['related_block_sort_order'], $blockSortOrders)) {
+                if (! in_array($question['related_block_sort_order'], $blockSortOrders)) {
                     throw new InvalidArgumentException(
                         "Question at lesson {$lessonIndex}, question {$qIndex} references unknown content block sort_order: {$question['related_block_sort_order']}"
                     );
@@ -295,12 +302,12 @@ class ImportTrackContent extends Command
                 );
             }
 
-            if (!empty($option['is_correct'])) {
+            if (! empty($option['is_correct'])) {
                 $hasCorrect = true;
             }
         }
 
-        if (!$hasCorrect) {
+        if (! $hasCorrect) {
             $this->warn("Warning: Question at lesson {$lessonIndex}, question {$questionIndex} has no correct answer marked");
         }
     }
@@ -322,14 +329,14 @@ class ImportTrackContent extends Command
 
         // Skill levels
         $skillLevels = $data['skill_levels'] ?? [];
-        $this->info("Skill Levels: " . count($skillLevels));
+        $this->info('Skill Levels: '.count($skillLevels));
         foreach ($skillLevels as $level) {
             $this->line("  {$level['level_number']}. {$level['name']} ({$level['slug']})");
         }
 
         // Lessons summary
         $lessons = $data['lessons'] ?? [];
-        $this->info("Lessons: " . count($lessons));
+        $this->info('Lessons: '.count($lessons));
 
         $totalBlocks = 0;
         $totalQuestions = 0;
@@ -375,16 +382,16 @@ class ImportTrackContent extends Command
                 $options = $q['answer_options'] ?? [];
                 $totalOptions += count($options);
                 foreach ($options as $opt) {
-                    if (!empty($opt['feedback'])) {
+                    if (! empty($opt['feedback'])) {
                         $totalFeedback++;
                     }
                 }
             }
         }
 
-        $this->line("  1 Track");
-        $this->line("  " . count($data['skill_levels'] ?? []) . " Skill Levels");
-        $this->line("  " . count($lessons) . " Lessons");
+        $this->line('  1 Track');
+        $this->line('  '.count($data['skill_levels'] ?? []).' Skill Levels');
+        $this->line('  '.count($lessons).' Lessons');
         $this->line("  {$totalBlocks} Content Blocks");
         $this->line("  {$totalQuestions} Questions");
         $this->line("  {$totalOptions} Answer Options");

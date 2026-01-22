@@ -37,7 +37,7 @@ class SimulationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Simulation failed: ' . $e->getMessage(),
+                'error' => 'Simulation failed: '.$e->getMessage(),
             ], 500);
         }
     }

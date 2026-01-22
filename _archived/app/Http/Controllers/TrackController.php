@@ -15,19 +15,19 @@ class TrackController extends Controller
         $user = $request->user();
 
         // Check if track is active
-        if (!$track->is_active) {
+        if (! $track->is_active) {
             return back()->with('error', 'This track is not available.');
         }
 
         // Check cooldown
         $cooldownCheck = $user->canSwitchTrack($track);
-        if (!$cooldownCheck['allowed']) {
+        if (! $cooldownCheck['allowed']) {
             return back()->with('error', $cooldownCheck['reason']);
         }
 
         // Check enrollment limits
         $enrollmentCheck = $user->canEnrollInTrack($track);
-        if (!$enrollmentCheck['allowed']) {
+        if (! $enrollmentCheck['allowed']) {
             return back()->with('error', $enrollmentCheck['reason']);
         }
 
@@ -51,7 +51,7 @@ class TrackController extends Controller
             ->where('track_id', $track->id)
             ->first();
 
-        if (!$enrollment) {
+        if (! $enrollment) {
             return back()->with('error', 'You are not enrolled in this track.');
         }
 

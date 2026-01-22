@@ -25,10 +25,11 @@ class SendBlindSpotTeaserEmail implements ShouldQueue
     public function handle(BlindSpotAnalyzer $analyzer): void
     {
         // Double-check eligibility (in case of race conditions)
-        if (!$this->isEligible()) {
+        if (! $this->isEligible()) {
             Log::debug('Teaser email skipped - user no longer eligible', [
                 'user_id' => $this->user->id,
             ]);
+
             return;
         }
 
@@ -36,10 +37,11 @@ class SendBlindSpotTeaserEmail implements ShouldQueue
         $analysis = $analyzer->analyze($this->user);
 
         // Only send if there are actual blind spots
-        if (!$analysis->hasBlindSpots()) {
+        if (! $analysis->hasBlindSpots()) {
             Log::debug('Teaser email skipped - no blind spots found', [
                 'user_id' => $this->user->id,
             ]);
+
             return;
         }
 
@@ -79,8 +81,8 @@ class SendBlindSpotTeaserEmail implements ShouldQueue
 
     private function isEligible(): bool
     {
-        return !$this->user->hasPaidPlan()
-            && !$this->user->blindSpotEmails()->where('email_type', 'teaser')->exists();
+        return ! $this->user->hasPaidPlan()
+            && ! $this->user->blindSpotEmails()->where('email_type', 'teaser')->exists();
     }
 
     private function getSubjectLine(int $count): string

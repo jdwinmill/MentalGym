@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Lesson;
 use App\Models\SkillLevel;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class LessonController extends Controller
 {
@@ -42,7 +41,7 @@ class LessonController extends Controller
         ]);
 
         // Filter out empty objectives
-        $validated['learning_objectives'] = array_values(array_filter($validated['learning_objectives'], fn($obj) => trim($obj) !== ''));
+        $validated['learning_objectives'] = array_values(array_filter($validated['learning_objectives'], fn ($obj) => trim($obj) !== ''));
 
         if (empty($validated['learning_objectives'])) {
             return back()->withErrors(['learning_objectives' => 'At least one learning objective is required.'])->withInput();
@@ -79,7 +78,7 @@ class LessonController extends Controller
         ]);
 
         // Filter out empty objectives
-        $validated['learning_objectives'] = array_values(array_filter($validated['learning_objectives'], fn($obj) => trim($obj) !== ''));
+        $validated['learning_objectives'] = array_values(array_filter($validated['learning_objectives'], fn ($obj) => trim($obj) !== ''));
 
         if (empty($validated['learning_objectives'])) {
             return back()->withErrors(['learning_objectives' => 'At least one learning objective is required.'])->withInput();
@@ -101,7 +100,7 @@ class LessonController extends Controller
 
         $lesson->delete();
 
-        $message = "Lesson deleted successfully.";
+        $message = 'Lesson deleted successfully.';
         if ($contentCount > 0 || $questionCount > 0) {
             $message .= " {$contentCount} content block(s) and {$questionCount} question(s) were also removed.";
         }

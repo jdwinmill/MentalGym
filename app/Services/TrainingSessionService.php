@@ -382,7 +382,7 @@ class TrainingSessionService
             ->orderBy('sequence', 'desc')
             ->first();
 
-        if (!$lastAssistantMessage) {
+        if (! $lastAssistantMessage) {
             return null;
         }
 
@@ -398,7 +398,7 @@ class TrainingSessionService
         ?array $previousCard
     ): void {
         // Skip if no previous card or no drill_phase
-        if (!$previousCard || empty($previousCard['drill_phase'])) {
+        if (! $previousCard || empty($previousCard['drill_phase'])) {
             return;
         }
 
@@ -413,7 +413,7 @@ class TrainingSessionService
         }
 
         // Skip if card type is not a prompt (we only score prompt responses)
-        if (!in_array($previousCard['type'] ?? '', ['prompt', 'scenario'])) {
+        if (! in_array($previousCard['type'] ?? '', ['prompt', 'scenario'])) {
             return;
         }
 

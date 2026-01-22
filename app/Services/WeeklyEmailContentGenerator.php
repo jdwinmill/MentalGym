@@ -29,7 +29,7 @@ class WeeklyEmailContentGenerator
                     [
                         'role' => 'user',
                         'content' => $prompt,
-                    ]
+                    ],
                 ],
             ]);
 
@@ -104,6 +104,7 @@ PROMPT;
         $items = array_map(function ($spot) {
             $rate = round($spot->currentRate * 100);
             $issue = $spot->primaryIssue ?? 'general';
+
             return "{$spot->skill} ({$rate}% failure rate, primary issue: {$issue})";
         }, $blindSpots);
 
@@ -119,6 +120,7 @@ PROMPT;
         $items = array_map(function ($skill) {
             $current = round($skill->currentRate * 100);
             $baseline = round($skill->baselineRate * 100);
+
             return "{$skill->skill} (was {$baseline}%, now {$current}%)";
         }, $skills);
 
@@ -133,6 +135,7 @@ PROMPT;
 
         $items = array_map(function ($pattern) {
             $rate = round($pattern->rate * 100);
+
             return "{$pattern->criteria}: {$rate}% ({$pattern->count}/{$pattern->total})";
         }, $patterns);
 
@@ -144,14 +147,14 @@ PROMPT;
         // Extract JSON from response (handle potential markdown code blocks)
         $jsonMatch = preg_match('/\{[\s\S]*\}/', $response, $matches);
 
-        if (!$jsonMatch) {
+        if (! $jsonMatch) {
             throw new \RuntimeException('No JSON found in response');
         }
 
         $data = json_decode($matches[0], true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException('Invalid JSON in response: ' . json_last_error_msg());
+            throw new \RuntimeException('Invalid JSON in response: '.json_last_error_msg());
         }
 
         return new WeeklyEmailContent(
@@ -167,7 +170,7 @@ PROMPT;
     {
         $needsWork = [];
 
-        if (!empty($analysis->blindSpots)) {
+        if (! empty($analysis->blindSpots)) {
             $topBlindSpot = $analysis->blindSpots[0];
             $rate = round($topBlindSpot->currentRate * 100);
             $needsWork[] = "{$topBlindSpot->skill}: showing up in {$rate}% of your responses.";
@@ -181,7 +184,7 @@ PROMPT;
             subjectLine: $analysis->biggestGap
                 ? "Your week: Focus on {$analysis->biggestGap}"
                 : 'Your weekly training report',
-            improving: !empty($analysis->improving)
+            improving: ! empty($analysis->improving)
                 ? ["{$analysis->improving[0]->skill} is trending in the right direction."]
                 : [],
             needsWork: $needsWork,

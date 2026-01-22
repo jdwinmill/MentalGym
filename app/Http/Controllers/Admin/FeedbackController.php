@@ -16,7 +16,7 @@ class FeedbackController extends Controller
             ->orderByRaw("CASE WHEN type = 'bug' THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
             ->paginate(20)
-            ->through(fn($item) => [
+            ->through(fn ($item) => [
                 'id' => $item->id,
                 'type' => $item->type,
                 'title' => $item->title,

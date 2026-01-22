@@ -150,7 +150,7 @@ class Track extends Model
      */
     public function isAccessibleBy(User $user): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 

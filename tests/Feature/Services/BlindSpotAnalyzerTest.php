@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->analyzer = new BlindSpotAnalyzer();
+    $this->analyzer = new BlindSpotAnalyzer;
 });
 
 describe('hasEnoughData', function () {
@@ -145,7 +145,7 @@ describe('blind spot detection', function () {
         expect($analysis->hasBlindSpots())->toBeTrue();
 
         $authorityBlindSpot = collect($analysis->blindSpots)
-            ->first(fn($s) => $s->skill === 'authority');
+            ->first(fn ($s) => $s->skill === 'authority');
 
         expect($authorityBlindSpot)->not->toBeNull();
         expect($authorityBlindSpot->currentRate)->toBeGreaterThanOrEqual(0.6);
@@ -182,7 +182,7 @@ describe('blind spot detection', function () {
         $analysis = $this->analyzer->analyze($user);
 
         $authorityBlindSpot = collect($analysis->blindSpots)
-            ->first(fn($s) => $s->skill === 'authority');
+            ->first(fn ($s) => $s->skill === 'authority');
 
         expect($authorityBlindSpot)->toBeNull();
     });
@@ -236,7 +236,7 @@ describe('trend detection', function () {
             $analysis->stable,
             $analysis->slipping,
             $analysis->blindSpots
-        ))->first(fn($s) => $s->skill === 'authority');
+        ))->first(fn ($s) => $s->skill === 'authority');
 
         if ($authorityAnalysis) {
             expect($authorityAnalysis->trend)->toBeIn(['improving', 'stable']);
@@ -290,7 +290,7 @@ describe('trend detection', function () {
             $analysis->stable,
             $analysis->slipping,
             $analysis->blindSpots
-        ))->first(fn($s) => $s->skill === 'authority');
+        ))->first(fn ($s) => $s->skill === 'authority');
 
         if ($authorityAnalysis && $authorityAnalysis->baselineRate < $authorityAnalysis->currentRate) {
             expect($authorityAnalysis->trend)->toBeIn(['slipping', 'stuck']);
@@ -341,7 +341,7 @@ describe('trend detection', function () {
         $analysis = $this->analyzer->analyze($user);
 
         $authorityAnalysis = collect($analysis->blindSpots)
-            ->first(fn($s) => $s->skill === 'authority');
+            ->first(fn ($s) => $s->skill === 'authority');
 
         if ($authorityAnalysis) {
             expect($authorityAnalysis->trend)->toBe('stuck');
@@ -377,7 +377,7 @@ describe('universal patterns', function () {
         $analysis = $this->analyzer->analyze($user);
 
         $hedgingPattern = collect($analysis->universalPatterns)
-            ->first(fn($p) => $p->criteria === 'hedging');
+            ->first(fn ($p) => $p->criteria === 'hedging');
 
         expect($hedgingPattern)->not->toBeNull();
         expect($hedgingPattern->rate)->toBe(0.7);
@@ -413,7 +413,7 @@ describe('universal patterns', function () {
 
         $problematic = $analysis->getProblematicUniversalPatterns();
         $hedgingPattern = collect($problematic)
-            ->first(fn($p) => $p->criteria === 'hedging');
+            ->first(fn ($p) => $p->criteria === 'hedging');
 
         expect($hedgingPattern)->not->toBeNull();
         expect($hedgingPattern->isProblematic())->toBeTrue();
@@ -614,7 +614,7 @@ describe('context finding', function () {
             $analysis->improving,
             $analysis->stable,
             $analysis->slipping
-        ))->first(fn($s) => $s->skill === 'authority');
+        ))->first(fn ($s) => $s->skill === 'authority');
 
         if ($authorityAnalysis && $authorityAnalysis->context) {
             expect($authorityAnalysis->context)->toBe('Executive Communication');
@@ -732,7 +732,7 @@ describe('minimum responses requirement', function () {
             $analysis->improving,
             $analysis->stable,
             $analysis->slipping
-        ))->contains(fn($s) => $s->skill === 'authority');
+        ))->contains(fn ($s) => $s->skill === 'authority');
 
         expect($authorityInAny)->toBeFalse();
     });
