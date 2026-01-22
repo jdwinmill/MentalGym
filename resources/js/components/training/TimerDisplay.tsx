@@ -21,17 +21,9 @@ interface TimerDisplayProps {
 export function TimerDisplay({ seconds, onExpire }: TimerDisplayProps) {
     const [state, setState] = useState<TimerState>('idle');
     const [remaining, setRemaining] = useState(seconds);
-    const [showIntro, setShowIntro] = useState(false);
+    const [showIntro, setShowIntro] = useState(() => !hasSeenTimerIntro());
     const [showDisablePrompt, setShowDisablePrompt] = useState(false);
-    const [disabled, setDisabled] = useState(false);
-
-    // Check if timer is globally disabled on mount
-    useEffect(() => {
-        setDisabled(isTimerDisabled());
-        if (!hasSeenTimerIntro()) {
-            setShowIntro(true);
-        }
-    }, []);
+    const [disabled, setDisabled] = useState(() => isTimerDisabled());
 
     // Timer countdown logic
     useEffect(() => {

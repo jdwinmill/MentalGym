@@ -241,6 +241,14 @@ class PracticeAIService
                             'type' => 'string',
                             'description' => 'Current drill name for structured training modes',
                         ],
+                        'drill_number' => [
+                            'type' => 'integer',
+                            'description' => 'Current drill number (1, 2, 3, 4, etc). Must increment as session progresses.',
+                        ],
+                        'step_number' => [
+                            'type' => 'integer',
+                            'description' => 'Current step within the drill (1, 2, 3, etc). Resets to 1 at each new drill.',
+                        ],
                         'is_iteration' => [
                             'type' => 'boolean',
                             'description' => 'True if this is a required second attempt at a drill',
