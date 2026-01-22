@@ -33,15 +33,15 @@ export function PromptCard({ card, onSubmit, characterLimit, isLoading }: Prompt
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-auto">
-            <CardContent className="pt-6 space-y-4">
+        <Card className="w-full max-w-3xl mx-auto">
+            <CardContent className="p-6 md:p-8 space-y-6">
                 {/* Scenario context if consolidated */}
                 {card.scenarioContext && (
-                    <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg border-l-4 border-primary">
+                    <div className="bg-neutral-100 dark:bg-neutral-800 p-4 md:p-5 rounded-lg border-l-4 border-primary">
                         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wide">
                             Scenario
                         </p>
-                        <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
+                        <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed">
                             {card.scenarioContext}
                         </p>
                     </div>
@@ -50,15 +50,13 @@ export function PromptCard({ card, onSubmit, characterLimit, isLoading }: Prompt
                 {/* Prompt question */}
                 <div>
                     {card.scenarioContext && (
-                        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2 uppercase tracking-wide">
+                        <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wide">
                             Your Task
                         </p>
                     )}
-                    <div className="prose prose-neutral dark:prose-invert max-w-none">
-                        <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
-                            {card.content}
-                        </p>
-                    </div>
+                    <p className="text-lg text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed max-w-prose">
+                        {card.content}
+                    </p>
                 </div>
                 <div className="space-y-2">
                     <Textarea
@@ -76,7 +74,7 @@ export function PromptCard({ card, onSubmit, characterLimit, isLoading }: Prompt
                     </div>
                 </div>
             </CardContent>
-            <CardFooter className="justify-end">
+            <CardFooter className="justify-end px-6 md:px-8 pb-6 md:pb-8">
                 <Button onClick={handleSubmit} disabled={!canSubmit}>
                     {isLoading ? 'Sending...' : 'Submit'}
                     <Send className="ml-2 h-4 w-4" />

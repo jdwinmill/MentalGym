@@ -34,7 +34,7 @@ export default function Pricing() {
             price: '$0',
             tagline: 'Enough to know if this is real. Not enough to fix anything.',
             features: [
-                { text: '15 exchanges per day' },
+                { text: '5 exchanges per day' },
                 { text: 'All practice modes' },
                 { text: 'Blind spots detected (details locked)', locked: true },
             ],
@@ -46,10 +46,10 @@ export default function Pricing() {
             price: '$30/mo',
             tagline: 'The full system. Train daily. Track patterns. Actually improve.',
             features: [
-                { text: '100 exchanges per day' },
+                { text: '50 exchanges per day' },
                 { text: 'All practice modes' },
                 { text: 'Full Blind Spots dashboard' },
-                { text: 'Weekly reports on what you\'re still getting wrong' },
+                { text: 'Weekly reports on how to improve' },
             ],
             cta: isLoggedIn
                 ? currentPlan === 'pro' || currentPlan === 'unlimited'

@@ -2,15 +2,11 @@
 
 return [
     'free' => [
-        'daily_exchanges' => 15,
+        'daily_exchanges' => 5,
         'max_level' => 2,
     ],
     'pro' => [
-        'daily_exchanges' => 40,
-        'max_level' => 4,
-    ],
-    'unlimited' => [
-        'daily_exchanges' => 100,
+        'daily_exchanges' => 50,
         'max_level' => 5,
     ],
 ];
