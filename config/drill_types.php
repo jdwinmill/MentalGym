@@ -3,6 +3,51 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | Drill Phase to Practice Mode Mapping
+    |--------------------------------------------------------------------------
+    |
+    | Maps drill phases to their parent practice mode slug. Used by the
+    | Blind Spots feature to link "Train This" buttons to the relevant mode.
+    |
+    */
+
+    'practice_mode_mapping' => [
+        // MBA+ Executive Training → mba-decision-lab
+        'Compression' => 'mba-decision-lab',
+        'Executive Communication' => 'mba-decision-lab',
+        'Problem-Solving' => 'mba-decision-lab',
+        'Writing Precision' => 'mba-decision-lab',
+
+        // Interview Prep → interview-prep (future mode)
+        'Story Compression' => 'interview-prep',
+        'The Opener' => 'interview-prep',
+        'Curveball Recovery' => 'interview-prep',
+        'Closing Strong' => 'interview-prep',
+
+        // Thinking on Your Feet → thinking-on-your-feet (future mode)
+        'Unexpected Question' => 'thinking-on-your-feet',
+        'Impromptu Structure' => 'thinking-on-your-feet',
+        'Defending Your Position' => 'thinking-on-your-feet',
+        'Graceful I Don\'t Know' => 'thinking-on-your-feet',
+
+        // Difficult Conversations → difficult-conversations (future mode)
+        'The Direct Open' => 'difficult-conversations',
+        'Holding the Line' => 'difficult-conversations',
+        'The Clean No' => 'difficult-conversations',
+        'Bad News Delivery' => 'difficult-conversations',
+
+        // Negotiation → negotiation (future mode)
+        'Negotiation Anchor' => 'negotiation',
+        'Negotiation Pushback' => 'negotiation',
+
+        // Managing Up → managing-up (future mode)
+        'Managing Up' => 'managing-up',
+        'Status Update' => 'managing-up',
+        'Escalation' => 'managing-up',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Drill Phase to Drill Type Mapping
     |--------------------------------------------------------------------------
     |

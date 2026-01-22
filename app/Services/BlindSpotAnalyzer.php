@@ -167,7 +167,17 @@ class BlindSpotAnalyzer
 
         $failingCriteria = $this->getFailingCriteria($allScores, $positiveCriteria, $negativeCriteria);
         $primaryIssue = $failingCriteria[0] ?? null;
-        $context = $primaryIssue ? $this->findContext($user, $primaryIssue) : null;
+
+        // Find context: use primaryIssue if available, otherwise look at all skill criteria
+        $context = null;
+        if ($primaryIssue) {
+            $context = $this->findContext($user, $primaryIssue);
+        }
+        if (!$context && $currentRate >= $this->blindSpotThreshold) {
+            $context = $this->findContextForSkill($user, $positiveCriteria, $negativeCriteria);
+        }
+
+        $practiceMode = $context ? $this->mapContextToPracticeMode($context) : null;
 
         return new SkillAnalysis(
             skill: $skill,
@@ -178,6 +188,7 @@ class BlindSpotAnalyzer
             primaryIssue: $primaryIssue,
             context: $context,
             failingCriteria: $failingCriteria,
+            practiceMode: $practiceMode,
         );
     }
 
@@ -398,6 +409,53 @@ class BlindSpotAnalyzer
                     return false;
                 }
                 return $scoreData[$criteria] === true || $scoreData[$criteria] === false;
+            })
+            ->groupBy('drill_phase')
+            ->map(fn($group) => $group->count())
+            ->sortDesc()
+            ->keys()
+            ->first();
+
+        return $result;
+    }
+
+    private function mapContextToPracticeMode(?string $drillPhase): ?string
+    {
+        if (!$drillPhase) {
+            return null;
+        }
+
+        return config("drill_types.practice_mode_mapping.{$drillPhase}");
+    }
+
+    /**
+     * Find the drill phase where a skill's criteria fail most often.
+     * Used as fallback when no single criterion meets the blind spot threshold.
+     */
+    private function findContextForSkill(User $user, array $positiveCriteria, array $negativeCriteria): ?string
+    {
+        $result = DrillScore::where('user_id', $user->id)
+            ->where('created_at', '>=', now()->subDays($this->baselineDays))
+            ->get()
+            ->filter(function ($score) use ($positiveCriteria, $negativeCriteria) {
+                $scoreData = $score->scores;
+                if (!is_array($scoreData)) {
+                    return false;
+                }
+
+                // Check if this score has any failing criteria for this skill
+                foreach ($positiveCriteria as $criterion) {
+                    if (array_key_exists($criterion, $scoreData) && $scoreData[$criterion] === false) {
+                        return true;
+                    }
+                }
+                foreach ($negativeCriteria as $criterion) {
+                    if (array_key_exists($criterion, $scoreData) && $scoreData[$criterion] === true) {
+                        return true;
+                    }
+                }
+
+                return false;
             })
             ->groupBy('drill_phase')
             ->map(fn($group) => $group->count())

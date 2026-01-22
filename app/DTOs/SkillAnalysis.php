@@ -13,6 +13,7 @@ class SkillAnalysis
         public ?string $primaryIssue,
         public ?string $context,
         public array $failingCriteria,
+        public ?string $practiceMode = null,
     ) {}
 
     public function toArray(): array
@@ -26,6 +27,7 @@ class SkillAnalysis
             'primaryIssue' => $this->primaryIssue,
             'context' => $this->context,
             'failingCriteria' => $this->failingCriteria,
+            'practiceMode' => $this->practiceMode,
         ];
     }
 

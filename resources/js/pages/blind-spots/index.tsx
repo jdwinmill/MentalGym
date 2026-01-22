@@ -23,6 +23,7 @@ interface SkillPattern {
     primaryIssue: string | null;
     failingCriteria: string[];
     sampleSize: number;
+    practiceMode: string | null;
 }
 
 interface UniversalPattern {

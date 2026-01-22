@@ -9,6 +9,7 @@ interface SkillPattern {
     baselineRate: number | null;
     trend: string;
     primaryIssue: string | null;
+    practiceMode: string | null;
 }
 
 interface HighlightCardProps {
@@ -71,7 +72,10 @@ export function BiggestGapCard({ skill, details }: HighlightCardProps) {
             </CardContent>
             <CardFooter className="pt-0">
                 <Button asChild variant="outline" size="sm" className="w-full">
-                    <Link href={`/practice-modes?skill=${skill}`}>
+                    <Link href={details.practiceMode
+                        ? `/practice-modes/${details.practiceMode}/train`
+                        : '/practice-modes'
+                    }>
                         <Play className="h-4 w-4 mr-2" />
                         Train This
                     </Link>

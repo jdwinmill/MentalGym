@@ -14,6 +14,7 @@ interface SkillPattern {
     primaryIssue: string | null;
     failingCriteria: string[];
     sampleSize: number;
+    practiceMode: string | null;
 }
 
 interface PatternDetailsProps {
@@ -125,7 +126,10 @@ function PatternSection({
 
                     {(type === 'blind-spot' || type === 'slipping') && (
                         <Button asChild size="sm" className="mt-4">
-                            <Link href={`/practice-modes?skill=${pattern.skill}`}>
+                            <Link href={pattern.practiceMode
+                                ? `/practice-modes/${pattern.practiceMode}/train`
+                                : '/practice-modes'
+                            }>
                                 <Play className="h-4 w-4 mr-2" />
                                 Train {formatSkillName(pattern.skill)}
                             </Link>
