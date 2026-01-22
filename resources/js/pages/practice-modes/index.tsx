@@ -107,7 +107,7 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
                 )}
             </CardContent>
 
-            <CardFooter className="pt-0 justify-end">
+            <CardFooter className="pt-0">
                 {mode.can_access ? (
                     <Button asChild>
                         <Link href={`/practice-modes/${mode.slug}/train`}>

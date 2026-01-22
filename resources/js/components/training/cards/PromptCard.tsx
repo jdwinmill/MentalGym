@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { type PromptCard as PromptCardType } from '@/types/training';
 import { Send } from 'lucide-react';
+import { TimerDisplay } from '@/components/training/TimerDisplay';
 
 interface PromptCardProps {
     card: PromptCardType;
@@ -58,6 +59,12 @@ export function PromptCard({ card, onSubmit, characterLimit, isLoading }: Prompt
                         {card.content}
                     </p>
                 </div>
+
+                {/* Timer display (above textarea, per design spec) */}
+                {card.ui_hints?.timed && card.ui_hints.timer_seconds && (
+                    <TimerDisplay seconds={card.ui_hints.timer_seconds} />
+                )}
+
                 <div className="space-y-2">
                     <Textarea
                         value={input}

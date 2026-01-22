@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { type ReflectionCard as ReflectionCardType } from '@/types/training';
 import { Send, MessageCircle } from 'lucide-react';
+import { TimerDisplay } from '@/components/training/TimerDisplay';
 
 interface ReflectionCardProps {
     card: ReflectionCardType;
@@ -63,6 +64,12 @@ export function ReflectionCard({ card, onSubmit, characterLimit, isLoading }: Re
                         </p>
                     </div>
                 </div>
+
+                {/* Timer display (above textarea, per design spec) */}
+                {card.ui_hints?.timed && card.ui_hints.timer_seconds && (
+                    <TimerDisplay seconds={card.ui_hints.timer_seconds} />
+                )}
+
                 <div className="space-y-2">
                     <Textarea
                         value={input}

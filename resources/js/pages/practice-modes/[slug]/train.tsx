@@ -68,11 +68,30 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
             if (data.resumed && data.messages) {
                 // Resumed session - restore messages and get last card
                 setMessages(data.messages);
-                const lastAssistantMessage = [...data.messages]
-                    .reverse()
-                    .find((m): m is Extract<Message, { role: 'assistant' }> => m.role === 'assistant');
+                const assistantMessages = data.messages.filter(
+                    (m): m is Extract<Message, { role: 'assistant' }> => m.role === 'assistant'
+                );
+                const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+
                 if (lastAssistantMessage) {
-                    setCurrentCard(lastAssistantMessage.card);
+                    // Re-apply consolidation if needed: check if previous card was scenario
+                    // and current card is prompt/reflection
+                    const consolidatableTypes = ['prompt', 'reflection'];
+                    const secondLastAssistant = assistantMessages[assistantMessages.length - 2];
+
+                    if (
+                        secondLastAssistant?.card?.type === 'scenario' &&
+                        consolidatableTypes.includes(lastAssistantMessage.card.type)
+                    ) {
+                        // Re-consolidate: add scenario context to current card
+                        const consolidatedCard = {
+                            ...lastAssistantMessage.card,
+                            scenarioContext: secondLastAssistant.card.content,
+                        };
+                        setCurrentCard(consolidatedCard as Card);
+                    } else {
+                        setCurrentCard(lastAssistantMessage.card);
+                    }
                 }
             } else if (data.card) {
                 // New session - set first card

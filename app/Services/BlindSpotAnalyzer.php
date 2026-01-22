@@ -514,7 +514,8 @@ class BlindSpotAnalyzer
 
     private function findBiggestWin(array $skillAnalyses): ?string
     {
-        $best = null;
+        // First, try to find an improving skill with the best delta
+        $bestImproving = null;
         $bestDelta = 0;
 
         foreach ($skillAnalyses as $analysis) {
@@ -522,12 +523,28 @@ class BlindSpotAnalyzer
                 $delta = $analysis->baselineRate - $analysis->currentRate;
                 if ($delta > $bestDelta) {
                     $bestDelta = $delta;
-                    $best = $analysis->skill;
+                    $bestImproving = $analysis->skill;
                 }
             }
         }
 
-        return $best;
+        if ($bestImproving) {
+            return $bestImproving;
+        }
+
+        // Fallback: find the skill with the lowest failure rate (best performance)
+        $best = null;
+        $lowestRate = 1.0;
+
+        foreach ($skillAnalyses as $analysis) {
+            if ($analysis->currentRate < $lowestRate) {
+                $lowestRate = $analysis->currentRate;
+                $best = $analysis->skill;
+            }
+        }
+
+        // Only return if they're actually doing well (< 30% failure rate)
+        return $lowestRate < 0.30 ? $best : null;
     }
 
     public function analyzeIterationPattern(User $user): array

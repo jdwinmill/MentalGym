@@ -177,7 +177,7 @@ export function BiggestWinCard({ skill, details }: HighlightCardProps) {
                     <p className="text-sm font-medium text-green-800 dark:text-green-300">
                         {improvement && improvement > 0
                             ? `Improved ${improvement}% recently`
-                            : `${successRate}% success rate`}
+                            : `${successRate}% success rate — your strongest skill`}
                     </p>
                     {details.target && (
                         <p className="mt-1 text-xs text-green-700/70 dark:text-green-400/70">

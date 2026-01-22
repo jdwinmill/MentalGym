@@ -245,6 +245,20 @@ class PracticeAIService
                             'type' => 'boolean',
                             'description' => 'True if this is a required second attempt at a drill',
                         ],
+                        'ui_hints' => [
+                            'type' => 'object',
+                            'description' => 'UI configuration hints for the card display',
+                            'properties' => [
+                                'timed' => [
+                                    'type' => 'boolean',
+                                    'description' => 'Whether to show a countdown timer on this card',
+                                ],
+                                'timer_seconds' => [
+                                    'type' => 'integer',
+                                    'description' => 'Number of seconds for the countdown timer',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -300,6 +314,11 @@ class PracticeAIService
         }
         if (isset($toolInput['is_iteration'])) {
             $card['is_iteration'] = $toolInput['is_iteration'];
+        }
+
+        // Pass through ui_hints for timer display
+        if (isset($toolInput['ui_hints'])) {
+            $card['ui_hints'] = $toolInput['ui_hints'];
         }
 
         return $card;
@@ -403,6 +422,10 @@ class PracticeAIService
 
         if (isset($card['is_iteration'])) {
             $input['is_iteration'] = $card['is_iteration'];
+        }
+
+        if (isset($card['ui_hints'])) {
+            $input['ui_hints'] = $card['ui_hints'];
         }
 
         return $input;

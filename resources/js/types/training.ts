@@ -55,9 +55,19 @@ export interface SessionProgress {
 // Card Types
 export type CardType = 'scenario' | 'prompt' | 'multiple_choice' | 'insight' | 'reflection';
 
+export type PressureLevel = 'low' | 'medium' | 'high';
+
+export interface UIHints {
+    timed?: boolean;
+    timer_seconds?: number;
+    show_previous_response?: boolean;
+    pressure_level?: PressureLevel;
+}
+
 export interface BaseCard {
     type: CardType;
     content: string;
+    ui_hints?: UIHints;
 }
 
 export interface ScenarioCard extends BaseCard {

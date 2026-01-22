@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { GatedView } from '@/components/blind-spots/gated-view';
 import { SummaryStats } from '@/components/blind-spots/summary-stats';
 import { BiggestGapCard, BiggestWinCard, GrowthEdgeCard } from '@/components/blind-spots/highlight-cards';
-import { SkillTrajectory } from '@/components/blind-spots/skill-trajectory';
 import { PatternDetails } from '@/components/blind-spots/pattern-details';
 import { TrendChart } from '@/components/blind-spots/trend-chart';
 
@@ -126,6 +125,10 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
                         />
 
                         <div className="grid gap-4 md:grid-cols-2">
+                            <BiggestWinCard
+                                skill={analysis.biggestWin}
+                                details={getSkillDetails(analysis.biggestWin)}
+                            />
                             {showGrowthEdge ? (
                                 <GrowthEdgeCard
                                     skill={analysis.growthEdge}
@@ -137,13 +140,7 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
                                     details={getSkillDetails(analysis.biggestGap)}
                                 />
                             )}
-                            <BiggestWinCard
-                                skill={analysis.biggestWin}
-                                details={getSkillDetails(analysis.biggestWin)}
-                            />
                         </div>
-
-                        <SkillTrajectory skills={allSkills} />
 
                         <PatternDetails
                             blindSpots={analysis.blindSpots || []}
