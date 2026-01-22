@@ -267,6 +267,10 @@ class PracticeAIService
                                 ],
                             ],
                         ],
+                        'session_complete' => [
+                            'type' => 'boolean',
+                            'description' => 'Set to true on the final card of the session. Signals that training is complete.',
+                        ],
                     ],
                 ],
             ],
@@ -327,6 +331,11 @@ class PracticeAIService
         // Pass through ui_hints for timer display
         if (isset($toolInput['ui_hints'])) {
             $card['ui_hints'] = $toolInput['ui_hints'];
+        }
+
+        // Pass through session_complete flag
+        if (isset($toolInput['session_complete'])) {
+            $card['session_complete'] = $toolInput['session_complete'];
         }
 
         return $card;

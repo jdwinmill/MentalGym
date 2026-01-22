@@ -34,6 +34,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
     const [isFetchingFollowUp, setIsFetchingFollowUp] = useState(false);
     const [levelUpCard, setLevelUpCard] = useState<LevelUpCardType | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [sessionComplete, setSessionComplete] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Practice', href: '/practice-modes' },
@@ -110,7 +111,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
     }, [startSession]);
 
     // Auto-fetch follow-up card when scenario card is received
-    const fetchFollowUpCard = useCallback(async (scenarioContent: string) => {
+    const fetchFollowUpCard = useCallback(async (scenarioContent: string, scenarioCard: Card) => {
         if (!session) return;
 
         setIsFetchingFollowUp(true);
@@ -137,7 +138,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
             const scenarioMessage: Message = {
                 id: Date.now(),
                 role: 'assistant',
-                card: currentCard!,
+                card: scenarioCard,
                 type: 'scenario',
                 created_at: new Date().toISOString(),
             };
@@ -192,14 +193,15 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
         } finally {
             setIsFetchingFollowUp(false);
         }
-    }, [session, currentCard]);
+    }, [session]);
 
     // Auto-fetch when scenario card is received
     useEffect(() => {
         if (currentCard?.type === 'scenario' && !isFetchingFollowUp && session && !isStarting) {
-            fetchFollowUpCard(currentCard.content);
+            fetchFollowUpCard(currentCard.content, currentCard);
         }
-    }, [currentCard, session, isFetchingFollowUp, isStarting, fetchFollowUpCard]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentCard, session, isStarting]);
 
     // Submit user input (for prompt, reflection, or choice cards)
     const handleSubmit = async (input: string) => {
@@ -251,6 +253,11 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                 };
                 setMessages((prev) => [...prev, assistantMessage]);
                 setCurrentCard(data.card);
+
+                // Mark session as complete if AI signals it
+                if ((data.card as Card & { session_complete?: boolean }).session_complete) {
+                    setSessionComplete(true);
+                }
             }
 
             if (data.session) {
@@ -385,6 +392,23 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                                     />
                                 )}
                             </>
+                        )}
+
+                        {/* Session complete */}
+                        {sessionComplete && !isStarting && (
+                            <div className="w-full max-w-2xl mx-auto mt-6">
+                                <div className="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-900 dark:bg-green-950/50 text-center">
+                                    <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
+                                        Session Complete
+                                    </h3>
+                                    <p className="text-sm text-green-700 dark:text-green-300 mb-4">
+                                        Great work. Your progress has been saved.
+                                    </p>
+                                    <Button onClick={handleEndSession} disabled={isEnding}>
+                                        {isEnding ? 'Finishing...' : 'Finish Session'}
+                                    </Button>
+                                </div>
+                            </div>
                         )}
 
                         {/* Session history */}
