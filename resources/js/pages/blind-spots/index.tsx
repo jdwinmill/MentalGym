@@ -4,16 +4,22 @@ import { Head } from '@inertiajs/react';
 import { Badge } from '@/components/ui/badge';
 import { GatedView } from '@/components/blind-spots/gated-view';
 import { SummaryStats } from '@/components/blind-spots/summary-stats';
-import { BiggestGapCard, BiggestWinCard } from '@/components/blind-spots/highlight-cards';
+import { BiggestGapCard, BiggestWinCard, GrowthEdgeCard } from '@/components/blind-spots/highlight-cards';
 import { SkillTrajectory } from '@/components/blind-spots/skill-trajectory';
 import { PatternDetails } from '@/components/blind-spots/pattern-details';
-import { UniversalPatterns } from '@/components/blind-spots/universal-patterns';
 import { TrendChart } from '@/components/blind-spots/trend-chart';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Blind Spots', href: '/blind-spots' },
 ];
+
+interface ContextBreakdown {
+    phase: string;
+    rate: number;
+    total: number;
+    practiceMode: string | null;
+}
 
 interface SkillPattern {
     skill: string;
@@ -24,14 +30,14 @@ interface SkillPattern {
     failingCriteria: string[];
     sampleSize: number;
     practiceMode: string | null;
+    name: string | null;
+    description: string | null;
+    target: string | null;
+    tips: string[];
+    failingCriteriaLabels: string[];
+    contextBreakdown: ContextBreakdown[];
 }
 
-interface UniversalPattern {
-    criteria: string;
-    rate: number;
-    count: number;
-    total: number;
-}
 
 interface Analysis {
     hasEnoughData: boolean;
@@ -47,9 +53,10 @@ interface Analysis {
     improving: SkillPattern[] | null;
     slipping: SkillPattern[] | null;
     stable: SkillPattern[] | null;
-    universalPatterns: UniversalPattern[] | null;
     biggestGap: string | null;
     biggestWin: string | null;
+    growthEdge: string | null;
+    allSkills: SkillPattern[] | null;
     analyzedAt: string;
 }
 
@@ -67,7 +74,8 @@ interface BlindSpotsIndexProps {
 }
 
 export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpotsIndexProps) {
-    const allSkills = [
+    // Use server-provided allSkills if available, otherwise compute from categories
+    const allSkills = analysis.allSkills || [
         ...(analysis.blindSpots || []),
         ...(analysis.improving || []),
         ...(analysis.slipping || []),
@@ -78,6 +86,9 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
         if (!skillName) return null;
         return allSkills.find(s => s.skill === skillName) || null;
     };
+
+    // Determine if we should show Growth Edge instead of Biggest Gap
+    const showGrowthEdge = !analysis.biggestGap && analysis.growthEdge;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -115,10 +126,17 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
                         />
 
                         <div className="grid gap-4 md:grid-cols-2">
-                            <BiggestGapCard
-                                skill={analysis.biggestGap}
-                                details={getSkillDetails(analysis.biggestGap)}
-                            />
+                            {showGrowthEdge ? (
+                                <GrowthEdgeCard
+                                    skill={analysis.growthEdge}
+                                    details={getSkillDetails(analysis.growthEdge)}
+                                />
+                            ) : (
+                                <BiggestGapCard
+                                    skill={analysis.biggestGap}
+                                    details={getSkillDetails(analysis.biggestGap)}
+                                />
+                            )}
                             <BiggestWinCard
                                 skill={analysis.biggestWin}
                                 details={getSkillDetails(analysis.biggestWin)}
@@ -133,10 +151,6 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
                             stable={analysis.stable || []}
                             slipping={analysis.slipping || []}
                         />
-
-                        {analysis.universalPatterns && analysis.universalPatterns.length > 0 && (
-                            <UniversalPatterns patterns={analysis.universalPatterns} />
-                        )}
 
                         {history && history.some(h => h.data !== null) && (
                             <TrendChart history={history} />

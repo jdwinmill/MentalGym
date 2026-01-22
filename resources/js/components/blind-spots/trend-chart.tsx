@@ -14,24 +14,56 @@ interface TrendChartProps {
 }
 
 const skillColors: Record<string, string> = {
-    authority: '#ef4444',
-    structure: '#10b981',
-    brevity: '#6366f1',
-    composure: '#f59e0b',
-    directness: '#8b5cf6',
+    clarity: '#3b82f6',      // blue
+    brevity: '#6366f1',      // indigo
+    authority: '#ef4444',    // red
+    structure: '#10b981',    // green
+    composure: '#f59e0b',    // amber
+    directness: '#8b5cf6',   // purple
+    ownership: '#ec4899',    // pink
+    authenticity: '#14b8a6', // teal
+    specificity: '#f97316',  // orange
+    solution_focus: '#06b6d4', // cyan
+    empathy: '#84cc16',      // lime
 };
 
 const skillLabels: Record<string, string> = {
+    clarity: 'Clarity',
+    brevity: 'Brevity',
     authority: 'Authority',
     structure: 'Structure',
-    brevity: 'Brevity',
     composure: 'Composure',
     directness: 'Directness',
+    ownership: 'Ownership',
+    authenticity: 'Authenticity',
+    specificity: 'Specificity',
+    solution_focus: 'Solution Focus',
+    empathy: 'Empathy',
 };
+
+// Helper to extract available skills from history
+function getAvailableSkillsFromHistory(history: WeekData[]): string[] {
+    const skills = new Set<string>();
+    history.forEach((week) => {
+        if (week.data) {
+            Object.keys(week.data).forEach((skill) => {
+                if (week.data![skill] !== null) {
+                    skills.add(skill);
+                }
+            });
+        }
+    });
+    return Array.from(skills);
+}
 
 export function TrendChart({ history }: TrendChartProps) {
     const [timeRange, setTimeRange] = useState('4');
-    const [selectedSkills, setSelectedSkills] = useState<string[]>(['authority', 'structure']);
+
+    // Initialize selected skills based on what's available in history
+    const [selectedSkills, setSelectedSkills] = useState<string[]>(() => {
+        const available = getAvailableSkillsFromHistory(history);
+        return available.slice(0, 2);
+    });
 
     const chartData = useMemo(() => {
         const weeks = parseInt(timeRange);
@@ -39,17 +71,7 @@ export function TrendChart({ history }: TrendChartProps) {
     }, [history, timeRange]);
 
     const availableSkills = useMemo(() => {
-        const skills = new Set<string>();
-        history.forEach((week) => {
-            if (week.data) {
-                Object.keys(week.data).forEach((skill) => {
-                    if (week.data![skill] !== null) {
-                        skills.add(skill);
-                    }
-                });
-            }
-        });
-        return Array.from(skills);
+        return getAvailableSkillsFromHistory(history);
     }, [history]);
 
     const chartWidth = 600;
@@ -171,29 +193,34 @@ export function TrendChart({ history }: TrendChartProps) {
                             );
                         })}
 
-                        {/* Lines */}
+                        {/* Lines and dots */}
                         {selectedSkills.map((skill) => {
                             const points = getPoints(skill);
+                            if (points.length === 0) return null;
+
                             const path = getPath(points);
-                            if (!path) return null;
 
                             return (
                                 <g key={skill}>
-                                    <path
-                                        d={path}
-                                        fill="none"
-                                        stroke={skillColors[skill]}
-                                        strokeWidth={2}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
+                                    {/* Only draw line if we have 2+ points */}
+                                    {path && (
+                                        <path
+                                            d={path}
+                                            fill="none"
+                                            stroke={skillColors[skill] || '#888'}
+                                            strokeWidth={2}
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    )}
+                                    {/* Always draw dots for data points */}
                                     {points.map((point, i) => (
                                         <circle
                                             key={i}
                                             cx={point.x}
                                             cy={point.y}
                                             r={4}
-                                            fill={skillColors[skill]}
+                                            fill={skillColors[skill] || '#888'}
                                         />
                                     ))}
                                 </g>

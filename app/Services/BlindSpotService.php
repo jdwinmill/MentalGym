@@ -101,6 +101,7 @@ class BlindSpotService
     {
         $trends = [];
         $now = now();
+        $skills = config('skills.skill_criteria', []);
 
         for ($i = $weeks - 1; $i >= 0; $i--) {
             $weekStart = $now->copy()->subWeeks($i)->startOfWeek();
@@ -121,15 +122,21 @@ class BlindSpotService
                 continue;
             }
 
+            $skillRates = [];
+            foreach ($skills as $skill => $criteria) {
+                $rate = $this->calculateSkillFailureRate(
+                    $scores,
+                    $criteria['positive'] ?? [],
+                    $criteria['negative'] ?? []
+                );
+                if ($rate !== null) {
+                    $skillRates[$skill] = $rate;
+                }
+            }
+
             $trends[] = [
                 'week' => $weekStart->format('M j'),
-                'data' => [
-                    'authority' => $this->calculateFailureRate($scores, 'hedging'),
-                    'brevity' => $this->calculateFailureRate($scores, 'ran_long'),
-                    'structure' => $this->calculateFailureRate($scores, 'structure_followed', invert: true),
-                    'composure' => $this->calculateFailureRate($scores, 'calm_tone', invert: true),
-                    'directness' => $this->calculateFailureRate($scores, 'direct_opening', invert: true),
-                ],
+                'data' => empty($skillRates) ? null : $skillRates,
                 'sessions' => $scores->pluck('training_session_id')->unique()->count(),
                 'responses' => $scores->count(),
             ];
@@ -138,19 +145,71 @@ class BlindSpotService
         return $trends;
     }
 
-    private function calculateFailureRate(Collection $scores, string $criteria, bool $invert = false): ?float
+    /**
+     * Calculate the failure rate for a skill based on its positive and negative criteria.
+     */
+    private function calculateSkillFailureRate(Collection $scores, array $positiveCriteria, array $negativeCriteria): ?float
     {
-        $relevant = $scores->filter(fn ($s) => isset($s->scores[$criteria]));
+        $total = 0;
+        $failures = 0;
 
-        if ($relevant->isEmpty()) {
+        foreach ($scores as $score) {
+            $scoreData = $score->scores;
+            if (! is_array($scoreData)) {
+                continue;
+            }
+
+            $hasRelevantCriteria = false;
+            $hasFailed = false;
+
+            // Check positive criteria (should be truthy; falsy = failure)
+            foreach ($positiveCriteria as $criterion) {
+                if (array_key_exists($criterion, $scoreData)) {
+                    $hasRelevantCriteria = true;
+                    if ($this->isFalsy($scoreData[$criterion])) {
+                        $hasFailed = true;
+                    }
+                }
+            }
+
+            // Check negative criteria (should be falsy; truthy = failure)
+            foreach ($negativeCriteria as $criterion) {
+                if (array_key_exists($criterion, $scoreData)) {
+                    $hasRelevantCriteria = true;
+                    if ($this->isTruthy($scoreData[$criterion])) {
+                        $hasFailed = true;
+                    }
+                }
+            }
+
+            if ($hasRelevantCriteria) {
+                $total++;
+                if ($hasFailed) {
+                    $failures++;
+                }
+            }
+        }
+
+        if ($total < 3) { // Need at least 3 responses for a meaningful rate
             return null;
         }
 
-        $failures = $relevant->filter(fn ($s) => $invert
-            ? $s->scores[$criteria] === false
-            : $s->scores[$criteria] === true
-        )->count();
+        return round($failures / $total, 2);
+    }
 
-        return round($failures / $relevant->count(), 2);
+    /**
+     * Check if a score value represents a truthy (passed) state.
+     */
+    private function isTruthy(mixed $value): bool
+    {
+        return $value === true || $value === 1 || $value === '1';
+    }
+
+    /**
+     * Check if a score value represents a falsy (failed) state.
+     */
+    private function isFalsy(mixed $value): bool
+    {
+        return ! $this->isTruthy($value);
     }
 }

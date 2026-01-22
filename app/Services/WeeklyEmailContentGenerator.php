@@ -53,7 +53,6 @@ class WeeklyEmailContentGenerator
         $improvingText = $this->formatSkills($analysis->improving);
         $slippingText = $this->formatSkills($analysis->slipping);
         $stableText = $this->formatSkills($analysis->stable);
-        $universalText = $this->formatUniversal($analysis->universalPatterns);
 
         return <<<PROMPT
 You are writing a weekly training report email for a professional using SharpStack, a mental fitness training platform.
@@ -68,7 +67,6 @@ ANALYSIS DATA:
 - Improving: {$improvingText}
 - Slipping: {$slippingText}
 - Stable: {$stableText}
-- Universal patterns: {$universalText}
 - Biggest gap: {$analysis->biggestGap}
 - Biggest win: {$analysis->biggestWin}
 
@@ -123,21 +121,6 @@ PROMPT;
 
             return "{$skill->skill} (was {$baseline}%, now {$current}%)";
         }, $skills);
-
-        return implode('; ', $items);
-    }
-
-    private function formatUniversal(array $patterns): string
-    {
-        if (empty($patterns)) {
-            return 'None tracked';
-        }
-
-        $items = array_map(function ($pattern) {
-            $rate = round($pattern->rate * 100);
-
-            return "{$pattern->criteria}: {$rate}% ({$pattern->count}/{$pattern->total})";
-        }, $patterns);
 
         return implode('; ', $items);
     }

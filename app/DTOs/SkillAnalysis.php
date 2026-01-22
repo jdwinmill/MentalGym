@@ -14,6 +14,12 @@ class SkillAnalysis
         public ?string $context,
         public array $failingCriteria,
         public ?string $practiceMode = null,
+        public ?string $name = null,
+        public ?string $description = null,
+        public ?string $target = null,
+        public array $tips = [],
+        public array $failingCriteriaLabels = [],
+        public array $contextBreakdown = [],
     ) {}
 
     public function toArray(): array
@@ -28,6 +34,12 @@ class SkillAnalysis
             'context' => $this->context,
             'failingCriteria' => $this->failingCriteria,
             'practiceMode' => $this->practiceMode,
+            'name' => $this->name,
+            'description' => $this->description,
+            'target' => $this->target,
+            'tips' => $this->tips,
+            'failingCriteriaLabels' => $this->failingCriteriaLabels,
+            'contextBreakdown' => $this->contextBreakdown,
         ];
     }
 

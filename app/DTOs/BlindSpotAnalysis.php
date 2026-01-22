@@ -14,10 +14,11 @@ class BlindSpotAnalysis
         public array $improving,
         public array $stable,
         public array $slipping,
-        public array $universalPatterns,
         public ?string $biggestGap,
         public ?string $biggestWin,
         public Carbon $analyzedAt,
+        public ?string $growthEdge = null,
+        public array $allSkills = [],
     ) {}
 
     public static function insufficient(int $totalSessions = 0, int $totalResponses = 0): self
@@ -30,10 +31,11 @@ class BlindSpotAnalysis
             improving: [],
             stable: [],
             slipping: [],
-            universalPatterns: [],
             biggestGap: null,
             biggestWin: null,
             analyzedAt: now(),
+            growthEdge: null,
+            allSkills: [],
         );
     }
 
@@ -47,10 +49,11 @@ class BlindSpotAnalysis
             'improving' => array_map(fn ($s) => $s->toArray(), $this->improving),
             'stable' => array_map(fn ($s) => $s->toArray(), $this->stable),
             'slipping' => array_map(fn ($s) => $s->toArray(), $this->slipping),
-            'universalPatterns' => array_map(fn ($p) => $p->toArray(), $this->universalPatterns),
             'biggestGap' => $this->biggestGap,
             'biggestWin' => $this->biggestWin,
             'analyzedAt' => $this->analyzedAt->toIso8601String(),
+            'growthEdge' => $this->growthEdge,
+            'allSkills' => array_map(fn ($s) => $s->toArray(), $this->allSkills),
         ];
     }
 
@@ -72,10 +75,5 @@ class BlindSpotAnalysis
     public function hasRegressions(): bool
     {
         return count($this->slipping) > 0;
-    }
-
-    public function getProblematicUniversalPatterns(): array
-    {
-        return array_filter($this->universalPatterns, fn ($p) => $p->isProblematic());
     }
 }

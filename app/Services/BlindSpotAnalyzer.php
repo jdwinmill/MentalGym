@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\BlindSpotAnalysis;
 use App\DTOs\SkillAnalysis;
-use App\DTOs\UniversalPattern;
 use App\Models\DrillScore;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -50,8 +49,6 @@ class BlindSpotAnalyzer
         $recentScores = $this->getScores($user, $this->recentDays);
         $baselineScores = $this->getBaselineScores($user);
 
-        $universalPatterns = $this->analyzeUniversalCriteria($allScores, $recentScores, $baselineScores);
-
         $skills = $this->getSkillsFromConfig();
         $skillAnalyses = [];
 
@@ -69,6 +66,11 @@ class BlindSpotAnalyzer
 
         $biggestGap = $this->findBiggestGap($skillAnalyses);
         $biggestWin = $this->findBiggestWin($skillAnalyses);
+        $growthEdge = $this->findGrowthEdge($skillAnalyses);
+
+        // All skills sorted by success rate (best first)
+        $allSkills = array_values($skillAnalyses);
+        usort($allSkills, fn ($a, $b) => $a->currentRate <=> $b->currentRate);
 
         return new BlindSpotAnalysis(
             hasEnoughData: true,
@@ -78,10 +80,11 @@ class BlindSpotAnalyzer
             improving: $improving,
             stable: $stable,
             slipping: $slipping,
-            universalPatterns: $universalPatterns,
             biggestGap: $biggestGap,
             biggestWin: $biggestWin,
             analyzedAt: now(),
+            growthEdge: $growthEdge,
+            allSkills: $allSkills,
         );
     }
 
@@ -185,6 +188,19 @@ class BlindSpotAnalyzer
 
         $practiceMode = $context ? $this->mapContextToPracticeMode($context) : null;
 
+        // Get skill metadata from config
+        $skillConfig = config("skills.skill_criteria.{$skill}", []);
+        $criteriaLabels = config('skills.criteria_labels', []);
+
+        // Map failing criteria to human-readable labels
+        $failingCriteriaLabels = array_map(
+            fn ($c) => $criteriaLabels[$c] ?? $c,
+            $failingCriteria
+        );
+
+        // Calculate context breakdown (failure rate per drill phase)
+        $contextBreakdown = $this->calculateContextBreakdown($allScores, $positiveCriteria, $negativeCriteria);
+
         return new SkillAnalysis(
             skill: $skill,
             trend: $trend,
@@ -195,6 +211,12 @@ class BlindSpotAnalyzer
             context: $context,
             failingCriteria: $failingCriteria,
             practiceMode: $practiceMode,
+            name: $skillConfig['name'] ?? ucfirst($skill),
+            description: $skillConfig['description'] ?? null,
+            target: $skillConfig['target'] ?? null,
+            tips: $skillConfig['tips'] ?? [],
+            failingCriteriaLabels: $failingCriteriaLabels,
+            contextBreakdown: $contextBreakdown,
         );
     }
 
@@ -215,7 +237,7 @@ class BlindSpotAnalyzer
             foreach ($positiveCriteria as $criterion) {
                 if (array_key_exists($criterion, $scoreData)) {
                     $hasRelevantCriteria = true;
-                    if ($scoreData[$criterion] === false) {
+                    if ($this->isFalsy($scoreData[$criterion])) {
                         $hasFailed = true;
                     }
                 }
@@ -224,7 +246,7 @@ class BlindSpotAnalyzer
             foreach ($negativeCriteria as $criterion) {
                 if (array_key_exists($criterion, $scoreData)) {
                     $hasRelevantCriteria = true;
-                    if ($scoreData[$criterion] === true) {
+                    if ($this->isTruthy($scoreData[$criterion])) {
                         $hasFailed = true;
                     }
                 }
@@ -253,7 +275,7 @@ class BlindSpotAnalyzer
                 $scoreData = $score->scores;
                 if (is_array($scoreData) && array_key_exists($criterion, $scoreData)) {
                     $total++;
-                    if ($scoreData[$criterion] === false) {
+                    if ($this->isFalsy($scoreData[$criterion])) {
                         $failures++;
                     }
                 }
@@ -272,7 +294,7 @@ class BlindSpotAnalyzer
                 $scoreData = $score->scores;
                 if (is_array($scoreData) && array_key_exists($criterion, $scoreData)) {
                     $total++;
-                    if ($scoreData[$criterion] === true) {
+                    if ($this->isTruthy($scoreData[$criterion])) {
                         $failures++;
                     }
                 }
@@ -289,98 +311,6 @@ class BlindSpotAnalyzer
     }
 
     private function calculateTrend(float $currentRate, float $baselineRate, int $baselineSampleSize): string
-    {
-        if ($baselineSampleSize < 3) {
-            return 'new';
-        }
-
-        $delta = $baselineRate - $currentRate;
-
-        if ($currentRate >= $this->blindSpotThreshold && $baselineRate >= $this->blindSpotThreshold) {
-            if ($delta >= $this->improvementThreshold) {
-                return 'improving';
-            }
-
-            return 'stuck';
-        }
-
-        if ($delta >= $this->improvementThreshold) {
-            return 'improving';
-        }
-
-        if ($delta <= -$this->regressionThreshold) {
-            return 'slipping';
-        }
-
-        return 'stable';
-    }
-
-    private function analyzeUniversalCriteria(Collection $allScores, Collection $recentScores, Collection $baselineScores): array
-    {
-        $universalCriteria = config('skills.universal_criteria', []);
-        $patterns = [];
-
-        foreach ($universalCriteria as $criterion) {
-            $allStats = $this->calculateCriteriaStats($allScores, $criterion);
-            $recentStats = $this->calculateCriteriaStats($recentScores, $criterion);
-            $baselineStats = $this->calculateCriteriaStats($baselineScores, $criterion);
-
-            if ($allStats['total'] < $this->minimumResponses) {
-                continue;
-            }
-
-            $currentRate = $recentStats['total'] > 0
-                ? $recentStats['count'] / $recentStats['total']
-                : $allStats['count'] / $allStats['total'];
-
-            $baselineRate = $baselineStats['total'] > 0
-                ? $baselineStats['count'] / $baselineStats['total']
-                : $currentRate;
-
-            $trend = $this->calculateUniversalTrend($currentRate, $baselineRate, $baselineStats['total']);
-
-            $patterns[] = new UniversalPattern(
-                criteria: $criterion,
-                rate: round($currentRate, 2),
-                count: $allStats['count'],
-                total: $allStats['total'],
-                trend: $trend,
-            );
-        }
-
-        usort($patterns, fn ($a, $b) => $b->rate <=> $a->rate);
-
-        return $patterns;
-    }
-
-    private function calculateCriteriaStats(Collection $scores, string $criterion): array
-    {
-        $total = 0;
-        $count = 0;
-
-        foreach ($scores as $score) {
-            $scoreData = $score->scores;
-            if (! is_array($scoreData) || ! array_key_exists($criterion, $scoreData)) {
-                continue;
-            }
-
-            $total++;
-
-            if ($criterion === 'filler_phrases') {
-                if ($scoreData[$criterion] > 0) {
-                    $count++;
-                }
-            } else {
-                if ($scoreData[$criterion] === true) {
-                    $count++;
-                }
-            }
-        }
-
-        return ['total' => $total, 'count' => $count];
-    }
-
-    private function calculateUniversalTrend(float $currentRate, float $baselineRate, int $baselineSampleSize): string
     {
         if ($baselineSampleSize < 3) {
             return 'new';
@@ -455,12 +385,12 @@ class BlindSpotAnalyzer
 
                 // Check if this score has any failing criteria for this skill
                 foreach ($positiveCriteria as $criterion) {
-                    if (array_key_exists($criterion, $scoreData) && $scoreData[$criterion] === false) {
+                    if (array_key_exists($criterion, $scoreData) && $this->isFalsy($scoreData[$criterion])) {
                         return true;
                     }
                 }
                 foreach ($negativeCriteria as $criterion) {
-                    if (array_key_exists($criterion, $scoreData) && $scoreData[$criterion] === true) {
+                    if (array_key_exists($criterion, $scoreData) && $this->isTruthy($scoreData[$criterion])) {
                         return true;
                     }
                 }
@@ -476,6 +406,77 @@ class BlindSpotAnalyzer
         return $result;
     }
 
+    /**
+     * Calculate failure rates per drill phase for a skill's criteria.
+     * Returns array of [phase => rate] sorted by rate descending.
+     */
+    private function calculateContextBreakdown(Collection $scores, array $positiveCriteria, array $negativeCriteria): array
+    {
+        $phaseStats = [];
+
+        foreach ($scores as $score) {
+            $scoreData = $score->scores;
+            $phase = $score->drill_phase;
+
+            if (! is_array($scoreData) || ! $phase) {
+                continue;
+            }
+
+            // Check if this score has any relevant criteria for this skill
+            $hasRelevantCriteria = false;
+            $hasFailed = false;
+
+            foreach ($positiveCriteria as $criterion) {
+                if (array_key_exists($criterion, $scoreData)) {
+                    $hasRelevantCriteria = true;
+                    if ($this->isFalsy($scoreData[$criterion])) {
+                        $hasFailed = true;
+                    }
+                }
+            }
+
+            foreach ($negativeCriteria as $criterion) {
+                if (array_key_exists($criterion, $scoreData)) {
+                    $hasRelevantCriteria = true;
+                    if ($this->isTruthy($scoreData[$criterion])) {
+                        $hasFailed = true;
+                    }
+                }
+            }
+
+            if ($hasRelevantCriteria) {
+                if (! isset($phaseStats[$phase])) {
+                    $phaseStats[$phase] = ['total' => 0, 'failures' => 0];
+                }
+                $phaseStats[$phase]['total']++;
+                if ($hasFailed) {
+                    $phaseStats[$phase]['failures']++;
+                }
+            }
+        }
+
+        // Calculate rates and format for frontend
+        $breakdown = [];
+        $practiceModeMapping = config('drill_types.practice_mode_mapping', []);
+
+        foreach ($phaseStats as $phase => $stats) {
+            if ($stats['total'] >= 3) { // Need at least 3 samples
+                $rate = round($stats['failures'] / $stats['total'], 2);
+                $breakdown[] = [
+                    'phase' => $phase,
+                    'rate' => $rate,
+                    'total' => $stats['total'],
+                    'practiceMode' => $practiceModeMapping[$phase] ?? null,
+                ];
+            }
+        }
+
+        // Sort by rate descending (worst first)
+        usort($breakdown, fn ($a, $b) => $b['rate'] <=> $a['rate']);
+
+        return $breakdown;
+    }
+
     private function findBiggestGap(array $skillAnalyses): ?string
     {
         $worst = null;
@@ -489,6 +490,26 @@ class BlindSpotAnalyzer
         }
 
         return $worstRate >= $this->blindSpotThreshold ? $worst : null;
+    }
+
+    /**
+     * Find the skill with highest failure rate, regardless of threshold.
+     * Used for "Growth Edge" - the area with most room for improvement.
+     */
+    private function findGrowthEdge(array $skillAnalyses): ?string
+    {
+        $worst = null;
+        $worstRate = 0;
+
+        foreach ($skillAnalyses as $analysis) {
+            if ($analysis->currentRate > $worstRate) {
+                $worstRate = $analysis->currentRate;
+                $worst = $analysis->skill;
+            }
+        }
+
+        // Only return if there's actually some room for improvement (> 5%)
+        return $worstRate > 0.05 ? $worst : null;
     }
 
     private function findBiggestWin(array $skillAnalyses): ?string
@@ -549,6 +570,14 @@ class BlindSpotAnalyzer
             return 0;
         }
 
+        // Build lookup of all negative criteria from skill config
+        $negativeCriteria = [];
+        foreach (config('skills.skill_criteria', []) as $skill) {
+            foreach ($skill['negative'] ?? [] as $criterion) {
+                $negativeCriteria[$criterion] = true;
+            }
+        }
+
         $totalCriteria = 0;
         $totalFailures = 0;
 
@@ -559,19 +588,44 @@ class BlindSpotAnalyzer
             }
 
             foreach ($scoreData as $criterion => $value) {
-                if (is_bool($value)) {
-                    $totalCriteria++;
-                    $isUniversalNegative = in_array($criterion, config('skills.universal_criteria', []));
+                // Skip non-boolean-like values (e.g., filler_phrases count)
+                if ($value !== true && $value !== false && $value !== 1 && $value !== '1' && $value !== 0 && $value !== '0' && $value !== '') {
+                    continue;
+                }
 
-                    if ($isUniversalNegative && $value === true) {
-                        $totalFailures++;
-                    } elseif (! $isUniversalNegative && $value === false) {
-                        $totalFailures++;
-                    }
+                $totalCriteria++;
+                $isNegative = isset($negativeCriteria[$criterion]);
+
+                if ($isNegative && $this->isTruthy($value)) {
+                    $totalFailures++;
+                } elseif (! $isNegative && $this->isFalsy($value)) {
+                    $totalFailures++;
                 }
             }
         }
 
         return $totalCriteria > 0 ? $totalFailures / $totalCriteria : 0;
+    }
+
+    /**
+     * Check if a score value represents a truthy (passed) state.
+     * Handles booleans, integers, and strings from the database.
+     */
+    private function isTruthy(mixed $value): bool
+    {
+        if ($value === true || $value === 1 || $value === '1') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if a score value represents a falsy (failed) state.
+     * Empty strings, null, 0, and false are considered falsy.
+     */
+    private function isFalsy(mixed $value): bool
+    {
+        return ! $this->isTruthy($value);
     }
 }

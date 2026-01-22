@@ -2,7 +2,6 @@
 
 use App\DTOs\BlindSpotAnalysis;
 use App\DTOs\SkillAnalysis;
-use App\DTOs\UniversalPattern;
 use App\Models\DrillScore;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
@@ -349,77 +348,6 @@ describe('trend detection', function () {
     });
 });
 
-describe('universal patterns', function () {
-    it('tracks hedging across all responses', function () {
-        $user = User::factory()->create();
-        $mode = PracticeMode::factory()->create();
-
-        $sessions = TrainingSession::factory()
-            ->count(5)
-            ->completed()
-            ->forUser($user)
-            ->forMode($mode)
-            ->create();
-
-        // 7 out of 10 responses have hedging
-        DrillScore::factory()
-            ->count(7)
-            ->forSession($sessions->first())
-            ->withHedging(true)
-            ->create();
-
-        DrillScore::factory()
-            ->count(3)
-            ->forSession($sessions->first())
-            ->withHedging(false)
-            ->create();
-
-        $analysis = $this->analyzer->analyze($user);
-
-        $hedgingPattern = collect($analysis->universalPatterns)
-            ->first(fn ($p) => $p->criteria === 'hedging');
-
-        expect($hedgingPattern)->not->toBeNull();
-        expect($hedgingPattern->rate)->toBe(0.7);
-        expect($hedgingPattern->count)->toBe(7);
-        expect($hedgingPattern->total)->toBe(10);
-    });
-
-    it('identifies problematic universal patterns', function () {
-        $user = User::factory()->create();
-        $mode = PracticeMode::factory()->create();
-
-        $sessions = TrainingSession::factory()
-            ->count(5)
-            ->completed()
-            ->forUser($user)
-            ->forMode($mode)
-            ->create();
-
-        // High hedging rate
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withHedging(true)
-            ->create();
-
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($sessions->first())
-            ->withHedging(false)
-            ->create();
-
-        $analysis = $this->analyzer->analyze($user);
-
-        $problematic = $analysis->getProblematicUniversalPatterns();
-        $hedgingPattern = collect($problematic)
-            ->first(fn ($p) => $p->criteria === 'hedging');
-
-        expect($hedgingPattern)->not->toBeNull();
-        expect($hedgingPattern->isProblematic())->toBeTrue();
-    });
-});
-
 describe('biggest gap and win', function () {
     it('identifies biggest gap as skill with highest failure rate', function () {
         $user = User::factory()->create();
@@ -651,7 +579,6 @@ describe('DTO methods', function () {
             'improving',
             'stable',
             'slipping',
-            'universalPatterns',
             'biggestGap',
             'biggestWin',
             'analyzedAt',
@@ -674,27 +601,6 @@ describe('DTO methods', function () {
         expect($skillAnalysis->isStuck())->toBeTrue();
         expect($skillAnalysis->isImproving())->toBeFalse();
         expect($skillAnalysis->isSlipping())->toBeFalse();
-    });
-
-    it('UniversalPattern identifies problematic patterns', function () {
-        $problematic = new UniversalPattern(
-            criteria: 'hedging',
-            rate: 0.7,
-            count: 7,
-            total: 10,
-            trend: 'stuck',
-        );
-
-        $notProblematic = new UniversalPattern(
-            criteria: 'hedging',
-            rate: 0.3,
-            count: 3,
-            total: 10,
-            trend: 'stable',
-        );
-
-        expect($problematic->isProblematic())->toBeTrue();
-        expect($notProblematic->isProblematic())->toBeFalse();
     });
 });
 

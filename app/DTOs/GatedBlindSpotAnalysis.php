@@ -25,9 +25,10 @@ class GatedBlindSpotAnalysis
         public ?array $improving,
         public ?array $slipping,
         public ?array $stable,
-        public ?array $universalPatterns,
         public ?string $biggestGap,
         public ?string $biggestWin,
+        public ?string $growthEdge,
+        public ?array $allSkills,
 
         public Carbon $analyzedAt,
     ) {}
@@ -50,9 +51,10 @@ class GatedBlindSpotAnalysis
             improving: null,
             slipping: null,
             stable: null,
-            universalPatterns: null,
             biggestGap: null,
             biggestWin: null,
+            growthEdge: null,
+            allSkills: null,
 
             analyzedAt: $analysis->analyzedAt,
         );
@@ -76,9 +78,10 @@ class GatedBlindSpotAnalysis
             improving: null,
             slipping: null,
             stable: null,
-            universalPatterns: null,
             biggestGap: null,
             biggestWin: null,
+            growthEdge: null,
+            allSkills: null,
 
             analyzedAt: now(),
         );
@@ -102,9 +105,10 @@ class GatedBlindSpotAnalysis
             improving: $analysis->improving,
             slipping: $analysis->slipping,
             stable: $analysis->stable,
-            universalPatterns: $analysis->universalPatterns,
             biggestGap: $analysis->biggestGap,
             biggestWin: $analysis->biggestWin,
+            growthEdge: $analysis->growthEdge,
+            allSkills: $analysis->allSkills,
 
             analyzedAt: $analysis->analyzedAt,
         );
@@ -128,9 +132,10 @@ class GatedBlindSpotAnalysis
             'improving' => is_array($this->improving) ? array_map(fn ($s) => $s->toArray(), $this->improving) : null,
             'slipping' => is_array($this->slipping) ? array_map(fn ($s) => $s->toArray(), $this->slipping) : null,
             'stable' => is_array($this->stable) ? array_map(fn ($s) => $s->toArray(), $this->stable) : null,
-            'universalPatterns' => is_array($this->universalPatterns) ? array_map(fn ($p) => $p->toArray(), $this->universalPatterns) : null,
             'biggestGap' => $this->biggestGap,
             'biggestWin' => $this->biggestWin,
+            'growthEdge' => $this->growthEdge,
+            'allSkills' => is_array($this->allSkills) ? array_map(fn ($s) => $s->toArray(), $this->allSkills) : null,
 
             'analyzedAt' => $this->analyzedAt->toIso8601String(),
         ];
