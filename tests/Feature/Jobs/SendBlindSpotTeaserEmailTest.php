@@ -90,7 +90,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
 
         // Trigger event
         $listener = new CheckBlindSpotTeaserTrigger;
-        $listener->handle(new SessionCompleted($fifthSession));
+        $listener->handle(new SessionCompleted($user, $fifthSession));
 
         // Job should have been dispatched - check by running it directly
         SendBlindSpotTeaserEmail::dispatch($user);
@@ -105,7 +105,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         $session = $user->trainingSessions()->latest()->first();
 
         $listener = new CheckBlindSpotTeaserTrigger;
-        $listener->handle(new SessionCompleted($session));
+        $listener->handle(new SessionCompleted($session->user, $session));
 
         Mail::assertNothingSent();
     });
@@ -115,7 +115,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         $session = $user->trainingSessions()->latest()->first();
 
         $listener = new CheckBlindSpotTeaserTrigger;
-        $listener->handle(new SessionCompleted($session));
+        $listener->handle(new SessionCompleted($session->user, $session));
 
         Mail::assertNothingSent();
     });
@@ -140,7 +140,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
         }
 
         $listener = new CheckBlindSpotTeaserTrigger;
-        $listener->handle(new SessionCompleted($sessions->last()));
+        $listener->handle(new SessionCompleted($user, $sessions->last()));
 
         Mail::assertNothingSent();
     });
@@ -217,7 +217,7 @@ describe('SendBlindSpotTeaserEmail job', function () {
         $session = $user->trainingSessions()->latest()->first();
 
         $listener = new CheckBlindSpotTeaserTrigger;
-        $listener->handle(new SessionCompleted($session));
+        $listener->handle(new SessionCompleted($session->user, $session));
 
         Mail::assertNothingSent();
     });

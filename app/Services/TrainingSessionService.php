@@ -153,12 +153,13 @@ class TrainingSessionService
      */
     public function endSession(TrainingSession $session): bool
     {
-        $user = $session->user;
+        $authUser = auth()->user();
 
-        if ($user->cannot('end', $session)) {
+        if ($authUser->cannot('end', $session)) {
             throw new AuthorizationException('Cannot end this session.');
         }
 
+        $sessionOwner = $session->user;
         $durationSeconds = $session->started_at->diffInSeconds(now());
 
         $session->update([
@@ -169,7 +170,7 @@ class TrainingSessionService
 
         // Dispatch session completed event
         SessionCompleted::dispatch(
-            $user,
+            $sessionOwner,
             $session,
             $session->exchange_count,
             $durationSeconds,
