@@ -39,7 +39,94 @@ export interface TrainingMode {
     config: ModeConfig;
 }
 
-// Session Types
+// =========================================================================
+// New Drill-Based Types (v2 API)
+// =========================================================================
+
+export interface Drill {
+    id: number;
+    name: string;
+    timer_seconds: number | null;
+    input_type: 'text' | 'multiple_choice';
+}
+
+export interface DrillSession {
+    id: number;
+    drill_index: number;
+    phase: 'scenario' | 'responding' | 'feedback' | 'complete';
+}
+
+export interface DrillScore {
+    drill_id: number;
+    drill_name: string;
+    score: number;
+}
+
+export interface DrillProgress {
+    current: number;
+    total: number;
+}
+
+export interface DrillScenarioCard {
+    type: 'scenario';
+    content: string;
+    task: string;
+    options?: string[];
+}
+
+export interface DrillFeedbackCard {
+    type: 'feedback';
+    content: string;
+    score: number;
+}
+
+export type DrillCard = DrillScenarioCard | DrillFeedbackCard;
+
+export interface SessionStats {
+    drills_completed: number;
+    total_duration_seconds: number;
+    scores: DrillScore[];
+}
+
+// v2 API Response Types
+export interface StartDrillResponse {
+    success: boolean;
+    session: DrillSession;
+    drill: Drill;
+    card: DrillScenarioCard;
+    progress: DrillProgress;
+    resumed?: boolean;
+    error?: string;
+    message?: string;
+}
+
+export interface SubmitDrillResponse {
+    success: boolean;
+    session: DrillSession;
+    card: DrillFeedbackCard;
+    error?: string;
+    message?: string;
+}
+
+export interface ContinueDrillResponse {
+    success: boolean;
+    session: DrillSession;
+    drill?: Drill;
+    card?: DrillScenarioCard;
+    progress?: DrillProgress;
+    complete?: boolean;
+    stats?: SessionStats;
+    error?: string;
+    message?: string;
+}
+
+// =========================================================================
+// Legacy Session Types (v1 API)
+// @deprecated These types are for the legacy v1 API flow.
+// New code should use the drill-based types above.
+// =========================================================================
+
+/** @deprecated Use DrillSession instead */
 export interface Session {
     id: number;
     exchange_count: number;
@@ -77,6 +164,7 @@ export interface ScenarioCard extends BaseCard {
 export interface PromptCard extends BaseCard {
     type: 'prompt';
     scenarioContext?: string;
+    is_iteration?: boolean;
 }
 
 export interface MultipleChoiceCard extends BaseCard {

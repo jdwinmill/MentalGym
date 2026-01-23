@@ -6,6 +6,11 @@ import { type PromptCard as PromptCardType } from '@/types/training';
 import { Send } from 'lucide-react';
 import { TimerDisplay } from '@/components/training/TimerDisplay';
 
+/**
+ * @deprecated This component is for the legacy v1 API flow.
+ * New drill-based sessions should use DrillScenarioCard instead.
+ */
+
 interface PromptCardProps {
     card: PromptCardType;
     onSubmit: (input: string) => void;
@@ -52,8 +57,15 @@ export function PromptCard({ card, onSubmit, characterLimit, isLoading }: Prompt
                 <div>
                     {card.scenarioContext && (
                         <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-3 uppercase tracking-wide">
-                            Your Task
+                            {card.is_iteration ? 'Refine Your Response' : 'Your Task'}
                         </p>
+                    )}
+                    {card.is_iteration && (
+                        <div className="mb-3 px-3 py-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md">
+                            <p className="text-sm text-amber-700 dark:text-amber-300">
+                                Second attempt. Tighten and strengthen your previous response.
+                            </p>
+                        </div>
                     )}
                     <p className="text-lg text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed max-w-prose">
                         {card.content}

@@ -11,7 +11,7 @@ class CheckBlindSpotTeaserTrigger
 {
     public function handle(SessionCompleted $event): void
     {
-        $user = $event->session->user;
+        $user = $event->user;
 
         if ($this->shouldSendTeaser($user)) {
             SendBlindSpotTeaserEmail::dispatch($user);

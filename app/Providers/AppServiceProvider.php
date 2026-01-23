@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Events\SessionCompleted;
 use App\Http\Responses\LogoutResponse;
 use App\Listeners\CheckBlindSpotTeaserTrigger;
+use App\Listeners\RecordSessionCompletion;
 use App\Models\DailyUsage;
 use App\Models\PracticeMode;
 use App\Models\Tag;
@@ -48,6 +49,11 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerEvents(): void
     {
+        Event::listen(
+            SessionCompleted::class,
+            RecordSessionCompletion::class
+        );
+
         Event::listen(
             SessionCompleted::class,
             CheckBlindSpotTeaserTrigger::class

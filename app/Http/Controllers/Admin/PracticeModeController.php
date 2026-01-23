@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
@@ -58,6 +59,9 @@ class PracticeModeController extends Controller
         $practiceMode = PracticeMode::create($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
 
+        // Save drills
+        $this->saveDrills($practiceMode, $request->input('drills', []));
+
         return redirect()
             ->route('admin.practice-modes.index')
             ->with('success', 'Practice Mode created successfully.');
@@ -79,6 +83,15 @@ class PracticeModeController extends Controller
                 'required_plan' => $practiceMode->required_plan,
                 'is_active' => $practiceMode->is_active,
                 'sort_order' => $practiceMode->sort_order,
+                'drills' => $practiceMode->drills()->orderBy('position')->get()->map(fn ($drill) => [
+                    'id' => $drill->id,
+                    'name' => $drill->name,
+                    'position' => $drill->position,
+                    'timer_seconds' => $drill->timer_seconds,
+                    'input_type' => $drill->input_type,
+                    'scenario_instruction_set' => $drill->scenario_instruction_set,
+                    'evaluation_instruction_set' => $drill->evaluation_instruction_set,
+                ]),
             ],
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
             'selectedTags' => $practiceMode->tags->pluck('id')->toArray(),
@@ -96,6 +109,9 @@ class PracticeModeController extends Controller
 
         $practiceMode->update($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
+
+        // Save drills
+        $this->saveDrills($practiceMode, $request->input('drills', []));
 
         return redirect()
             ->route('admin.practice-modes.index')
@@ -141,6 +157,15 @@ class PracticeModeController extends Controller
             // Tags
             'tags' => ['array'],
             'tags.*' => ['exists:tags,id'],
+            // Drills
+            'drills' => ['array'],
+            'drills.*.id' => ['nullable', 'integer'],
+            'drills.*.name' => ['required', 'string', 'max:255'],
+            'drills.*.position' => ['required', 'integer', 'min:0'],
+            'drills.*.timer_seconds' => ['nullable', 'integer', 'min:0', 'max:600'],
+            'drills.*.input_type' => ['required', 'in:text,multiple_choice'],
+            'drills.*.scenario_instruction_set' => ['required', 'string'],
+            'drills.*.evaluation_instruction_set' => ['required', 'string'],
         ];
     }
 
@@ -166,5 +191,51 @@ class PracticeModeController extends Controller
             'max_history_exchanges' => $config['max_history_exchanges'] ?? $defaults['max_history_exchanges'],
             'model' => $config['model'] ?? $defaults['model'],
         ];
+    }
+
+    /**
+     * Save drills for a practice mode.
+     * Handles create, update, and delete operations.
+     */
+    private function saveDrills(PracticeMode $practiceMode, array $drills): void
+    {
+        $existingDrillIds = $practiceMode->drills()->pluck('id')->toArray();
+        $submittedDrillIds = [];
+
+        foreach ($drills as $drillData) {
+            if (! empty($drillData['id'])) {
+                // Update existing drill
+                $drill = Drill::find($drillData['id']);
+                if ($drill && $drill->practice_mode_id === $practiceMode->id) {
+                    $drill->update([
+                        'name' => $drillData['name'],
+                        'position' => $drillData['position'],
+                        'timer_seconds' => $drillData['timer_seconds'],
+                        'input_type' => $drillData['input_type'],
+                        'scenario_instruction_set' => $drillData['scenario_instruction_set'],
+                        'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
+                    ]);
+                    $submittedDrillIds[] = $drill->id;
+                }
+            } else {
+                // Create new drill
+                $drill = Drill::create([
+                    'practice_mode_id' => $practiceMode->id,
+                    'name' => $drillData['name'],
+                    'position' => $drillData['position'],
+                    'timer_seconds' => $drillData['timer_seconds'],
+                    'input_type' => $drillData['input_type'],
+                    'scenario_instruction_set' => $drillData['scenario_instruction_set'],
+                    'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
+                ]);
+                $submittedDrillIds[] = $drill->id;
+            }
+        }
+
+        // Delete drills that were removed
+        $drillsToDelete = array_diff($existingDrillIds, $submittedDrillIds);
+        if (! empty($drillsToDelete)) {
+            Drill::whereIn('id', $drillsToDelete)->delete();
+        }
     }
 }

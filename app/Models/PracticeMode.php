@@ -48,6 +48,11 @@ class PracticeMode extends Model
         return $this->hasMany(UserModeProgress::class);
     }
 
+    public function drills(): HasMany
+    {
+        return $this->hasMany(Drill::class)->orderBy('position');
+    }
+
     // ─────────────────────────────────────────────────────────────
     // Scopes
     // ─────────────────────────────────────────────────────────────

@@ -3,38 +3,39 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import {
     type TrainPageProps,
-    type Card,
-    type Session,
-    type SessionProgress,
-    type Message,
-    type LevelUpCard as LevelUpCardType,
-    type StartSessionResponse,
-    type ContinueSessionResponse,
+    type DrillSession,
+    type Drill,
+    type DrillCard,
+    type DrillProgress,
+    type SessionStats,
+    type StartDrillResponse,
+    type SubmitDrillResponse,
+    type ContinueDrillResponse,
 } from '@/types/training';
 import { Head, router } from '@inertiajs/react';
-import { TrainingHeader } from '@/components/training/TrainingHeader';
-import { TrainingHistory } from '@/components/training/TrainingHistory';
-import { LoadingCard, LoadingCardSkeleton } from '@/components/training/LoadingCard';
-import { CardRenderer, LevelUpRenderer } from '@/components/training/cards/CardRenderer';
+import { LoadingCardSkeleton } from '@/components/training/LoadingCard';
+import { SessionCompleteDialog } from '@/components/training/SessionCompleteDialog';
+import { DrillScenarioCardComponent } from '@/components/training/cards/DrillScenarioCard';
+import { FeedbackCard } from '@/components/training/cards/FeedbackCard';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
-export default function TrainPage({ mode, progress: initialProgress }: TrainPageProps) {
-    const [session, setSession] = useState<Session | null>(null);
-    const [currentCard, setCurrentCard] = useState<Card | null>(null);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [progress, setProgress] = useState<SessionProgress>({
-        current_level: initialProgress.current_level,
-        exchanges_at_current_level: initialProgress.exchanges_at_current_level ?? 0,
-        exchanges_to_next_level: null,
-    });
+export default function TrainPage({ mode }: TrainPageProps) {
+    // Core state
+    const [session, setSession] = useState<DrillSession | null>(null);
+    const [currentDrill, setCurrentDrill] = useState<Drill | null>(null);
+    const [currentCard, setCurrentCard] = useState<DrillCard | null>(null);
+    const [progress, setProgress] = useState<DrillProgress | null>(null);
+
+    // UI state
     const [isLoading, setIsLoading] = useState(false);
     const [isStarting, setIsStarting] = useState(true);
-    const [isEnding, setIsEnding] = useState(false);
-    const [isFetchingFollowUp, setIsFetchingFollowUp] = useState(false);
-    const [levelUpCard, setLevelUpCard] = useState<LevelUpCardType | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [sessionComplete, setSessionComplete] = useState(false);
+
+    // Completion state
+    const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+    const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Practice', href: '/practice-modes' },
@@ -47,7 +48,7 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
         setError(null);
 
         try {
-            const response = await fetch(`/api/training/start/${mode.slug}`, {
+            const response = await fetch(`/api/training/v2/start/${mode.slug}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,49 +56,17 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                 },
             });
 
-            const data: StartSessionResponse = await response.json();
+            const data: StartDrillResponse = await response.json();
 
             if (!data.success) {
                 setError(data.message || 'Failed to start session');
                 return;
             }
 
-            if (data.session) {
-                setSession(data.session);
-            }
-
-            if (data.resumed && data.messages) {
-                // Resumed session - restore messages and get last card
-                setMessages(data.messages);
-                const assistantMessages = data.messages.filter(
-                    (m): m is Extract<Message, { role: 'assistant' }> => m.role === 'assistant'
-                );
-                const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-
-                if (lastAssistantMessage) {
-                    // Re-apply consolidation if needed: check if previous card was scenario
-                    // and current card is prompt/reflection
-                    const consolidatableTypes = ['prompt', 'reflection'];
-                    const secondLastAssistant = assistantMessages[assistantMessages.length - 2];
-
-                    if (
-                        secondLastAssistant?.card?.type === 'scenario' &&
-                        consolidatableTypes.includes(lastAssistantMessage.card.type)
-                    ) {
-                        // Re-consolidate: add scenario context to current card
-                        const consolidatedCard = {
-                            ...lastAssistantMessage.card,
-                            scenarioContext: secondLastAssistant.card.content,
-                        };
-                        setCurrentCard(consolidatedCard as Card);
-                    } else {
-                        setCurrentCard(lastAssistantMessage.card);
-                    }
-                }
-            } else if (data.card) {
-                // New session - set first card
-                setCurrentCard(data.card);
-            }
+            setSession(data.session);
+            setCurrentDrill(data.drill);
+            setCurrentCard(data.card);
+            setProgress(data.progress);
         } catch (err) {
             setError('Failed to connect. Please try again.');
             console.error('Start session error:', err);
@@ -110,205 +79,49 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
         startSession();
     }, [startSession]);
 
-    // Auto-fetch follow-up card when scenario card is received
-    const fetchFollowUpCard = useCallback(async (scenarioContent: string, scenarioCard: Card) => {
-        if (!session) return;
-
-        setIsFetchingFollowUp(true);
-
-        try {
-            const response = await fetch(`/api/training/continue/${session.id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
-                },
-                body: JSON.stringify({ input: 'continue' }),
-            });
-
-            const data: ContinueSessionResponse = await response.json();
-
-            if (!data.success) {
-                // Fall back to showing scenario with Continue button
-                setIsFetchingFollowUp(false);
-                return;
-            }
-
-            // Add scenario to message history (the auto-continue)
-            const scenarioMessage: Message = {
-                id: Date.now(),
-                role: 'assistant',
-                card: scenarioCard,
-                type: 'scenario',
-                created_at: new Date().toISOString(),
-            };
-            const continueMessage: Message = {
-                id: Date.now() + 1,
-                role: 'user',
-                content: 'continue',
-                created_at: new Date().toISOString(),
-            };
-            setMessages(prev => [...prev, scenarioMessage, continueMessage]);
-
-            // Check if we can consolidate
-            const consolidatableTypes = ['prompt', 'reflection'];
-            if (data.card && consolidatableTypes.includes(data.card.type)) {
-                // Consolidate: add scenario context to the prompt/reflection
-                const consolidatedCard = {
-                    ...data.card,
-                    scenarioContext: scenarioContent,
-                };
-
-                // Add the prompt as assistant message
-                const assistantMessage: Message = {
-                    id: Date.now() + 2,
-                    role: 'assistant',
-                    card: consolidatedCard,
-                    type: data.card.type,
-                    created_at: new Date().toISOString(),
-                };
-                setMessages(prev => [...prev, assistantMessage]);
-                setCurrentCard(consolidatedCard as Card);
-            } else if (data.card) {
-                // Can't consolidate - show the fetched card directly
-                const assistantMessage: Message = {
-                    id: Date.now() + 2,
-                    role: 'assistant',
-                    card: data.card,
-                    type: data.card.type,
-                    created_at: new Date().toISOString(),
-                };
-                setMessages(prev => [...prev, assistantMessage]);
-                setCurrentCard(data.card);
-            }
-
-            // Update session/progress
-            if (data.session) setSession(data.session);
-            if (data.progress) setProgress(data.progress);
-            if (data.levelUp) setLevelUpCard(data.levelUp);
-
-        } catch (err) {
-            console.error('Follow-up fetch error:', err);
-            // Fall back to showing scenario with Continue button
-        } finally {
-            setIsFetchingFollowUp(false);
-        }
-    }, [session]);
-
-    // Auto-fetch when scenario card is received
-    useEffect(() => {
-        if (currentCard?.type === 'scenario' && !isFetchingFollowUp && session && !isStarting) {
-            fetchFollowUpCard(currentCard.content, currentCard);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentCard, session, isStarting]);
-
-    // Submit user input (for prompt, reflection, or choice cards)
-    const handleSubmit = async (input: string) => {
+    // Submit response to current drill
+    const submitResponse = async (response: string) => {
         if (!session || isLoading) return;
 
         setIsLoading(true);
         setError(null);
 
-        // Add user message to history
-        const userMessage: Message = {
-            id: Date.now(),
-            role: 'user',
-            content: input,
-            created_at: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, userMessage]);
-
         try {
-            const response = await fetch(`/api/training/continue/${session.id}`, {
+            const res = await fetch(`/api/training/v2/respond/${session.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
                 },
-                body: JSON.stringify({ input }),
+                body: JSON.stringify({ response }),
             });
 
-            const data: ContinueSessionResponse = await response.json();
+            const data: SubmitDrillResponse = await res.json();
 
             if (!data.success) {
-                if (data.error === 'limit_reached') {
-                    setError(data.message || 'Daily exchange limit reached.');
-                } else {
-                    setError(data.message || 'Failed to continue session');
-                }
-                // Remove the user message we added
-                setMessages((prev) => prev.slice(0, -1));
+                setError(data.message || 'Failed to submit response');
                 return;
             }
 
-            if (data.card) {
-                // Add assistant message to history
-                const assistantMessage: Message = {
-                    id: Date.now() + 1,
-                    role: 'assistant',
-                    card: data.card,
-                    type: data.card.type,
-                    created_at: new Date().toISOString(),
-                };
-                setMessages((prev) => [...prev, assistantMessage]);
-                setCurrentCard(data.card);
-
-                // Mark session as complete if AI signals it
-                if ((data.card as Card & { session_complete?: boolean }).session_complete) {
-                    setSessionComplete(true);
-                }
-            }
-
-            if (data.session) {
-                setSession(data.session);
-            }
-
-            if (data.progress) {
-                setProgress(data.progress);
-            }
-
-            // Handle level up
-            if (data.levelUp) {
-                setLevelUpCard(data.levelUp);
-            }
+            setSession(data.session);
+            setCurrentCard(data.card);
         } catch (err) {
-            setError('Failed to send response. Please try again.');
-            // Remove the user message we added
-            setMessages((prev) => prev.slice(0, -1));
-            console.error('Continue session error:', err);
+            setError('Failed to submit response. Please try again.');
+            console.error('Submit response error:', err);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Handle continue button (for scenario, insight cards)
-    const handleContinue = () => {
-        // For cards that just need acknowledgment, send an empty or default response
-        handleSubmit('continue');
-    };
+    // Continue to next drill
+    const continueToNext = async () => {
+        if (!session || isLoading) return;
 
-    // Handle level up card dismissal
-    const handleLevelUpContinue = () => {
-        setLevelUpCard(null);
-        // Update progress with new level if it was a level up (not level cap)
-        if (levelUpCard?.type === 'level_up' && levelUpCard.new_level) {
-            setProgress((prev) => ({
-                ...prev,
-                current_level: levelUpCard.new_level!,
-                exchanges_at_current_level: 0,
-            }));
-        }
-    };
-
-    // End session
-    const handleEndSession = async () => {
-        if (!session || isEnding) return;
-
-        setIsEnding(true);
+        setIsLoading(true);
+        setError(null);
 
         try {
-            await fetch(`/api/training/end/${session.id}`, {
+            const res = await fetch(`/api/training/v2/continue/${session.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -316,13 +129,87 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                 },
             });
 
-            // Navigate back to practice modes
-            router.visit('/practice-modes');
+            const data: ContinueDrillResponse = await res.json();
+
+            if (!data.success) {
+                setError(data.message || 'Failed to continue');
+                return;
+            }
+
+            if (data.complete && data.stats) {
+                setSessionStats(data.stats);
+                setShowCompletionDialog(true);
+            } else {
+                setSession(data.session);
+                setCurrentDrill(data.drill!);
+                setCurrentCard(data.card!);
+                setProgress(data.progress!);
+            }
         } catch (err) {
-            console.error('End session error:', err);
-            // Navigate anyway
-            router.visit('/practice-modes');
+            setError('Failed to continue. Please try again.');
+            console.error('Continue error:', err);
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    // Handle "Run it back" - start a new session
+    const handleRunItBack = async () => {
+        setShowCompletionDialog(false);
+        setSession(null);
+        setCurrentCard(null);
+        setCurrentDrill(null);
+        setProgress(null);
+        setSessionStats(null);
+        await startSession();
+    };
+
+    // Handle "I'm out" - go back to dashboard
+    const handleImOut = () => {
+        router.visit('/practice-modes');
+    };
+
+    // Handle retry on error
+    const handleRetry = () => {
+        setError(null);
+        if (!session) {
+            startSession();
+        } else if (currentCard?.type === 'scenario') {
+            // Retry starting (scenario generation)
+            startSession();
+        } else if (currentCard?.type === 'feedback') {
+            // Retry continue
+            continueToNext();
+        }
+    };
+
+    // Render current card
+    const renderCard = () => {
+        if (!currentCard || !currentDrill) return null;
+
+        if (currentCard.type === 'scenario') {
+            return (
+                <DrillScenarioCardComponent
+                    card={currentCard}
+                    timerSeconds={currentDrill.timer_seconds}
+                    inputType={currentDrill.input_type}
+                    onSubmit={submitResponse}
+                    isLoading={isLoading}
+                />
+            );
+        }
+
+        if (currentCard.type === 'feedback') {
+            return (
+                <FeedbackCard
+                    card={currentCard}
+                    onContinue={continueToNext}
+                    isLoading={isLoading}
+                />
+            );
+        }
+
+        return null;
     };
 
     return (
@@ -330,14 +217,35 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
             <Head title={`Training - ${mode.name}`} />
 
             <div className="flex flex-col h-full">
-                {/* Header */}
+                {/* Header with progress */}
                 {session && !isStarting && (
-                    <TrainingHeader
-                        mode={mode}
-                        progress={progress}
-                        onEndSession={handleEndSession}
-                        isEnding={isEnding}
-                    />
+                    <div className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-4">
+                                    <h1 className="font-semibold text-neutral-900 dark:text-neutral-100">
+                                        {mode.name}
+                                    </h1>
+                                    {progress && (
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                                                Drill {progress.current} of {progress.total}
+                                            </span>
+                                            <Progress
+                                                value={(progress.current / progress.total) * 100}
+                                                className="w-24 h-2"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                {currentDrill && (
+                                    <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                        {currentDrill.name}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* Main content */}
@@ -353,16 +261,14 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                                             <p className="text-sm text-red-700 dark:text-red-300">
                                                 {error}
                                             </p>
-                                            {!session && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={startSession}
-                                                    className="mt-2"
-                                                >
-                                                    Try Again
-                                                </Button>
-                                            )}
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleRetry}
+                                                className="mt-2"
+                                            >
+                                                Try Again
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -372,52 +278,21 @@ export default function TrainPage({ mode, progress: initialProgress }: TrainPage
                         {/* Starting state */}
                         {isStarting && <LoadingCardSkeleton />}
 
-                        {/* Level up card */}
-                        {levelUpCard && !isStarting && (
-                            <LevelUpRenderer card={levelUpCard} onContinue={handleLevelUpContinue} />
-                        )}
-
                         {/* Current card */}
-                        {!levelUpCard && currentCard && !isStarting && (
-                            <>
-                                {isLoading || isFetchingFollowUp ? (
-                                    <LoadingCard />
-                                ) : (
-                                    <CardRenderer
-                                        card={currentCard}
-                                        config={mode.config}
-                                        onSubmit={handleSubmit}
-                                        onContinue={handleContinue}
-                                        isLoading={isLoading}
-                                    />
-                                )}
-                            </>
-                        )}
-
-                        {/* Session complete */}
-                        {sessionComplete && !isStarting && (
-                            <div className="w-full max-w-2xl mx-auto mt-6">
-                                <div className="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-900 dark:bg-green-950/50 text-center">
-                                    <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
-                                        Session Complete
-                                    </h3>
-                                    <p className="text-sm text-green-700 dark:text-green-300 mb-4">
-                                        Great work. Your progress has been saved.
-                                    </p>
-                                    <Button onClick={handleEndSession} disabled={isEnding}>
-                                        {isEnding ? 'Finishing...' : 'Finish Session'}
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Session history */}
-                        {!isStarting && messages.length > 0 && (
-                            <TrainingHistory messages={messages.slice(0, -1)} />
-                        )}
+                        {!isStarting && !error && renderCard()}
                     </div>
                 </div>
             </div>
+
+            {/* Completion dialog */}
+            {sessionStats && (
+                <SessionCompleteDialog
+                    isOpen={showCompletionDialog}
+                    stats={sessionStats}
+                    onRunItBack={handleRunItBack}
+                    onImOut={handleImOut}
+                />
+            )}
         </AppLayout>
     );
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\SessionCompleted;
 use App\Jobs\ScoreDrillResponse;
 use App\Models\DailyUsage;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\SessionMessage;
 use App\Models\TrainingSession;
@@ -23,6 +24,8 @@ class TrainingSessionService
 
     /**
      * Start a new training session
+     *
+     * @deprecated Use startDrillSession() for the new drill-based flow
      */
     public function startSession(User $user, PracticeMode $mode): array
     {
@@ -75,6 +78,8 @@ class TrainingSessionService
 
     /**
      * Continue an existing session with user input
+     *
+     * @deprecated Use submitDrillResponse() and continueToNextDrill() for the new drill-based flow
      */
     public function continueSession(TrainingSession $session, string $userInput): array
     {
@@ -148,20 +153,28 @@ class TrainingSessionService
      */
     public function endSession(TrainingSession $session): bool
     {
-        $user = auth()->user();
+        $user = $session->user;
 
         if ($user->cannot('end', $session)) {
             throw new AuthorizationException('Cannot end this session.');
         }
 
+        $durationSeconds = $session->started_at->diffInSeconds(now());
+
         $session->update([
             'ended_at' => now(),
             'status' => TrainingSession::STATUS_COMPLETED,
-            'duration_seconds' => $session->started_at->diffInSeconds(now()),
+            'duration_seconds' => $durationSeconds,
         ]);
 
-        // Dispatch session completed event for blind spot teaser emails
-        SessionCompleted::dispatch($session);
+        // Dispatch session completed event
+        SessionCompleted::dispatch(
+            $user,
+            $session,
+            $session->exchange_count,
+            $durationSeconds,
+            []
+        );
 
         return true;
     }
@@ -426,5 +439,246 @@ class TrainingSessionService
             $userInput,
             $previousCard['is_iteration'] ?? false
         );
+    }
+
+    // =========================================================================
+    // NEW DRILL-BASED METHODS (Phase 2 Refactor)
+    // =========================================================================
+
+    /**
+     * Start a new drill-based training session
+     */
+    public function startDrillSession(User $user, PracticeMode $mode): array
+    {
+        // Authorization check
+        if ($user->cannot('start', $mode)) {
+            throw new AuthorizationException('Cannot start training in this mode.');
+        }
+
+        // Check for existing active session
+        $existingSession = TrainingSession::where('user_id', $user->id)
+            ->where('practice_mode_id', $mode->id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($existingSession) {
+            return $this->resumeDrillSession($existingSession);
+        }
+
+        // Get or create progress record
+        $progress = $this->getOrCreateProgress($user, $mode);
+
+        // Create new session
+        $session = TrainingSession::create([
+            'user_id' => $user->id,
+            'practice_mode_id' => $mode->id,
+            'level_at_start' => $progress->current_level,
+            'exchange_count' => 0,
+            'started_at' => now(),
+            'status' => TrainingSession::STATUS_ACTIVE,
+            'drill_index' => 0,
+            'phase' => 'scenario',
+        ]);
+
+        // Get first drill and generate scenario
+        $drill = $mode->drills()->orderBy('position')->first();
+
+        if (! $drill) {
+            throw new \RuntimeException('No drills configured for this practice mode.');
+        }
+
+        $scenarioData = $this->aiService->generateScenario($drill, $user, $session);
+
+        // Store scenario for later evaluation
+        $session->update([
+            'current_scenario' => $scenarioData['scenario'],
+            'current_task' => $scenarioData['task'],
+            'current_options' => $scenarioData['options'],
+            'current_correct_option' => $scenarioData['correct_option'],
+            'phase' => 'responding',
+        ]);
+
+        return [
+            'session' => $session->fresh(),
+            'drill' => $drill,
+            'card' => [
+                'type' => 'scenario',
+                'content' => $scenarioData['scenario'],
+                'task' => $scenarioData['task'],
+                'options' => $scenarioData['options'],
+            ],
+            'progress' => [
+                'current' => 1,
+                'total' => $mode->drills()->count(),
+            ],
+        ];
+    }
+
+    /**
+     * Resume an existing drill-based session
+     */
+    public function resumeDrillSession(TrainingSession $session): array
+    {
+        $drill = $session->practiceMode->drills()
+            ->where('position', $session->drill_index)
+            ->first();
+
+        $card = match ($session->phase) {
+            'responding' => [
+                'type' => 'scenario',
+                'content' => $session->current_scenario,
+                'task' => $session->current_task,
+                'options' => $session->current_options,
+            ],
+            default => null,
+        };
+
+        return [
+            'session' => $session,
+            'drill' => $drill,
+            'card' => $card,
+            'progress' => [
+                'current' => $session->drill_index + 1,
+                'total' => $session->practiceMode->drills()->count(),
+            ],
+            'resumed' => true,
+        ];
+    }
+
+    /**
+     * Submit response to current drill
+     */
+    public function submitDrillResponse(TrainingSession $session, string $response, User $user): array
+    {
+        $drill = $session->practiceMode->drills()
+            ->where('position', $session->drill_index)
+            ->first();
+
+        if (! $drill) {
+            throw new \RuntimeException('Drill not found for current session state.');
+        }
+
+        // Evaluate response
+        $feedbackData = $this->aiService->evaluateResponse(
+            $drill,
+            $session->current_scenario,
+            $session->current_task,
+            $response,
+            $user,
+            $session
+        );
+
+        // Append score to drill_scores
+        $scores = $session->drill_scores ?? [];
+        $scores[] = [
+            'drill_id' => $drill->id,
+            'drill_name' => $drill->name,
+            'score' => $feedbackData['score'],
+        ];
+
+        $session->update([
+            'phase' => 'feedback',
+            'drill_scores' => $scores,
+        ]);
+
+        // Increment exchange count and daily usage
+        $session->increment('exchange_count');
+        $this->incrementDailyUsage($user);
+        $this->updateStreak($user);
+
+        return [
+            'session' => $session->fresh(),
+            'card' => [
+                'type' => 'feedback',
+                'content' => $feedbackData['feedback'],
+                'score' => $feedbackData['score'],
+            ],
+        ];
+    }
+
+    /**
+     * Continue to next drill
+     */
+    public function continueToNextDrill(TrainingSession $session, User $user): array
+    {
+        $nextIndex = $session->drill_index + 1;
+        $totalDrills = $session->practiceMode->drills()->count();
+
+        // Check if session is complete
+        if ($nextIndex >= $totalDrills) {
+            return $this->completeDrillSession($session, $user);
+        }
+
+        // Get next drill
+        $drill = $session->practiceMode->drills()
+            ->where('position', $nextIndex)
+            ->first();
+
+        if (! $drill) {
+            throw new \RuntimeException('Next drill not found.');
+        }
+
+        // Generate next scenario
+        $scenarioData = $this->aiService->generateScenario($drill, $user, $session);
+
+        $session->update([
+            'drill_index' => $nextIndex,
+            'phase' => 'responding',
+            'current_scenario' => $scenarioData['scenario'],
+            'current_task' => $scenarioData['task'],
+            'current_options' => $scenarioData['options'],
+            'current_correct_option' => $scenarioData['correct_option'],
+        ]);
+
+        return [
+            'session' => $session->fresh(),
+            'drill' => $drill,
+            'card' => [
+                'type' => 'scenario',
+                'content' => $scenarioData['scenario'],
+                'task' => $scenarioData['task'],
+                'options' => $scenarioData['options'],
+            ],
+            'progress' => [
+                'current' => $nextIndex + 1,
+                'total' => $totalDrills,
+            ],
+        ];
+    }
+
+    /**
+     * Complete the drill-based session
+     */
+    public function completeDrillSession(TrainingSession $session, User $user): array
+    {
+        $durationSeconds = $session->started_at->diffInSeconds(now());
+        $drillsCompleted = $session->drill_index + 1;
+        $scores = $session->drill_scores ?? [];
+
+        $session->update([
+            'phase' => 'complete',
+            'status' => TrainingSession::STATUS_COMPLETED,
+            'ended_at' => now(),
+            'duration_seconds' => $durationSeconds,
+        ]);
+
+        // Dispatch completion event for analytics and level up
+        SessionCompleted::dispatch(
+            $user,
+            $session,
+            $drillsCompleted,
+            $durationSeconds,
+            $scores
+        );
+
+        return [
+            'session' => $session->fresh(),
+            'complete' => true,
+            'stats' => [
+                'drills_completed' => $drillsCompleted,
+                'total_duration_seconds' => $durationSeconds,
+                'scores' => $scores,
+            ],
+        ];
     }
 }

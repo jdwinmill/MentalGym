@@ -26,11 +26,24 @@ class TrainingSession extends Model
         'ended_at',
         'duration_seconds',
         'status',
+        // New drill-based fields
+        'drill_index',
+        'phase',
+        'current_scenario',
+        'current_task',
+        'current_options',
+        'current_correct_option',
+        'drill_scores',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
+        // New drill-based fields
+        'drill_index' => 'integer',
+        'current_options' => 'array',
+        'current_correct_option' => 'integer',
+        'drill_scores' => 'array',
     ];
 
     // ─────────────────────────────────────────────────────────────
@@ -113,5 +126,40 @@ class TrainingSession extends Model
         $seconds = $this->duration_seconds % 60;
 
         return "{$minutes}m {$seconds}s";
+    }
+
+    /**
+     * Get the current drill based on drill_index.
+     */
+    public function getCurrentDrill(): ?Drill
+    {
+        return $this->practiceMode->drills()
+            ->where('position', $this->drill_index)
+            ->first();
+    }
+
+    /**
+     * Check if all drills are completed.
+     */
+    public function allDrillsCompleted(): bool
+    {
+        $totalDrills = $this->practiceMode->drills()->count();
+
+        return $this->drill_index >= $totalDrills;
+    }
+
+    /**
+     * Append a score to drill_scores.
+     */
+    public function appendDrillScore(int $drillId, string $drillName, int $score): void
+    {
+        $scores = $this->drill_scores ?? [];
+        $scores[] = [
+            'drill_id' => $drillId,
+            'drill_name' => $drillName,
+            'score' => $score,
+        ];
+        $this->drill_scores = $scores;
+        $this->save();
     }
 }

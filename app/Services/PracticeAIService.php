@@ -6,6 +6,7 @@ use Anthropic\Client;
 use Anthropic\Messages\Message;
 use App\Exceptions\MalformedResponseException;
 use App\Models\ApiLog;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -22,6 +23,8 @@ class PracticeAIService
 
     /**
      * Get the first response to start a session (no user input yet)
+     *
+     * @deprecated Use generateScenario() for the new drill-based flow
      */
     public function getFirstResponse(
         PracticeMode $mode,
@@ -105,6 +108,8 @@ class PracticeAIService
 
     /**
      * Get response to user input during a session
+     *
+     * @deprecated Use evaluateResponse() for the new drill-based flow
      */
     public function getResponse(
         PracticeMode $mode,
@@ -528,5 +533,273 @@ class PracticeAIService
             'error_message' => $errorMessage,
             'created_at' => now(),
         ]);
+    }
+
+    // =========================================================================
+    // NEW DRILL-BASED METHODS (Phase 2 Refactor)
+    // =========================================================================
+
+    /**
+     * Generate a scenario for a specific drill.
+     * Uses: Global + Mode + Drill.scenario_instruction_set
+     */
+    public function generateScenario(Drill $drill, User $user, ?TrainingSession $session = null): array
+    {
+        $mode = $drill->practiceMode;
+        $model = $mode->config['model'] ?? 'claude-sonnet-4-20250514';
+        $startTime = microtime(true);
+
+        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->scenario_instruction_set);
+        $userPrompt = $this->buildGeneratePrompt($drill, $user);
+
+        try {
+            $response = $this->callWithRetry(fn () => $this->client->messages->create([
+                'model' => $model,
+                'max_tokens' => 1000,
+                'system' => $systemPrompt,
+                'messages' => [
+                    ['role' => 'user', 'content' => $userPrompt],
+                ],
+            ]));
+
+            $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+
+            $this->logApiCall($user, $mode, $session, $model, $responseTimeMs, true, $response);
+
+            return $this->parseScenarioResponse($response);
+
+        } catch (\Exception $e) {
+            $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+            $this->logApiCall($user, $mode, $session, $model, $responseTimeMs, false, null, $e->getMessage());
+
+            Log::error('Failed to generate scenario', [
+                'drill_id' => $drill->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new \RuntimeException('Failed to generate scenario. Please try again.');
+        }
+    }
+
+    /**
+     * Evaluate user's response and provide feedback.
+     * Uses: Global + Mode + Drill.evaluation_instruction_set
+     */
+    public function evaluateResponse(
+        Drill $drill,
+        string $scenario,
+        string $task,
+        string $userResponse,
+        User $user,
+        ?TrainingSession $session = null
+    ): array {
+        $mode = $drill->practiceMode;
+        $model = $mode->config['model'] ?? 'claude-sonnet-4-20250514';
+        $startTime = microtime(true);
+
+        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->evaluation_instruction_set);
+        $userPrompt = $this->buildEvaluatePrompt($scenario, $task, $userResponse, $drill);
+
+        try {
+            $response = $this->callWithRetry(fn () => $this->client->messages->create([
+                'model' => $model,
+                'max_tokens' => 1000,
+                'system' => $systemPrompt,
+                'messages' => [
+                    ['role' => 'user', 'content' => $userPrompt],
+                ],
+            ]));
+
+            $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+
+            $this->logApiCall($user, $mode, $session, $model, $responseTimeMs, true, $response);
+
+            return $this->parseFeedbackResponse($response);
+
+        } catch (\Exception $e) {
+            $responseTimeMs = (int) ((microtime(true) - $startTime) * 1000);
+            $this->logApiCall($user, $mode, $session, $model, $responseTimeMs, false, null, $e->getMessage());
+
+            Log::error('Failed to evaluate response', [
+                'drill_id' => $drill->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new \RuntimeException('Failed to evaluate response. Please try again.');
+        }
+    }
+
+    /**
+     * Build system prompt from hierarchy: Global + Mode + Drill instruction
+     */
+    private function buildDrillSystemPrompt(PracticeMode $mode, string $drillInstruction): string
+    {
+        $global = config('mentalgym.main_instruction_set');
+
+        return <<<PROMPT
+{$global}
+
+---
+
+MODE: {$mode->name}
+{$mode->instruction_set}
+
+---
+
+DRILL INSTRUCTIONS:
+{$drillInstruction}
+PROMPT;
+    }
+
+    /**
+     * Build the prompt for scenario generation
+     */
+    private function buildGeneratePrompt(Drill $drill, User $user): string
+    {
+        $progress = $user->modeProgress()->where('practice_mode_id', $drill->practice_mode_id)->first();
+        $level = $progress?->current_level ?? 1;
+
+        if ($drill->input_type === 'multiple_choice') {
+            return <<<PROMPT
+User level: {$level}
+
+Generate a scenario with multiple choice options for this drill.
+
+Respond with valid JSON only (no markdown, no code blocks):
+{
+    "scenario": "...",
+    "task": "...",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correct_option": 0
+}
+PROMPT;
+        }
+
+        return <<<PROMPT
+User level: {$level}
+
+Generate a scenario and task for this drill.
+
+Respond with valid JSON only (no markdown, no code blocks):
+{
+    "scenario": "...",
+    "task": "..."
+}
+PROMPT;
+    }
+
+    /**
+     * Build the prompt for response evaluation
+     */
+    private function buildEvaluatePrompt(string $scenario, string $task, string $userResponse, Drill $drill): string
+    {
+        if ($drill->input_type === 'multiple_choice') {
+            return <<<PROMPT
+SCENARIO:
+{$scenario}
+
+TASK:
+{$task}
+
+USER SELECTED OPTION INDEX: {$userResponse}
+
+Evaluate this response. If correct, explain why. If incorrect, explain the correct answer.
+
+Respond with valid JSON only (no markdown, no code blocks):
+{
+    "feedback": "...",
+    "score": 0-100
+}
+PROMPT;
+        }
+
+        return <<<PROMPT
+SCENARIO:
+{$scenario}
+
+TASK:
+{$task}
+
+USER RESPONSE:
+{$userResponse}
+
+Evaluate this response according to the drill criteria.
+
+Respond with valid JSON only (no markdown, no code blocks):
+{
+    "feedback": "...",
+    "score": 0-100
+}
+PROMPT;
+    }
+
+    /**
+     * Parse the scenario response from Claude
+     */
+    private function parseScenarioResponse(Message $response): array
+    {
+        $text = $this->extractTextFromResponse($response);
+        $data = $this->parseJsonResponse($text);
+
+        return [
+            'scenario' => $data['scenario'] ?? '',
+            'task' => $data['task'] ?? '',
+            'options' => $data['options'] ?? null,
+            'correct_option' => $data['correct_option'] ?? null,
+        ];
+    }
+
+    /**
+     * Parse the feedback response from Claude
+     */
+    private function parseFeedbackResponse(Message $response): array
+    {
+        $text = $this->extractTextFromResponse($response);
+        $data = $this->parseJsonResponse($text);
+
+        return [
+            'feedback' => $data['feedback'] ?? '',
+            'score' => (int) ($data['score'] ?? 0),
+        ];
+    }
+
+    /**
+     * Extract text content from Claude response
+     */
+    private function extractTextFromResponse(Message $response): string
+    {
+        foreach ($response->content as $block) {
+            if ($block->type === 'text') {
+                return $block->text;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Parse JSON from response text, handling markdown code blocks
+     */
+    private function parseJsonResponse(string $text): array
+    {
+        // Remove markdown code blocks if present
+        $text = preg_replace('/```json\s*/i', '', $text);
+        $text = preg_replace('/```\s*/', '', $text);
+        $text = trim($text);
+
+        $data = json_decode($text, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::warning('Failed to parse JSON response', [
+                'text' => substr($text, 0, 500),
+                'error' => json_last_error_msg(),
+            ]);
+
+            return [];
+        }
+
+        return $data;
     }
 }

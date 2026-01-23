@@ -110,4 +110,193 @@ class TrainingApiController extends Controller
             ], 403);
         }
     }
+
+    // =========================================================================
+    // NEW DRILL-BASED ENDPOINTS (Phase 2 Refactor)
+    // =========================================================================
+
+    /**
+     * Start a new drill-based session.
+     * POST /api/training/v2/start/{mode_slug}
+     */
+    public function startDrill(Request $request, string $modeSlug): JsonResponse
+    {
+        $mode = PracticeMode::where('slug', $modeSlug)->firstOrFail();
+
+        try {
+            $result = $this->trainingService->startDrillSession(
+                $request->user(),
+                $mode
+            );
+
+            return response()->json([
+                'success' => true,
+                'session' => [
+                    'id' => $result['session']->id,
+                    'drill_index' => $result['session']->drill_index,
+                    'phase' => $result['session']->phase,
+                ],
+                'drill' => $result['drill'] ? [
+                    'id' => $result['drill']->id,
+                    'name' => $result['drill']->name,
+                    'timer_seconds' => $result['drill']->timer_seconds,
+                    'input_type' => $result['drill']->input_type,
+                ] : null,
+                'card' => $result['card'],
+                'progress' => $result['progress'],
+                'resumed' => $result['resumed'] ?? false,
+            ]);
+        } catch (AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'unauthorized',
+                'message' => $e->getMessage(),
+            ], 403);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'server_error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Get current drill session state (for resume).
+     * GET /api/training/v2/session/{session}
+     */
+    public function showDrill(TrainingSession $session): JsonResponse
+    {
+        // Check ownership
+        if ($session->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'unauthorized',
+                'message' => 'This session does not belong to you.',
+            ], 403);
+        }
+
+        $result = $this->trainingService->resumeDrillSession($session);
+
+        return response()->json([
+            'success' => true,
+            'session' => [
+                'id' => $result['session']->id,
+                'drill_index' => $result['session']->drill_index,
+                'phase' => $result['session']->phase,
+            ],
+            'drill' => $result['drill'] ? [
+                'id' => $result['drill']->id,
+                'name' => $result['drill']->name,
+                'timer_seconds' => $result['drill']->timer_seconds,
+                'input_type' => $result['drill']->input_type,
+            ] : null,
+            'card' => $result['card'],
+            'progress' => $result['progress'],
+        ]);
+    }
+
+    /**
+     * Submit response to current drill.
+     * POST /api/training/v2/respond/{session}
+     */
+    public function respondDrill(Request $request, TrainingSession $session): JsonResponse
+    {
+        // Check ownership
+        if ($session->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'unauthorized',
+                'message' => 'This session does not belong to you.',
+            ], 403);
+        }
+
+        $request->validate([
+            'response' => ['required', 'string', 'max:5000'],
+        ]);
+
+        try {
+            $result = $this->trainingService->submitDrillResponse(
+                $session,
+                $request->input('response'),
+                $request->user()
+            );
+
+            return response()->json([
+                'success' => true,
+                'session' => [
+                    'id' => $result['session']->id,
+                    'drill_index' => $result['session']->drill_index,
+                    'phase' => $result['session']->phase,
+                ],
+                'card' => $result['card'],
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'server_error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Continue to next drill.
+     * POST /api/training/v2/continue/{session}
+     */
+    public function continueDrill(Request $request, TrainingSession $session): JsonResponse
+    {
+        // Check ownership
+        if ($session->user_id !== auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'unauthorized',
+                'message' => 'This session does not belong to you.',
+            ], 403);
+        }
+
+        try {
+            $result = $this->trainingService->continueToNextDrill(
+                $session,
+                $request->user()
+            );
+
+            // Check if session is complete
+            if ($result['complete'] ?? false) {
+                return response()->json([
+                    'success' => true,
+                    'complete' => true,
+                    'session' => [
+                        'id' => $result['session']->id,
+                        'drill_index' => $result['session']->drill_index,
+                        'phase' => $result['session']->phase,
+                    ],
+                    'stats' => $result['stats'],
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'session' => [
+                    'id' => $result['session']->id,
+                    'drill_index' => $result['session']->drill_index,
+                    'phase' => $result['session']->phase,
+                ],
+                'drill' => $result['drill'] ? [
+                    'id' => $result['drill']->id,
+                    'name' => $result['drill']->name,
+                    'timer_seconds' => $result['drill']->timer_seconds,
+                    'input_type' => $result['drill']->input_type,
+                ] : null,
+                'card' => $result['card'],
+                'progress' => $result['progress'],
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'server_error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

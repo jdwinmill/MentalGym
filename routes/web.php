@@ -42,11 +42,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('practice-modes', [PracticeModeController::class, 'index'])->name('practice-modes.index');
     Route::get('practice-modes/{practiceMode:slug}/train', [PracticeModeController::class, 'train'])->name('practice-modes.train');
 
-    // Training API
+    // Training API (legacy)
     Route::prefix('api/training')->group(function () {
         Route::post('start/{practiceMode:slug}', [TrainingApiController::class, 'start'])->name('api.training.start');
         Route::post('continue/{session}', [TrainingApiController::class, 'continue'])->name('api.training.continue');
         Route::post('end/{session}', [TrainingApiController::class, 'end'])->name('api.training.end');
+    });
+
+    // Training API v2 (drill-based)
+    Route::prefix('api/training/v2')->group(function () {
+        Route::post('start/{mode_slug}', [TrainingApiController::class, 'startDrill'])->name('api.training.v2.start');
+        Route::get('session/{session}', [TrainingApiController::class, 'showDrill'])->name('api.training.v2.show');
+        Route::post('respond/{session}', [TrainingApiController::class, 'respondDrill'])->name('api.training.v2.respond');
+        Route::post('continue/{session}', [TrainingApiController::class, 'continueDrill'])->name('api.training.v2.continue');
     });
 
     // Blind Spots API
