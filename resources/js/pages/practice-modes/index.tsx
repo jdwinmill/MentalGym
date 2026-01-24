@@ -57,10 +57,17 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
                             </p>
                         </div>
                     </div>
-                    {!mode.can_access && mode.required_plan && (
-                        <Badge variant="outline" className="shrink-0 gap-1 text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">
-                            <Lock className="h-3 w-3" />
-                            {mode.required_plan}
+                    {mode.required_plan && (
+                        <Badge
+                            variant="outline"
+                            className={`shrink-0 gap-1 ${
+                                mode.can_access
+                                    ? 'text-primary border-primary/50'
+                                    : 'text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700'
+                            }`}
+                        >
+                            {!mode.can_access && <Lock className="h-3 w-3" />}
+                            {mode.required_plan.charAt(0).toUpperCase() + mode.required_plan.slice(1)}
                         </Badge>
                     )}
                 </div>

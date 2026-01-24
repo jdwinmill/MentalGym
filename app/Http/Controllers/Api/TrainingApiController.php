@@ -129,6 +129,15 @@ class TrainingApiController extends Controller
                 $mode
             );
 
+            // Check for limit reached error
+            if (isset($result['error']) && $result['error'] === 'limit_reached') {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'limit_reached',
+                    'plan' => $result['plan'],
+                ], 429);
+            }
+
             return response()->json([
                 'success' => true,
                 'session' => [
@@ -223,6 +232,15 @@ class TrainingApiController extends Controller
                 $request->user()
             );
 
+            // Check for limit reached error
+            if (isset($result['error']) && $result['error'] === 'limit_reached') {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'limit_reached',
+                    'plan' => $result['plan'],
+                ], 429);
+            }
+
             return response()->json([
                 'success' => true,
                 'session' => [
@@ -261,6 +279,15 @@ class TrainingApiController extends Controller
                 $session,
                 $request->user()
             );
+
+            // Check for limit reached error
+            if (isset($result['error']) && $result['error'] === 'limit_reached') {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'limit_reached',
+                    'plan' => $result['plan'],
+                ], 429);
+            }
 
             // Check if session is complete
             if ($result['complete'] ?? false) {

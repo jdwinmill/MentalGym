@@ -22,7 +22,8 @@ export interface PracticeMode {
     tags: Tag[];
     progress: ModeProgress | null;
     has_active_session: boolean;
-    can_access: boolean;
+    can_access: boolean; // Plan-based access (does user's plan allow this mode?)
+    can_train: boolean; // Daily limit check (has user hit their limit today?)
 }
 
 export interface ModeConfig {

@@ -16,6 +16,7 @@ import {
 import { Head, router } from '@inertiajs/react';
 import { LoadingCardSkeleton } from '@/components/training/LoadingCard';
 import { SessionCompleteDialog } from '@/components/training/SessionCompleteDialog';
+import { LimitReachedDialog } from '@/components/training/LimitReachedDialog';
 import { DrillScenarioCardComponent } from '@/components/training/cards/DrillScenarioCard';
 import { FeedbackCard } from '@/components/training/cards/FeedbackCard';
 import { PreDrillInsightCard } from '@/components/training/cards/PreDrillInsightCard';
@@ -40,6 +41,10 @@ export default function TrainPage({ mode }: TrainPageProps) {
     const [showCompletionDialog, setShowCompletionDialog] = useState(false);
     const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
 
+    // Limit reached state
+    const [showLimitDialog, setShowLimitDialog] = useState(false);
+    const [limitPlan, setLimitPlan] = useState<string>('free');
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Practice', href: '/practice-modes' },
         { title: mode.name, href: `/practice-modes/${mode.slug}/train` },
@@ -59,7 +64,15 @@ export default function TrainPage({ mode }: TrainPageProps) {
                 },
             });
 
-            const data: StartDrillResponse = await response.json();
+            const data = await response.json();
+
+            // Handle limit reached
+            if (data.error === 'limit_reached') {
+                setLimitPlan(data.plan || 'free');
+                setShowLimitDialog(true);
+                setIsStarting(false);
+                return;
+            }
 
             if (!data.success) {
                 setError(data.message || 'Failed to start session');
@@ -104,7 +117,14 @@ export default function TrainPage({ mode }: TrainPageProps) {
                 body: JSON.stringify({ response }),
             });
 
-            const data: SubmitDrillResponse = await res.json();
+            const data = await res.json();
+
+            // Handle limit reached
+            if (data.error === 'limit_reached') {
+                setLimitPlan(data.plan || 'free');
+                setShowLimitDialog(true);
+                return;
+            }
 
             if (!data.success) {
                 setError(data.message || 'Failed to submit response');
@@ -137,7 +157,14 @@ export default function TrainPage({ mode }: TrainPageProps) {
                 },
             });
 
-            const data: ContinueDrillResponse = await res.json();
+            const data = await res.json();
+
+            // Handle limit reached
+            if (data.error === 'limit_reached') {
+                setLimitPlan(data.plan || 'free');
+                setShowLimitDialog(true);
+                return;
+            }
 
             if (!data.success) {
                 setError(data.message || 'Failed to continue');
@@ -185,6 +212,12 @@ export default function TrainPage({ mode }: TrainPageProps) {
 
     // Handle "I'm out" - go back to dashboard
     const handleImOut = () => {
+        router.visit('/practice-modes');
+    };
+
+    // Handle closing the limit dialog
+    const handleLimitDialogClose = () => {
+        setShowLimitDialog(false);
         router.visit('/practice-modes');
     };
 
@@ -322,6 +355,13 @@ export default function TrainPage({ mode }: TrainPageProps) {
                     onImOut={handleImOut}
                 />
             )}
+
+            {/* Limit reached dialog */}
+            <LimitReachedDialog
+                isOpen={showLimitDialog}
+                plan={limitPlan}
+                onClose={handleLimitDialogClose}
+            />
         </AppLayout>
     );
 }

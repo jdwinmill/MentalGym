@@ -25,13 +25,9 @@ class PracticeModePolicy
             return false;
         }
 
-        // Check plan requirement
-        if (! $this->meetsRequiredPlan($user, $mode)) {
-            return false;
-        }
-
-        // Check can-train-mode gate (use forUser to check against the policy's user, not Auth::user())
-        return Gate::forUser($user)->allows('can-train-mode', $mode);
+        // Check plan requirement only - daily limits are checked in the service layer
+        // This allows the frontend to show appropriate messaging for each case
+        return $this->meetsRequiredPlan($user, $mode);
     }
 
     public function create(User $user): bool

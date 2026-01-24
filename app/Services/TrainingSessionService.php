@@ -451,9 +451,17 @@ class TrainingSessionService
      */
     public function startDrillSession(User $user, PracticeMode $mode): array
     {
-        // Authorization check
+        // Authorization check (plan requirements)
         if ($user->cannot('start', $mode)) {
             throw new AuthorizationException('Cannot start training in this mode.');
+        }
+
+        // Check daily limit
+        if (! Gate::forUser($user)->allows('can-train')) {
+            return [
+                'error' => 'limit_reached',
+                'plan' => $user->plan,
+            ];
         }
 
         // Check for existing active session
@@ -565,6 +573,15 @@ class TrainingSessionService
      */
     public function submitDrillResponse(TrainingSession $session, string $response, User $user): array
     {
+        // Check daily limit before processing response
+        if (! Gate::forUser($user)->allows('can-train')) {
+            return [
+                'error' => 'limit_reached',
+                'plan' => $user->plan,
+                'session' => $session,
+            ];
+        }
+
         $drill = $session->practiceMode->drills()
             ->where('position', $session->drill_index)
             ->first();
@@ -618,6 +635,15 @@ class TrainingSessionService
     {
         $nextIndex = $session->drill_index + 1;
         $totalDrills = $session->practiceMode->drills()->count();
+
+        // Check daily limit before starting next drill (unless completing session)
+        if ($nextIndex < $totalDrills && ! Gate::forUser($user)->allows('can-train')) {
+            return [
+                'error' => 'limit_reached',
+                'plan' => $user->plan,
+                'session' => $session,
+            ];
+        }
 
         // Check if session is complete
         if ($nextIndex >= $totalDrills) {

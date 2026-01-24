@@ -21,12 +21,15 @@ class PracticeModeController extends Controller
     {
         $user = $request->user();
 
+        // Check if user has hit their daily limit (separate from plan access)
+        $canTrain = \Illuminate\Support\Facades\Gate::allows('can-train');
+
         $modes = PracticeMode::query()
             ->active()
             ->ordered()
             ->with('tags')
             ->get()
-            ->map(function (PracticeMode $mode) use ($user) {
+            ->map(function (PracticeMode $mode) use ($user, $canTrain) {
                 // Get user's progress for this mode
                 $progress = $mode->userProgress()
                     ->where('user_id', $user->id)
@@ -35,8 +38,8 @@ class PracticeModeController extends Controller
                 // Check for active session
                 $activeSession = $this->trainingService->getActiveSession($user, $mode);
 
-                // Check if user can access this mode (plan check)
-                $canAccess = $user->can('start', $mode);
+                // Check if user's plan allows this mode (separate from daily limit)
+                $meetsPlanRequirement = $this->meetsPlanRequirement($user, $mode);
 
                 return [
                     'id' => $mode->id,
@@ -56,13 +59,30 @@ class PracticeModeController extends Controller
                         'total_sessions' => $progress->total_sessions,
                     ] : null,
                     'has_active_session' => $activeSession !== null,
-                    'can_access' => $canAccess,
+                    'can_access' => $meetsPlanRequirement, // Plan-based access only
+                    'can_train' => $canTrain, // Daily limit check
                 ];
             });
 
         return Inertia::render('practice-modes/index', [
             'modes' => $modes,
         ]);
+    }
+
+    /**
+     * Check if user's plan meets the mode's requirement.
+     */
+    private function meetsPlanRequirement($user, PracticeMode $mode): bool
+    {
+        if ($mode->required_plan === null) {
+            return true;
+        }
+
+        $planHierarchy = ['free' => 0, 'pro' => 1, 'unlimited' => 2];
+        $userLevel = $planHierarchy[$user->plan] ?? 0;
+        $requiredLevel = $planHierarchy[$mode->required_plan] ?? 0;
+
+        return $userLevel >= $requiredLevel;
     }
 
     /**
