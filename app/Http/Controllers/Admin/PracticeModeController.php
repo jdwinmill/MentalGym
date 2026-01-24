@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Drill;
 use App\Models\Insight;
 use App\Models\PracticeMode;
+use App\Models\PracticeModeRequiredContext;
 use App\Models\Principle;
 use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
@@ -58,6 +59,7 @@ class PracticeModeController extends Controller
         return Inertia::render('admin/practice-modes/create', [
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
             'insightsByPrinciple' => $insightsByPrinciple,
+            'contextFields' => config('profile.context_fields'),
         ]);
     }
 
@@ -75,6 +77,9 @@ class PracticeModeController extends Controller
 
         $practiceMode = PracticeMode::create($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
+
+        // Save required context
+        $this->syncRequiredContext($practiceMode, $request->input('required_context', []));
 
         // Save drills
         $this->saveDrills($practiceMode, $request->input('drills', []));
@@ -128,6 +133,8 @@ class PracticeModeController extends Controller
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
             'selectedTags' => $practiceMode->tags->pluck('id')->toArray(),
             'insightsByPrinciple' => $insightsByPrinciple,
+            'contextFields' => config('profile.context_fields'),
+            'selectedContext' => $practiceMode->getRequiredContextFields(),
         ]);
     }
 
@@ -142,6 +149,9 @@ class PracticeModeController extends Controller
 
         $practiceMode->update($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
+
+        // Save required context
+        $this->syncRequiredContext($practiceMode, $request->input('required_context', []));
 
         // Save drills
         $this->saveDrills($practiceMode, $request->input('drills', []));
@@ -190,6 +200,9 @@ class PracticeModeController extends Controller
             // Tags
             'tags' => ['array'],
             'tags.*' => ['exists:tags,id'],
+            // Required context
+            'required_context' => ['array'],
+            'required_context.*' => ['string', Rule::in(array_keys(config('profile.context_fields')))],
             // Drills
             'drills' => ['array'],
             'drills.*.id' => ['nullable', 'integer'],
@@ -293,6 +306,23 @@ class PracticeModeController extends Controller
             if ($insight) {
                 $drill->insights()->attach($insightId, ['is_primary' => true]);
             }
+        }
+    }
+
+    /**
+     * Sync required context fields for a practice mode.
+     */
+    private function syncRequiredContext(PracticeMode $practiceMode, array $fields): void
+    {
+        // Delete existing
+        $practiceMode->requiredContext()->delete();
+
+        // Insert new
+        foreach ($fields as $field) {
+            PracticeModeRequiredContext::create([
+                'practice_mode_id' => $practiceMode->id,
+                'profile_field' => $field,
+            ]);
         }
     }
 }

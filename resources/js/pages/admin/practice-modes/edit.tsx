@@ -50,9 +50,11 @@ interface Props {
     tagsByCategory: Record<string, Tag[]>;
     selectedTags: number[];
     insightsByPrinciple: PrincipleWithInsights[];
+    contextFields: Record<string, string>;
+    selectedContext: string[];
 }
 
-export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags, insightsByPrinciple }: Props) {
+export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags, insightsByPrinciple, contextFields, selectedContext }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/users' },
         { title: 'Practice Modes', href: '/admin/practice-modes' },
@@ -89,6 +91,8 @@ export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags, i
                     tagsByCategory={tagsByCategory}
                     selectedTags={selectedTags}
                     insightsByPrinciple={insightsByPrinciple}
+                    contextFields={contextFields}
+                    selectedContext={selectedContext}
                 />
             </div>
         </AppLayout>

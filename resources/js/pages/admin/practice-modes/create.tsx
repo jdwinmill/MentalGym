@@ -27,6 +27,7 @@ interface PrincipleWithInsights {
 interface Props {
     tagsByCategory: Record<string, Tag[]>;
     insightsByPrinciple: PrincipleWithInsights[];
+    contextFields: Record<string, string>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -35,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '/admin/practice-modes/create' },
 ];
 
-export default function PracticeModeCreate({ tagsByCategory, insightsByPrinciple }: Props) {
+export default function PracticeModeCreate({ tagsByCategory, insightsByPrinciple, contextFields }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Practice Mode" />
@@ -56,7 +57,7 @@ export default function PracticeModeCreate({ tagsByCategory, insightsByPrinciple
                     </p>
                 </div>
 
-                <PracticeModeForm tagsByCategory={tagsByCategory} insightsByPrinciple={insightsByPrinciple} />
+                <PracticeModeForm tagsByCategory={tagsByCategory} insightsByPrinciple={insightsByPrinciple} contextFields={contextFields} />
             </div>
         </AppLayout>
     );

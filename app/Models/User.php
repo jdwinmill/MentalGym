@@ -185,6 +185,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserStreak::class);
     }
 
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
     public function dailyUsage(): HasMany
     {
         return $this->hasMany(DailyUsage::class);
@@ -221,6 +226,111 @@ class User extends Authenticatable implements MustVerifyEmail
             'current_streak' => 0,
             'longest_streak' => 0,
         ]);
+    }
+
+    /**
+     * Get or create the user's profile.
+     */
+    public function getOrCreateProfile(): UserProfile
+    {
+        return $this->profile ?? UserProfile::create([
+            'user_id' => $this->id,
+        ]);
+    }
+
+    /**
+     * Get formatted profile context for AI prompts.
+     */
+    public function getProfileContext(): string
+    {
+        $profile = $this->profile;
+
+        if (! $profile) {
+            return '';
+        }
+
+        $lines = ['User Context:'];
+
+        // Role and company
+        if ($profile->job_title || $profile->company_size) {
+            $roleDesc = $profile->job_title ?? 'Professional';
+            if ($profile->career_level) {
+                $careerLevels = config('profile.career_levels');
+                $levelLabel = $careerLevels[$profile->career_level] ?? ucfirst($profile->career_level);
+                $roleDesc = $levelLabel.' '.$roleDesc;
+            }
+            if ($profile->company_size) {
+                $sizes = config('profile.company_sizes');
+                $sizeLabel = $sizes[$profile->company_size] ?? $profile->company_size;
+                $roleDesc .= ' at a '.strtolower(explode(' ', $sizeLabel)[0]);
+            }
+            $lines[] = "- Role: {$roleDesc}";
+        }
+
+        // Industry
+        if ($profile->industry) {
+            $lines[] = "- Industry: {$profile->industry}";
+        }
+
+        // Experience
+        $experienceParts = [];
+        if ($profile->years_experience) {
+            $experienceParts[] = "{$profile->years_experience} years total";
+        }
+        if ($profile->years_in_role) {
+            $experienceParts[] = "{$profile->years_in_role} years in current role";
+        }
+        if (! empty($experienceParts)) {
+            $lines[] = '- Experience: '.implode(', ', $experienceParts);
+        }
+
+        // Team structure
+        $teamParts = [];
+        if ($profile->manages_people && $profile->direct_reports) {
+            $teamParts[] = "Manages {$profile->direct_reports} direct reports";
+        }
+        if ($profile->reports_to_role) {
+            $teamParts[] = "reports to {$profile->reports_to_role}";
+        }
+        if (! empty($teamParts)) {
+            $lines[] = '- Team: '.implode(', ', $teamParts);
+        }
+
+        // Team setup and cross-functional work
+        $setupParts = [];
+        if ($profile->team_composition) {
+            $compositions = config('profile.team_compositions');
+            $setupParts[] = $compositions[$profile->team_composition] ?? ucfirst($profile->team_composition);
+        }
+        if (! empty($profile->cross_functional_teams)) {
+            $teamLabels = config('profile.cross_functional_options');
+            $teamNames = array_map(fn ($t) => $teamLabels[$t] ?? ucfirst($t), $profile->cross_functional_teams);
+            $setupParts[] = 'works with '.implode(', ', $teamNames);
+        }
+        if (! empty($setupParts)) {
+            $lines[] = '- Team setup: '.implode(', ', $setupParts);
+        }
+
+        // Improvement areas
+        if (! empty($profile->improvement_areas)) {
+            $areaLabels = config('profile.improvement_areas');
+            $areaNames = array_map(fn ($a) => $areaLabels[$a] ?? ucfirst(str_replace('_', ' ', $a)), $profile->improvement_areas);
+            $lines[] = '- Working on: '.implode(', ', $areaNames);
+        }
+
+        // Upcoming challenges
+        if (! empty($profile->upcoming_challenges)) {
+            $challengeLabels = config('profile.challenges');
+            $challengeNames = array_map(fn ($c) => $challengeLabels[$c] ?? ucfirst(str_replace('_', ' ', $c)), $profile->upcoming_challenges);
+            $lines[] = '- Upcoming challenge: '.implode(', ', $challengeNames);
+        }
+
+        // Only return context if we have more than just the header
+        if (count($lines) <= 1) {
+            return '';
+        }
+
+        return implode("\n", $lines);
     }
 
     /**

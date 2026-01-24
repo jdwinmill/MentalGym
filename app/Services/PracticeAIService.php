@@ -599,7 +599,7 @@ class PracticeAIService
         $startTime = microtime(true);
 
         $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->evaluation_instruction_set);
-        $userPrompt = $this->buildEvaluatePrompt($scenario, $task, $userResponse, $drill);
+        $userPrompt = $this->buildEvaluatePrompt($scenario, $task, $userResponse, $drill, $user);
 
         try {
             $response = $this->callWithRetry(fn () => $this->client->messages->create([
@@ -661,10 +661,15 @@ PROMPT;
         $progress = $user->modeProgress()->where('practice_mode_id', $drill->practice_mode_id)->first();
         $level = $progress?->current_level ?? 1;
 
+        // Load user profile for context
+        $user->loadMissing('profile');
+        $profileContext = $user->getProfileContext();
+        $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT
 User level: {$level}
-
+{$profileSection}
 Generate a scenario with multiple choice options for this drill.
 
 Respond with valid JSON only (no markdown, no code blocks):
@@ -679,7 +684,7 @@ PROMPT;
 
         return <<<PROMPT
 User level: {$level}
-
+{$profileSection}
 Generate a scenario and task for this drill.
 
 Respond with valid JSON only (no markdown, no code blocks):
@@ -693,10 +698,16 @@ PROMPT;
     /**
      * Build the prompt for response evaluation
      */
-    private function buildEvaluatePrompt(string $scenario, string $task, string $userResponse, Drill $drill): string
+    private function buildEvaluatePrompt(string $scenario, string $task, string $userResponse, Drill $drill, User $user): string
     {
+        // Load user profile for context
+        $user->loadMissing('profile');
+        $profileContext = $user->getProfileContext();
+        $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT
+{$profileSection}
 SCENARIO:
 {$scenario}
 
@@ -716,6 +727,7 @@ PROMPT;
         }
 
         return <<<PROMPT
+{$profileSection}
 SCENARIO:
 {$scenario}
 

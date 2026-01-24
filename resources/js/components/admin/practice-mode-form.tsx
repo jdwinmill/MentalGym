@@ -79,6 +79,8 @@ interface Props {
     tagsByCategory?: Record<string, Tag[]>;
     selectedTags?: number[];
     insightsByPrinciple?: PrincipleWithInsights[];
+    contextFields?: Record<string, string>;
+    selectedContext?: string[];
 }
 
 const categoryLabels: Record<string, string> = {
@@ -108,7 +110,7 @@ const defaultDrill: DrillData = {
     primary_insight_id: null,
 };
 
-export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory = {}, selectedTags = [], insightsByPrinciple = [] }: Props) {
+export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory = {}, selectedTags = [], insightsByPrinciple = [], contextFields = {}, selectedContext = [] }: Props) {
     const form = useForm({
         name: mode?.name || '',
         slug: mode?.slug || '',
@@ -120,6 +122,7 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
         is_active: mode?.is_active ?? false,
         sort_order: mode?.sort_order ?? 0,
         tags: selectedTags,
+        required_context: selectedContext,
         drills: mode?.drills || [],
     });
 
@@ -164,6 +167,15 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
             form.setData('tags', currentTags.filter((id) => id !== tagId));
         } else {
             form.setData('tags', [...currentTags, tagId]);
+        }
+    };
+
+    const toggleContext = (field: string) => {
+        const currentContext = form.data.required_context;
+        if (currentContext.includes(field)) {
+            form.setData('required_context', currentContext.filter((f) => f !== field));
+        } else {
+            form.setData('required_context', [...currentContext, field]);
         }
     };
 
@@ -272,6 +284,45 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Required Context */}
+            {Object.keys(contextFields).length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Required User Context</CardTitle>
+                        <CardDescription>
+                            Select which user profile fields should be injected into prompts.
+                            Use {"{{field_name}}"} placeholders in your instruction set (e.g., {"{{job_title}}"}, {"{{industry}}"}).
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-wrap gap-2">
+                            {Object.entries(contextFields).map(([field, label]) => (
+                                <button
+                                    key={field}
+                                    type="button"
+                                    onClick={() => toggleContext(field)}
+                                    className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                                        form.data.required_context.includes(field)
+                                            ? 'bg-primary text-primary-foreground border-primary'
+                                            : 'bg-background hover:bg-accent border-border'
+                                    }`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                        {form.data.required_context.length > 0 && (
+                            <p className="text-xs text-neutral-500 mt-3">
+                                Available placeholders: {form.data.required_context.map(f => `{{${f}}}`).join(', ')}
+                            </p>
+                        )}
+                        {form.errors.required_context && (
+                            <p className="text-sm text-red-500 mt-2">{form.errors.required_context}</p>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Instruction Set */}
             <Card>

@@ -38,6 +38,16 @@ class PracticeMode extends Model
         return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
+    public function requiredContext(): HasMany
+    {
+        return $this->hasMany(PracticeModeRequiredContext::class);
+    }
+
+    public function getRequiredContextFields(): array
+    {
+        return $this->requiredContext->pluck('profile_field')->toArray();
+    }
+
     public function trainingSessions(): HasMany
     {
         return $this->hasMany(TrainingSession::class);
@@ -99,5 +109,35 @@ class PracticeMode extends Model
     public function getInstructionSetForLevel(int $level): string
     {
         return str_replace('{{level}}', (string) $level, $this->instruction_set);
+    }
+
+    /**
+     * Inject user profile context into a prompt string.
+     * Replaces {{field_name}} placeholders with actual values from user's profile.
+     */
+    public function injectUserContext(string $prompt, ?UserProfile $profile): string
+    {
+        if (! $profile) {
+            return $prompt;
+        }
+
+        $requiredFields = $this->getRequiredContextFields();
+
+        foreach ($requiredFields as $field) {
+            $value = $profile->getContextValue($field);
+            $prompt = str_replace("{{{$field}}}", $value, $prompt);
+        }
+
+        return $prompt;
+    }
+
+    /**
+     * Get instruction set with both level and user context injected.
+     */
+    public function getInstructionSetWithContext(int $level, ?UserProfile $profile): string
+    {
+        $prompt = $this->getInstructionSetForLevel($level);
+
+        return $this->injectUserContext($prompt, $profile);
     }
 }

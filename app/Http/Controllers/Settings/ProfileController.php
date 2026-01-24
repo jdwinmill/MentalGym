@@ -18,9 +18,22 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $user->load('profile');
+
         return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'profile' => $user->profile,
+            'profileOptions' => [
+                'companySizes' => config('profile.company_sizes'),
+                'careerLevels' => config('profile.career_levels'),
+                'teamCompositions' => config('profile.team_compositions'),
+                'collaborationStyles' => config('profile.collaboration_styles'),
+                'crossFunctionalOptions' => config('profile.cross_functional_options'),
+                'improvementAreas' => config('profile.improvement_areas'),
+                'challenges' => config('profile.challenges'),
+            ],
         ]);
     }
 
@@ -29,13 +42,51 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Extract user fields
+        $userFields = ['name', 'email'];
+        $userData = array_intersect_key($validated, array_flip($userFields));
+
+        // Fill and check email change
+        $user->fill($userData);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        // Extract profile fields
+        $profileFields = [
+            'birth_year',
+            'gender',
+            'zip_code',
+            'job_title',
+            'industry',
+            'company_size',
+            'career_level',
+            'years_in_role',
+            'years_experience',
+            'manages_people',
+            'direct_reports',
+            'reports_to_role',
+            'team_composition',
+            'collaboration_style',
+            'cross_functional_teams',
+            'communication_tools',
+            'improvement_areas',
+            'upcoming_challenges',
+        ];
+        $profileData = array_intersect_key($validated, array_flip($profileFields));
+
+        // Only update profile if there are profile fields in the request
+        if (! empty($profileData)) {
+            $profile = $user->getOrCreateProfile();
+            $profile->fill($profileData);
+            $profile->save();
+        }
 
         return to_route('profile.edit');
     }
