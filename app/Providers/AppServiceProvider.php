@@ -7,12 +7,16 @@ use App\Http\Responses\LogoutResponse;
 use App\Listeners\CheckBlindSpotTeaserTrigger;
 use App\Listeners\RecordSessionCompletion;
 use App\Models\DailyUsage;
+use App\Models\Insight;
 use App\Models\PracticeMode;
+use App\Models\Principle;
 use App\Models\Tag;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Models\UserModeProgress;
+use App\Policies\InsightPolicy;
 use App\Policies\PracticeModePolicy;
+use App\Policies\PrinciplePolicy;
 use App\Policies\TagPolicy;
 use App\Policies\TrainingSessionPolicy;
 use App\Services\PracticeAIService;
@@ -113,5 +117,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(PracticeMode::class, PracticeModePolicy::class);
         Gate::policy(TrainingSession::class, TrainingSessionPolicy::class);
         Gate::policy(Tag::class, TagPolicy::class);
+        Gate::policy(Principle::class, PrinciplePolicy::class);
+        Gate::policy(Insight::class, InsightPolicy::class);
     }
 }

@@ -2,17 +2,21 @@
 
 use App\Http\Controllers\Admin\ApiMetricsController as AdminApiMetricsController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
+use App\Http\Controllers\Admin\InsightController as AdminInsightController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeController;
+use App\Http\Controllers\Admin\PrincipleController as AdminPrincipleController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\BlindSpotController;
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\PrinciplesApiController;
 use App\Http\Controllers\Api\TrainingApiController;
 use App\Http\Controllers\BlindSpotDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailPreferenceController;
+use App\Http\Controllers\InsightsController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PracticeModeController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +37,10 @@ Route::get('/pricing', function () {
 Route::get('/app', function () {
     return Inertia::render('mental-gym');
 })->name('home');
+
+// Playbook (public - user-facing insights/learn section)
+Route::get('playbook', [InsightsController::class, 'index'])->name('playbook.index');
+Route::get('playbook/{insight:slug}', [InsightsController::class, 'show'])->name('playbook.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard - accessible to all authenticated users
@@ -67,6 +75,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Feedback API
     Route::post('api/feedback', [FeedbackController::class, 'store'])->name('api.feedback.store');
 
+    // Principles & Insights API
+    Route::get('api/principles', [PrinciplesApiController::class, 'index'])->name('api.principles.index');
+    Route::get('api/insights/{slug}', [PrinciplesApiController::class, 'showInsight'])->name('api.insights.show');
+
     // Blind Spots Dashboard
     Route::get('blind-spots', [BlindSpotDashboardController::class, 'index'])->name('blind-spots.index');
 });
@@ -94,6 +106,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     // Tag management
     Route::resource('tags', AdminTagController::class)->except(['show']);
+
+    // Principles & Insights management
+    Route::resource('principles', AdminPrincipleController::class)->except(['show']);
+    Route::resource('insights', AdminInsightController::class)->except(['show']);
 
     // API Metrics
     Route::get('api-metrics', [AdminApiMetricsController::class, 'index'])->name('api-metrics.index');

@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             QuestionSeeder::class,
             PlansAndCapabilitiesSeeder::class,
             TagSeeder::class,
+            PrincipleSeeder::class,
+            InsightSeeder::class,
         ]);
 
         User::factory()->create([

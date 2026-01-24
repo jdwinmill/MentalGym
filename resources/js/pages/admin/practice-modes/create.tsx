@@ -13,8 +13,20 @@ interface Tag {
     display_order: number;
 }
 
+interface InsightOption {
+    id: number;
+    name: string;
+}
+
+interface PrincipleWithInsights {
+    id: number;
+    name: string;
+    insights: InsightOption[];
+}
+
 interface Props {
     tagsByCategory: Record<string, Tag[]>;
+    insightsByPrinciple: PrincipleWithInsights[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Create', href: '/admin/practice-modes/create' },
 ];
 
-export default function PracticeModeCreate({ tagsByCategory }: Props) {
+export default function PracticeModeCreate({ tagsByCategory, insightsByPrinciple }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Practice Mode" />
@@ -44,7 +56,7 @@ export default function PracticeModeCreate({ tagsByCategory }: Props) {
                     </p>
                 </div>
 
-                <PracticeModeForm tagsByCategory={tagsByCategory} />
+                <PracticeModeForm tagsByCategory={tagsByCategory} insightsByPrinciple={insightsByPrinciple} />
             </div>
         </AppLayout>
     );

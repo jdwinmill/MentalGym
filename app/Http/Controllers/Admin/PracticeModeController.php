@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Drill;
+use App\Models\Insight;
 use App\Models\PracticeMode;
+use App\Models\Principle;
 use App\Models\Tag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,8 +41,23 @@ class PracticeModeController extends Controller
     {
         $this->authorize('create', PracticeMode::class);
 
+        // Get insights grouped by principle for the dropdown
+        $insightsByPrinciple = Principle::active()
+            ->ordered()
+            ->with(['insights' => fn ($query) => $query->active()->ordered()])
+            ->get()
+            ->map(fn ($principle) => [
+                'id' => $principle->id,
+                'name' => $principle->name,
+                'insights' => $principle->insights->map(fn ($insight) => [
+                    'id' => $insight->id,
+                    'name' => $insight->name,
+                ]),
+            ]);
+
         return Inertia::render('admin/practice-modes/create', [
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
+            'insightsByPrinciple' => $insightsByPrinciple,
         ]);
     }
 
@@ -71,6 +88,20 @@ class PracticeModeController extends Controller
     {
         $this->authorize('update', $practiceMode);
 
+        // Get insights grouped by principle for the dropdown
+        $insightsByPrinciple = Principle::active()
+            ->ordered()
+            ->with(['insights' => fn ($query) => $query->active()->ordered()])
+            ->get()
+            ->map(fn ($principle) => [
+                'id' => $principle->id,
+                'name' => $principle->name,
+                'insights' => $principle->insights->map(fn ($insight) => [
+                    'id' => $insight->id,
+                    'name' => $insight->name,
+                ]),
+            ]);
+
         return Inertia::render('admin/practice-modes/edit', [
             'mode' => [
                 'id' => $practiceMode->id,
@@ -83,7 +114,7 @@ class PracticeModeController extends Controller
                 'required_plan' => $practiceMode->required_plan,
                 'is_active' => $practiceMode->is_active,
                 'sort_order' => $practiceMode->sort_order,
-                'drills' => $practiceMode->drills()->orderBy('position')->get()->map(fn ($drill) => [
+                'drills' => $practiceMode->drills()->orderBy('position')->with('insights')->get()->map(fn ($drill) => [
                     'id' => $drill->id,
                     'name' => $drill->name,
                     'position' => $drill->position,
@@ -91,10 +122,12 @@ class PracticeModeController extends Controller
                     'input_type' => $drill->input_type,
                     'scenario_instruction_set' => $drill->scenario_instruction_set,
                     'evaluation_instruction_set' => $drill->evaluation_instruction_set,
+                    'primary_insight_id' => $drill->insights->where('pivot.is_primary', true)->first()?->id,
                 ]),
             ],
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
             'selectedTags' => $practiceMode->tags->pluck('id')->toArray(),
+            'insightsByPrinciple' => $insightsByPrinciple,
         ]);
     }
 
@@ -166,6 +199,7 @@ class PracticeModeController extends Controller
             'drills.*.input_type' => ['required', 'in:text,multiple_choice'],
             'drills.*.scenario_instruction_set' => ['required', 'string'],
             'drills.*.evaluation_instruction_set' => ['required', 'string'],
+            'drills.*.primary_insight_id' => ['nullable', 'integer', 'exists:insights,id'],
         ];
     }
 
@@ -216,6 +250,9 @@ class PracticeModeController extends Controller
                         'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
                     ]);
                     $submittedDrillIds[] = $drill->id;
+
+                    // Handle primary insight
+                    $this->syncPrimaryInsight($drill, $drillData['primary_insight_id'] ?? null);
                 }
             } else {
                 // Create new drill
@@ -229,6 +266,9 @@ class PracticeModeController extends Controller
                     'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
                 ]);
                 $submittedDrillIds[] = $drill->id;
+
+                // Handle primary insight
+                $this->syncPrimaryInsight($drill, $drillData['primary_insight_id'] ?? null);
             }
         }
 
@@ -236,6 +276,23 @@ class PracticeModeController extends Controller
         $drillsToDelete = array_diff($existingDrillIds, $submittedDrillIds);
         if (! empty($drillsToDelete)) {
             Drill::whereIn('id', $drillsToDelete)->delete();
+        }
+    }
+
+    /**
+     * Sync the primary insight for a drill.
+     */
+    private function syncPrimaryInsight(Drill $drill, ?int $insightId): void
+    {
+        // Remove existing primary insight
+        $drill->insights()->wherePivot('is_primary', true)->detach();
+
+        // Attach new primary insight if provided
+        if ($insightId) {
+            $insight = Insight::find($insightId);
+            if ($insight) {
+                $drill->insights()->attach($insightId, ['is_primary' => true]);
+            }
         }
     }
 }

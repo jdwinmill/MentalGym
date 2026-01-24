@@ -11,12 +11,14 @@ import {
     type StartDrillResponse,
     type SubmitDrillResponse,
     type ContinueDrillResponse,
+    type PrimaryInsight,
 } from '@/types/training';
 import { Head, router } from '@inertiajs/react';
 import { LoadingCardSkeleton } from '@/components/training/LoadingCard';
 import { SessionCompleteDialog } from '@/components/training/SessionCompleteDialog';
 import { DrillScenarioCardComponent } from '@/components/training/cards/DrillScenarioCard';
 import { FeedbackCard } from '@/components/training/cards/FeedbackCard';
+import { PreDrillInsightCard } from '@/components/training/cards/PreDrillInsightCard';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -27,6 +29,7 @@ export default function TrainPage({ mode }: TrainPageProps) {
     const [currentDrill, setCurrentDrill] = useState<Drill | null>(null);
     const [currentCard, setCurrentCard] = useState<DrillCard | null>(null);
     const [progress, setProgress] = useState<DrillProgress | null>(null);
+    const [pendingInsight, setPendingInsight] = useState<PrimaryInsight | null>(null);
 
     // UI state
     const [isLoading, setIsLoading] = useState(false);
@@ -67,6 +70,11 @@ export default function TrainPage({ mode }: TrainPageProps) {
             setCurrentDrill(data.drill);
             setCurrentCard(data.card);
             setProgress(data.progress);
+
+            // Check for primary insight
+            if (data.primary_insight) {
+                setPendingInsight(data.primary_insight);
+            }
         } catch (err) {
             setError('Failed to connect. Please try again.');
             console.error('Start session error:', err);
@@ -144,6 +152,11 @@ export default function TrainPage({ mode }: TrainPageProps) {
                 setCurrentDrill(data.drill!);
                 setCurrentCard(data.card!);
                 setProgress(data.progress!);
+
+                // Check for primary insight
+                if (data.primary_insight) {
+                    setPendingInsight(data.primary_insight);
+                }
             }
         } catch (err) {
             setError('Failed to continue. Please try again.');
@@ -151,6 +164,11 @@ export default function TrainPage({ mode }: TrainPageProps) {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Handle proceeding from the insight card
+    const handleInsightProceed = () => {
+        setPendingInsight(null);
     };
 
     // Handle "Run it back" - start a new session
@@ -161,6 +179,7 @@ export default function TrainPage({ mode }: TrainPageProps) {
         setCurrentDrill(null);
         setProgress(null);
         setSessionStats(null);
+        setPendingInsight(null);
         await startSession();
     };
 
@@ -185,6 +204,16 @@ export default function TrainPage({ mode }: TrainPageProps) {
 
     // Render current card
     const renderCard = () => {
+        // Show insight card first if there's a pending insight
+        if (pendingInsight) {
+            return (
+                <PreDrillInsightCard
+                    insight={pendingInsight}
+                    onProceed={handleInsightProceed}
+                />
+            );
+        }
+
         if (!currentCard || !currentDrill) return null;
 
         if (currentCard.type === 'scenario') {

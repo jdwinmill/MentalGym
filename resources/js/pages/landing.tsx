@@ -94,23 +94,36 @@ export default function Landing() {
                 </main>
 
                 {/* Footer */}
-                <footer className="px-6 py-12 text-center text-sm text-muted-foreground">
-                    <p className="mb-4">
-                        <span className="text-foreground font-medium">
-                            Questions? Ideas? Just want to say hi?
-                        </span>
-                        <br className="sm:hidden" />
-                        <a
-                            href="mailto:hello@sharpstack.io"
-                            className="text-primary hover:underline font-medium ml-0 sm:ml-2"
-                        >
-                            hello@sharpstack.io
-                        </a>
-                    </p>
-                    <p>
-                        &copy; {currentYear} SharpStack - a product of Outpost AI Labs LLC. All
-                        rights reserved.
-                    </p>
+                <footer className="px-6 py-12 bg-secondary/50 border-t border-border">
+                    <div className="max-w-4xl mx-auto">
+                        {/* Links */}
+                        <div className="flex flex-wrap justify-center gap-6 mb-6">
+                            <Link
+                                href="/playbook"
+                                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                            >
+                                Playbook
+                            </Link>
+                            <Link
+                                href="/pricing"
+                                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                            >
+                                Pricing
+                            </Link>
+                            <a
+                                href="mailto:hello@sharpstack.io"
+                                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                            >
+                                Contact
+                            </a>
+                        </div>
+
+                        {/* Copyright */}
+                        <p className="text-center text-sm text-muted-foreground">
+                            &copy; {currentYear} SharpStack - a product of Outpost AI Labs LLC. All
+                            rights reserved.
+                        </p>
+                    </div>
                 </footer>
             </div>
         </>

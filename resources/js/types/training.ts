@@ -50,6 +50,18 @@ export interface Drill {
     input_type: 'text' | 'multiple_choice';
 }
 
+export interface PrimaryInsight {
+    id: number;
+    name: string;
+    slug: string;
+    summary: string;
+    content: string;
+    principle: {
+        name: string;
+        slug: string;
+    };
+}
+
 export interface DrillSession {
     id: number;
     drill_index: number;
@@ -96,6 +108,7 @@ export interface StartDrillResponse {
     card: DrillScenarioCard;
     progress: DrillProgress;
     resumed?: boolean;
+    primary_insight?: PrimaryInsight | null;
     error?: string;
     message?: string;
 }
@@ -116,6 +129,7 @@ export interface ContinueDrillResponse {
     progress?: DrillProgress;
     complete?: boolean;
     stats?: SessionStats;
+    primary_insight?: PrimaryInsight | null;
     error?: string;
     message?: string;
 }

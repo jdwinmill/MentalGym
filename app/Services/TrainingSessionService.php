@@ -499,6 +499,9 @@ class TrainingSessionService
             'phase' => 'responding',
         ]);
 
+        // Get primary insight for the drill
+        $primaryInsight = $drill->getPrimaryInsight();
+
         return [
             'session' => $session->fresh(),
             'drill' => $drill,
@@ -512,6 +515,17 @@ class TrainingSessionService
                 'current' => 1,
                 'total' => $mode->drills()->count(),
             ],
+            'primary_insight' => $primaryInsight ? [
+                'id' => $primaryInsight->id,
+                'name' => $primaryInsight->name,
+                'slug' => $primaryInsight->slug,
+                'summary' => $primaryInsight->summary,
+                'content' => $primaryInsight->content,
+                'principle' => [
+                    'name' => $primaryInsight->principle->name,
+                    'slug' => $primaryInsight->principle->slug,
+                ],
+            ] : null,
         ];
     }
 
@@ -631,6 +645,9 @@ class TrainingSessionService
             'current_correct_option' => $scenarioData['correct_option'],
         ]);
 
+        // Get primary insight for the drill
+        $primaryInsight = $drill->getPrimaryInsight();
+
         return [
             'session' => $session->fresh(),
             'drill' => $drill,
@@ -644,6 +661,17 @@ class TrainingSessionService
                 'current' => $nextIndex + 1,
                 'total' => $totalDrills,
             ],
+            'primary_insight' => $primaryInsight ? [
+                'id' => $primaryInsight->id,
+                'name' => $primaryInsight->name,
+                'slug' => $primaryInsight->slug,
+                'summary' => $primaryInsight->summary,
+                'content' => $primaryInsight->content,
+                'principle' => [
+                    'name' => $primaryInsight->principle->name,
+                    'slug' => $primaryInsight->principle->slug,
+                ],
+            ] : null,
         ];
     }
 

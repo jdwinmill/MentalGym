@@ -145,6 +145,7 @@ class TrainingApiController extends Controller
                 'card' => $result['card'],
                 'progress' => $result['progress'],
                 'resumed' => $result['resumed'] ?? false,
+                'primary_insight' => $result['primary_insight'] ?? null,
             ]);
         } catch (AuthorizationException $e) {
             return response()->json([
@@ -290,6 +291,7 @@ class TrainingApiController extends Controller
                 ] : null,
                 'card' => $result['card'],
                 'progress' => $result['progress'],
+                'primary_insight' => $result['primary_insight'] ?? null,
             ]);
         } catch (\RuntimeException $e) {
             return response()->json([

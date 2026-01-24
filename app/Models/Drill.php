@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Drill extends Model
 {
@@ -36,6 +37,13 @@ class Drill extends Model
         return $this->belongsTo(PracticeMode::class);
     }
 
+    public function insights(): BelongsToMany
+    {
+        return $this->belongsToMany(Insight::class)
+            ->withPivot('is_primary')
+            ->withTimestamps();
+    }
+
     // ─────────────────────────────────────────────────────────────
     // Scopes
     // ─────────────────────────────────────────────────────────────
@@ -63,5 +71,16 @@ class Drill extends Model
     public function hasTimer(): bool
     {
         return $this->timer_seconds !== null;
+    }
+
+    /**
+     * Get the primary insight for this drill.
+     */
+    public function getPrimaryInsight(): ?Insight
+    {
+        return $this->insights()
+            ->wherePivot('is_primary', true)
+            ->with('principle')
+            ->first();
     }
 }

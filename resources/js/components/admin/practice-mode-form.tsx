@@ -37,6 +37,18 @@ interface DrillData {
     input_type: 'text' | 'multiple_choice';
     scenario_instruction_set: string;
     evaluation_instruction_set: string;
+    primary_insight_id: number | null;
+}
+
+interface InsightOption {
+    id: number;
+    name: string;
+}
+
+interface PrincipleWithInsights {
+    id: number;
+    name: string;
+    insights: InsightOption[];
 }
 
 interface PracticeModeData {
@@ -66,6 +78,7 @@ interface Props {
     isEdit?: boolean;
     tagsByCategory?: Record<string, Tag[]>;
     selectedTags?: number[];
+    insightsByPrinciple?: PrincipleWithInsights[];
 }
 
 const categoryLabels: Record<string, string> = {
@@ -92,9 +105,10 @@ const defaultDrill: DrillData = {
     input_type: 'text',
     scenario_instruction_set: '',
     evaluation_instruction_set: '',
+    primary_insight_id: null,
 };
 
-export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory = {}, selectedTags = [] }: Props) {
+export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory = {}, selectedTags = [], insightsByPrinciple = [] }: Props) {
     const form = useForm({
         name: mode?.name || '',
         slug: mode?.slug || '',
@@ -388,6 +402,40 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                                                         </Select>
                                                     </div>
                                                 </div>
+
+                                                {insightsByPrinciple.length > 0 && (
+                                                    <div className="space-y-2">
+                                                        <Label>Primary Insight</Label>
+                                                        <Select
+                                                            value={drill.primary_insight_id?.toString() || 'none'}
+                                                            onValueChange={(value) => updateDrill(index, 'primary_insight_id', value === 'none' ? null : parseInt(value))}
+                                                        >
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select an insight (optional)" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="none">No insight</SelectItem>
+                                                                {insightsByPrinciple.map((principle) => (
+                                                                    principle.insights.length > 0 && (
+                                                                        <div key={principle.id}>
+                                                                            <div className="px-2 py-1.5 text-xs font-semibold text-neutral-500 bg-neutral-50 dark:bg-neutral-800">
+                                                                                {principle.name}
+                                                                            </div>
+                                                                            {principle.insights.map((insight) => (
+                                                                                <SelectItem key={insight.id} value={insight.id.toString()}>
+                                                                                    {insight.name}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </div>
+                                                                    )
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <p className="text-xs text-neutral-500">
+                                                            This insight will be shown before the drill scenario
+                                                        </p>
+                                                    </div>
+                                                )}
 
                                                 <div className="space-y-2">
                                                     <Label>Scenario Instruction Set *</Label>

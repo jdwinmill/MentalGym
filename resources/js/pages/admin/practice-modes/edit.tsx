@@ -34,13 +34,25 @@ interface Tag {
     display_order: number;
 }
 
+interface InsightOption {
+    id: number;
+    name: string;
+}
+
+interface PrincipleWithInsights {
+    id: number;
+    name: string;
+    insights: InsightOption[];
+}
+
 interface Props {
     mode: PracticeMode;
     tagsByCategory: Record<string, Tag[]>;
     selectedTags: number[];
+    insightsByPrinciple: PrincipleWithInsights[];
 }
 
-export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags }: Props) {
+export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags, insightsByPrinciple }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/users' },
         { title: 'Practice Modes', href: '/admin/practice-modes' },
@@ -76,6 +88,7 @@ export default function PracticeModeEdit({ mode, tagsByCategory, selectedTags }:
                     isEdit
                     tagsByCategory={tagsByCategory}
                     selectedTags={selectedTags}
+                    insightsByPrinciple={insightsByPrinciple}
                 />
             </div>
         </AppLayout>
