@@ -47,7 +47,7 @@ class DailyUsage extends Model
     }
 
     /**
-     * Record activity for today.
+     * Record activity for today using atomic increments to prevent race conditions.
      */
     public static function recordActivity(int $userId, int $timeSeconds = 0, int $messages = 0, bool $newSession = false): self
     {
@@ -56,13 +56,28 @@ class DailyUsage extends Model
             ['exchange_count' => 0, 'sessions_count' => 0, 'total_time_seconds' => 0, 'messages_count' => 0]
         );
 
+        $increments = [];
+
         if ($newSession) {
-            $usage->sessions_count++;
+            $increments['sessions_count'] = 1;
         }
 
-        $usage->total_time_seconds += $timeSeconds;
-        $usage->messages_count += $messages;
-        $usage->save();
+        if ($timeSeconds > 0) {
+            $increments['total_time_seconds'] = $timeSeconds;
+        }
+
+        if ($messages > 0) {
+            $increments['messages_count'] = $messages;
+        }
+
+        if (! empty($increments)) {
+            static::where('id', $usage->id)->increment(
+                array_key_first($increments),
+                $increments[array_key_first($increments)],
+                count($increments) > 1 ? array_slice($increments, 1) : []
+            );
+            $usage->refresh();
+        }
 
         return $usage;
     }

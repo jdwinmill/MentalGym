@@ -26,7 +26,7 @@ class RequireActivePlan
             return $next($request);
         }
 
-        if (! $user->hasActivePlan()) {
+        if (! $user->hasAccess()) {
             return $this->denyAccess($request, 'An active subscription is required');
         }
 
