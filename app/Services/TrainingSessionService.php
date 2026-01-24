@@ -471,7 +471,7 @@ class TrainingSessionService
             ->first();
 
         if ($existingSession) {
-            return $this->resumeDrillSession($existingSession);
+            return $this->resumeDrillSession($existingSession, $user);
         }
 
         // Get or create progress record
@@ -540,8 +540,14 @@ class TrainingSessionService
     /**
      * Resume an existing drill-based session
      */
-    public function resumeDrillSession(TrainingSession $session): array
+    public function resumeDrillSession(TrainingSession $session, ?User $user = null): array
     {
+        // If session is in feedback phase, the user already submitted and saw feedback.
+        // Auto-advance to the next drill instead of showing nothing.
+        if ($session->phase === 'feedback' && $user) {
+            return $this->continueToNextDrill($session, $user);
+        }
+
         $drill = $session->practiceMode->drills()
             ->where('position', $session->drill_index)
             ->first();
@@ -556,6 +562,9 @@ class TrainingSessionService
             default => null,
         };
 
+        // Get primary insight for the drill (on resume)
+        $primaryInsight = $drill?->getPrimaryInsight();
+
         return [
             'session' => $session,
             'drill' => $drill,
@@ -565,6 +574,17 @@ class TrainingSessionService
                 'total' => $session->practiceMode->drills()->count(),
             ],
             'resumed' => true,
+            'primary_insight' => $primaryInsight ? [
+                'id' => $primaryInsight->id,
+                'name' => $primaryInsight->name,
+                'slug' => $primaryInsight->slug,
+                'summary' => $primaryInsight->summary,
+                'content' => $primaryInsight->content,
+                'principle' => [
+                    'name' => $primaryInsight->principle->name,
+                    'slug' => $primaryInsight->principle->slug,
+                ],
+            ] : null,
         ];
     }
 

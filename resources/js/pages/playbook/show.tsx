@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowLeft, Clock, PlayCircle, ChevronRight, UserPlus } from 'lucide-react';
+import { ArrowLeft, Clock, PlayCircle, ChevronRight, UserPlus, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +14,9 @@ interface Drill {
         id: number;
         name: string;
         slug: string;
+        is_active: boolean;
+        required_plan: string | null;
+        can_access: boolean;
     };
 }
 
@@ -112,17 +115,28 @@ export default function InsightShow({ insight }: Props) {
                                     </h2>
                                     <p className="text-neutral-600 dark:text-neutral-400">
                                         {isLoggedIn
-                                            ? 'Apply what you\'ve learned in a realistic scenario. Get instant AI feedback on your response.'
+                                            ? primaryDrill?.practice_mode.can_access
+                                                ? 'Apply what you\'ve learned in a realistic scenario. Get instant AI feedback on your response.'
+                                                : `Upgrade to ${primaryDrill?.practice_mode.required_plan} to practice this skill.`
                                             : 'Sign up for free to practice with AI-powered scenarios and get instant feedback.'}
                                     </p>
                                 </div>
                                 {isLoggedIn && primaryDrill ? (
-                                    <Link href={`/practice-modes/${primaryDrill.practice_mode.slug}/train`}>
-                                        <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
-                                            <PlayCircle className="w-5 h-5 mr-2" />
-                                            Practice Now
-                                        </Button>
-                                    </Link>
+                                    primaryDrill.practice_mode.can_access ? (
+                                        <Link href={`/practice-modes/${primaryDrill.practice_mode.slug}/train`}>
+                                            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
+                                                <PlayCircle className="w-5 h-5 mr-2" />
+                                                Practice Now
+                                            </Button>
+                                        </Link>
+                                    ) : (
+                                        <Link href="/pricing">
+                                            <Button size="lg" variant="outline" className="whitespace-nowrap">
+                                                <Lock className="w-5 h-5 mr-2" />
+                                                Upgrade to {primaryDrill.practice_mode.required_plan?.charAt(0).toUpperCase()}{primaryDrill.practice_mode.required_plan?.slice(1)}
+                                            </Button>
+                                        </Link>
+                                    )
                                 ) : !isLoggedIn ? (
                                     <Link href="/register">
                                         <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground whitespace-nowrap">
@@ -145,21 +159,41 @@ export default function InsightShow({ insight }: Props) {
                             </h3>
                             <div className="space-y-3">
                                 {insight.drills.filter(d => !d.is_primary).map((drill) => (
-                                    <Link
-                                        key={drill.id}
-                                        href={`/practice-modes/${drill.practice_mode.slug}/train`}
-                                        className="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group"
-                                    >
-                                        <div>
-                                            <p className="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary">
-                                                {drill.name}
-                                            </p>
-                                            <p className="text-sm text-neutral-500">
-                                                {drill.practice_mode.name}
-                                            </p>
+                                    drill.practice_mode.can_access ? (
+                                        <Link
+                                            key={drill.id}
+                                            href={`/practice-modes/${drill.practice_mode.slug}/train`}
+                                            className="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-primary/50 dark:hover:border-primary/50 transition-colors group"
+                                        >
+                                            <div>
+                                                <p className="font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-primary">
+                                                    {drill.name}
+                                                </p>
+                                                <p className="text-sm text-neutral-500">
+                                                    {drill.practice_mode.name}
+                                                </p>
+                                            </div>
+                                            <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary" />
+                                        </Link>
+                                    ) : (
+                                        <div
+                                            key={drill.id}
+                                            className="flex items-center justify-between p-4 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 opacity-75"
+                                        >
+                                            <div>
+                                                <p className="font-medium text-neutral-900 dark:text-neutral-100">
+                                                    {drill.name}
+                                                </p>
+                                                <p className="text-sm text-neutral-500">
+                                                    {drill.practice_mode.name}
+                                                </p>
+                                            </div>
+                                            <span className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
+                                                <Lock className="w-4 h-4" />
+                                                {drill.practice_mode.required_plan?.charAt(0).toUpperCase()}{drill.practice_mode.required_plan?.slice(1)}
+                                            </span>
                                         </div>
-                                        <ChevronRight className="w-5 h-5 text-neutral-400 group-hover:text-primary" />
-                                    </Link>
+                                    )
                                 ))}
                             </div>
                         </div>

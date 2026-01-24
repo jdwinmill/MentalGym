@@ -175,7 +175,7 @@ class TrainingApiController extends Controller
      * Get current drill session state (for resume).
      * GET /api/training/v2/session/{session}
      */
-    public function showDrill(TrainingSession $session): JsonResponse
+    public function showDrill(Request $request, TrainingSession $session): JsonResponse
     {
         // Check ownership
         if ($session->user_id !== auth()->id()) {
@@ -186,7 +186,30 @@ class TrainingApiController extends Controller
             ], 403);
         }
 
-        $result = $this->trainingService->resumeDrillSession($session);
+        $result = $this->trainingService->resumeDrillSession($session, $request->user());
+
+        // Handle limit reached (if auto-advanced from feedback phase)
+        if (isset($result['error']) && $result['error'] === 'limit_reached') {
+            return response()->json([
+                'success' => false,
+                'error' => 'limit_reached',
+                'plan' => $result['plan'],
+            ], 429);
+        }
+
+        // Handle session complete (if auto-advanced from feedback phase)
+        if ($result['complete'] ?? false) {
+            return response()->json([
+                'success' => true,
+                'complete' => true,
+                'session' => [
+                    'id' => $result['session']->id,
+                    'drill_index' => $result['session']->drill_index,
+                    'phase' => $result['session']->phase,
+                ],
+                'stats' => $result['stats'],
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -203,6 +226,7 @@ class TrainingApiController extends Controller
             ] : null,
             'card' => $result['card'],
             'progress' => $result['progress'],
+            'primary_insight' => $result['primary_insight'] ?? null,
         ]);
     }
 

@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-import { Search, Clock, ArrowRight, BookOpen } from 'lucide-react';
+import { Search, Clock, ArrowRight, BookOpen, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,8 @@ interface Drill {
     id: number;
     name: string;
     practice_mode_slug: string;
+    can_access: boolean;
+    required_plan: string | null;
 }
 
 interface Principle {
@@ -176,11 +178,20 @@ export default function PlaybookIndex({ principles, insights }: Props) {
                                                     </Link>
                                                     {insight.drill && (
                                                         isLoggedIn ? (
-                                                            <Link href={`/practice-modes/${insight.drill.practice_mode_slug}/train`}>
-                                                                <Button variant="outline" size="sm">
-                                                                    Practice this
-                                                                </Button>
-                                                            </Link>
+                                                            insight.drill.can_access ? (
+                                                                <Link href={`/practice-modes/${insight.drill.practice_mode_slug}/train`}>
+                                                                    <Button variant="outline" size="sm">
+                                                                        Practice this
+                                                                    </Button>
+                                                                </Link>
+                                                            ) : (
+                                                                <Link href="/pricing">
+                                                                    <Button variant="outline" size="sm" className="text-amber-600 border-amber-300 dark:text-amber-400 dark:border-amber-700">
+                                                                        <Lock className="w-3 h-3 mr-1" />
+                                                                        {insight.drill.required_plan?.charAt(0).toUpperCase()}{insight.drill.required_plan?.slice(1)}
+                                                                    </Button>
+                                                                </Link>
+                                                            )
                                                         ) : (
                                                             <Link href="/register">
                                                                 <Button variant="outline" size="sm">
