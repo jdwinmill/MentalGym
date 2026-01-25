@@ -83,4 +83,98 @@ return [
         'cross_functional_project' => 'Cross-Functional Project',
         'difficult_stakeholders' => 'Difficult Stakeholders',
     ],
+
+    // Field metadata for dynamic form generation
+    'context_fields_meta' => [
+        'birth_year' => [
+            'label' => 'Birth Year',
+            'type' => 'number',
+            'min' => 1920,
+            'max' => 2015,
+            'placeholder' => 'e.g., 1990',
+        ],
+        'gender' => [
+            'label' => 'Gender',
+            'type' => 'text',
+            'placeholder' => 'e.g., Male, Female, Non-binary',
+        ],
+        'zip_code' => [
+            'label' => 'Zip Code',
+            'type' => 'text',
+            'placeholder' => 'e.g., 94103',
+        ],
+        'job_title' => [
+            'label' => 'Job Title',
+            'type' => 'text',
+            'placeholder' => 'e.g., Engineering Manager',
+        ],
+        'industry' => [
+            'label' => 'Industry',
+            'type' => 'text',
+            'placeholder' => 'e.g., Technology, Finance',
+        ],
+        'company_size' => [
+            'label' => 'Company Size',
+            'type' => 'select',
+        ],
+        'career_level' => [
+            'label' => 'Career Level',
+            'type' => 'select',
+        ],
+        'years_in_role' => [
+            'label' => 'Years in Current Role',
+            'type' => 'number',
+            'min' => 0,
+            'max' => 50,
+            'placeholder' => 'e.g., 3',
+        ],
+        'years_experience' => [
+            'label' => 'Total Years of Experience',
+            'type' => 'number',
+            'min' => 0,
+            'max' => 60,
+            'placeholder' => 'e.g., 10',
+        ],
+        'manages_people' => [
+            'label' => 'Do you manage people?',
+            'type' => 'checkbox',
+        ],
+        'direct_reports' => [
+            'label' => 'Number of Direct Reports',
+            'type' => 'number',
+            'min' => 0,
+            'max' => 1000,
+            'placeholder' => 'e.g., 5',
+        ],
+        'reports_to_role' => [
+            'label' => 'Your Manager\'s Role',
+            'type' => 'text',
+            'placeholder' => 'e.g., VP of Engineering',
+        ],
+        'team_composition' => [
+            'label' => 'Team Composition',
+            'type' => 'select',
+        ],
+        'collaboration_style' => [
+            'label' => 'Collaboration Style',
+            'type' => 'select',
+        ],
+        'cross_functional_teams' => [
+            'label' => 'Teams You Work With',
+            'type' => 'multiselect',
+        ],
+        'communication_tools' => [
+            'label' => 'Communication Tools',
+            'type' => 'text',
+            'placeholder' => 'e.g., Slack, Email, Zoom',
+        ],
+        'improvement_areas' => [
+            'label' => 'Areas to Improve',
+            'type' => 'multiselect',
+        ],
+        'upcoming_challenges' => [
+            'label' => 'Upcoming Challenges',
+            'type' => 'multiselect',
+        ],
+    ],
 ];

@@ -20,6 +20,7 @@ import { LimitReachedDialog } from '@/components/training/LimitReachedDialog';
 import { DrillScenarioCardComponent } from '@/components/training/cards/DrillScenarioCard';
 import { FeedbackCard } from '@/components/training/cards/FeedbackCard';
 import { PreDrillInsightCard } from '@/components/training/cards/PreDrillInsightCard';
+import { RequiredContextModal, type FieldMeta } from '@/components/training/RequiredContextModal';
 import { AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -45,16 +46,44 @@ export default function TrainPage({ mode }: TrainPageProps) {
     const [showLimitDialog, setShowLimitDialog] = useState(false);
     const [limitPlan, setLimitPlan] = useState<string>('free');
 
+    // Required context modal state
+    const [showContextModal, setShowContextModal] = useState(false);
+    const [missingFields, setMissingFields] = useState<FieldMeta[]>([]);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Practice', href: '/practice-modes' },
         { title: mode.name, href: `/practice-modes/${mode.slug}/train` },
     ];
 
-    // Start or resume session on mount
-    const startSession = useCallback(async () => {
-        setIsStarting(true);
-        setError(null);
+    // Check for required context before starting
+    const checkRequiredContext = useCallback(async (): Promise<boolean> => {
+        try {
+            const response = await fetch(`/api/training/v2/check-context/${mode.slug}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                },
+            });
 
+            const data = await response.json();
+
+            if (data.success && !data.has_required_context && data.missing_fields.length > 0) {
+                setMissingFields(data.missing_fields);
+                setShowContextModal(true);
+                return false;
+            }
+
+            return true;
+        } catch (err) {
+            console.error('Check context error:', err);
+            // On error, proceed anyway - the session start will handle validation
+            return true;
+        }
+    }, [mode.slug]);
+
+    // Start the actual session (after context is verified)
+    const startActualSession = useCallback(async () => {
         try {
             const response = await fetch(`/api/training/v2/start/${mode.slug}`, {
                 method: 'POST',
@@ -95,6 +124,51 @@ export default function TrainPage({ mode }: TrainPageProps) {
             setIsStarting(false);
         }
     }, [mode.slug]);
+
+    // Start or resume session on mount
+    const startSession = useCallback(async () => {
+        setIsStarting(true);
+        setError(null);
+
+        // First check if we have required context
+        const hasContext = await checkRequiredContext();
+        if (!hasContext) {
+            setIsStarting(false);
+            return;
+        }
+
+        await startActualSession();
+    }, [checkRequiredContext, startActualSession]);
+
+    // Handle context form submission
+    const handleContextSubmit = async (data: Record<string, unknown>) => {
+        const response = await fetch('/api/training/v2/update-profile', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to update profile');
+        }
+
+        // Close modal and start session
+        setShowContextModal(false);
+        setMissingFields([]);
+        setIsStarting(true);
+        await startActualSession();
+    };
+
+    // Handle context modal close (go back to practice modes)
+    const handleContextModalClose = () => {
+        setShowContextModal(false);
+        router.visit('/practice-modes');
+    };
 
     useEffect(() => {
         startSession();
@@ -361,6 +435,15 @@ export default function TrainPage({ mode }: TrainPageProps) {
                 isOpen={showLimitDialog}
                 plan={limitPlan}
                 onClose={handleLimitDialogClose}
+            />
+
+            {/* Required context modal */}
+            <RequiredContextModal
+                isOpen={showContextModal}
+                onClose={handleContextModalClose}
+                onSubmit={handleContextSubmit}
+                fields={missingFields}
+                modeName={mode.name}
             />
         </AppLayout>
     );

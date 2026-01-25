@@ -13,28 +13,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Blind Spots', href: '/blind-spots' },
 ];
 
-interface ContextBreakdown {
-    phase: string;
-    rate: number;
-    total: number;
-    practiceMode: string | null;
-}
-
 interface SkillPattern {
     skill: string;
-    currentRate: number;
-    baselineRate: number | null;
-    trend: 'improving' | 'stable' | 'slipping' | 'stuck';
-    primaryIssue: string | null;
-    failingCriteria: string[];
-    sampleSize: number;
-    practiceMode: string | null;
-    name: string | null;
+    name: string;
+    category: string;
     description: string | null;
-    target: string | null;
-    tips: string[];
-    failingCriteriaLabels: string[];
-    contextBreakdown: ContextBreakdown[];
+    averageScore: number;
+    scoreLevel: 'low' | 'mid' | 'high';
+    sampleSize: number;
+    trend: 'improving' | 'stable' | 'slipping' | 'new';
+    suggestion: string | null;
 }
 
 
@@ -79,7 +67,7 @@ export default function BlindSpotsIndex({ analysis, history, isPro }: BlindSpots
         ...(analysis.improving || []),
         ...(analysis.slipping || []),
         ...(analysis.stable || []),
-    ].sort((a, b) => b.currentRate - a.currentRate);
+    ].sort((a, b) => a.averageScore - b.averageScore);
 
     const getSkillDetails = (skillName: string | null) => {
         if (!skillName) return null;

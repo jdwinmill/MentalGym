@@ -19,11 +19,13 @@ class SkillDimension extends Model
         'description',
         'category',
         'score_anchors',
+        'improvement_tips',
         'active',
     ];
 
     protected $casts = [
         'score_anchors' => 'array',
+        'improvement_tips' => 'array',
         'active' => 'boolean',
     ];
 
@@ -53,5 +55,48 @@ class SkillDimension extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('category')->orderBy('label');
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * Get the appropriate improvement tip based on score.
+     * Score 1-4 = low, 5-6 = mid, 7-10 = high
+     */
+    public function getTipForScore(int $score): ?string
+    {
+        $tips = $this->improvement_tips;
+
+        if (empty($tips)) {
+            return null;
+        }
+
+        if ($score <= 4) {
+            return $tips['low'] ?? null;
+        }
+
+        if ($score <= 6) {
+            return $tips['mid'] ?? null;
+        }
+
+        return $tips['high'] ?? null;
+    }
+
+    /**
+     * Get the score level label (low, mid, high) for a score.
+     */
+    public static function getScoreLevel(int $score): string
+    {
+        if ($score <= 4) {
+            return 'low';
+        }
+
+        if ($score <= 6) {
+            return 'mid';
+        }
+
+        return 'high';
     }
 }

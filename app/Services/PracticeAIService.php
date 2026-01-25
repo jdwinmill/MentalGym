@@ -724,9 +724,24 @@ PROMPT;
         // Get dimensions for this drill and build scoring guide
         $dimensions = $drill->dimensions ?? [];
         $scoringGuide = $this->buildDimensionScoringGuide($dimensions);
-        $dimensionScoresExample = ! empty($dimensions)
-            ? collect($dimensions)->mapWithKeys(fn ($d) => [$d => '1-10'])->toJson()
-            : '{"overall_performance": "1-10"}';
+
+        // Build example JSON structure for dimension scores
+        if (! empty($dimensions)) {
+            $exampleScores = [];
+            foreach ($dimensions as $i => $dim) {
+                // Alternate between high score (no suggestion) and low score (with suggestion) for example
+                if ($i === 0) {
+                    $exampleScores[$dim] = ['score' => 8, 'suggestion' => null];
+                } else {
+                    $exampleScores[$dim] = ['score' => 5, 'suggestion' => 'Brief improvement tip here'];
+                }
+            }
+            $dimensionScoresExample = json_encode($exampleScores, JSON_UNESCAPED_SLASHES);
+        } else {
+            $dimensionScoresExample = '{"overall_performance": {"score": 7, "suggestion": null}}';
+        }
+
+        $suggestionInstruction = "For each dimension, provide a score (1-10) and a brief, actionable suggestion if score <= 6 (null if score > 6). Suggestions should be specific to what the user did wrong and how to improve.";
 
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT
@@ -742,6 +757,8 @@ USER SELECTED OPTION INDEX: {$userResponse}
 Evaluate this response. If correct, explain why. If incorrect, explain the correct answer.
 
 {$scoringGuide}
+
+{$suggestionInstruction}
 
 Respond with valid JSON only (no markdown, no code blocks):
 {
@@ -766,6 +783,8 @@ USER RESPONSE:
 Evaluate this response according to the drill criteria.
 
 {$scoringGuide}
+
+{$suggestionInstruction}
 
 Respond with valid JSON only (no markdown, no code blocks):
 {
@@ -829,10 +848,35 @@ PROMPT;
         $text = $this->extractTextFromResponse($response);
         $data = $this->parseJsonResponse($text);
 
+        // Parse dimension_scores which now has format: {"clarity": {"score": 7, "suggestion": null}}
+        $rawDimensionScores = $data['dimension_scores'] ?? [];
+        $dimensionScores = [];
+
+        foreach ($rawDimensionScores as $key => $value) {
+            if (is_array($value) && isset($value['score'])) {
+                // New format: {"score": 7, "suggestion": "..."}
+                $suggestion = $value['suggestion'] ?? null;
+                // Treat empty strings as null
+                if ($suggestion === '') {
+                    $suggestion = null;
+                }
+                $dimensionScores[$key] = [
+                    'score' => (int) $value['score'],
+                    'suggestion' => $suggestion,
+                ];
+            } else {
+                // Legacy format: just a number (backward compatibility)
+                $dimensionScores[$key] = [
+                    'score' => (int) $value,
+                    'suggestion' => null,
+                ];
+            }
+        }
+
         return [
             'feedback' => $data['feedback'] ?? '',
             'score' => (int) ($data['score'] ?? 0),
-            'dimension_scores' => $data['dimension_scores'] ?? [],
+            'dimension_scores' => $dimensionScores,
         ];
     }
 

@@ -3,6 +3,7 @@ import { Lightbulb, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { type PrimaryInsight } from '@/types/training';
+import ReactMarkdown from 'react-markdown';
 
 interface Props {
     insight: PrimaryInsight;
@@ -61,12 +62,10 @@ export function PreDrillInsightCard({ insight, onProceed }: Props) {
 
                         {isExpanded && (
                             <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
-                                <div className="prose prose-neutral dark:prose-invert prose-sm max-w-none">
-                                    {insight.content.split('\n\n').map((paragraph, index) => (
-                                        <p key={index} className="text-neutral-600 dark:text-neutral-400 leading-relaxed mb-3 last:mb-0">
-                                            {paragraph}
-                                        </p>
-                                    ))}
+                                <div className="article-content text-sm">
+                                    <ReactMarkdown>
+                                        {insight.content}
+                                    </ReactMarkdown>
                                 </div>
                             </div>
                         )}

@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Training API v2 (drill-based)
     Route::prefix('api/training/v2')->group(function () {
+        Route::get('check-context/{mode_slug}', [TrainingApiController::class, 'checkRequiredContext'])->name('api.training.v2.check-context');
+        Route::patch('update-profile', [TrainingApiController::class, 'updateProfile'])->name('api.training.v2.update-profile');
         Route::post('start/{mode_slug}', [TrainingApiController::class, 'startDrill'])->name('api.training.v2.start');
         Route::get('session/{session}', [TrainingApiController::class, 'showDrill'])->name('api.training.v2.show');
         Route::post('respond/{session}', [TrainingApiController::class, 'respondDrill'])->name('api.training.v2.respond');

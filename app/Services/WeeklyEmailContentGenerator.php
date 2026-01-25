@@ -100,10 +100,10 @@ PROMPT;
         }
 
         $items = array_map(function ($spot) {
-            $rate = round($spot->currentRate * 100);
-            $issue = $spot->primaryIssue ?? 'general';
+            $score = round($spot->averageScore, 1);
+            $suggestion = $spot->latestSuggestion ?? '';
 
-            return "{$spot->skill} ({$rate}% failure rate, primary issue: {$issue})";
+            return "{$spot->label} (avg score: {$score}/10" . ($suggestion ? ", suggestion: {$suggestion}" : '') . ')';
         }, $blindSpots);
 
         return implode('; ', $items);
@@ -116,10 +116,10 @@ PROMPT;
         }
 
         $items = array_map(function ($skill) {
-            $current = round($skill->currentRate * 100);
-            $baseline = round($skill->baselineRate * 100);
+            $score = round($skill->averageScore, 1);
+            $trend = $skill->trend;
 
-            return "{$skill->skill} (was {$baseline}%, now {$current}%)";
+            return "{$skill->label} (score: {$score}/10, trend: {$trend})";
         }, $skills);
 
         return implode('; ', $items);
@@ -155,8 +155,8 @@ PROMPT;
 
         if (! empty($analysis->blindSpots)) {
             $topBlindSpot = $analysis->blindSpots[0];
-            $rate = round($topBlindSpot->currentRate * 100);
-            $needsWork[] = "{$topBlindSpot->skill}: showing up in {$rate}% of your responses.";
+            $score = round($topBlindSpot->averageScore, 1);
+            $needsWork[] = "{$topBlindSpot->label}: averaging {$score}/10 - needs focused practice.";
         }
 
         if (empty($needsWork)) {
@@ -168,7 +168,7 @@ PROMPT;
                 ? "Your week: Focus on {$analysis->biggestGap}"
                 : 'Your weekly training report',
             improving: ! empty($analysis->improving)
-                ? ["{$analysis->improving[0]->skill} is trending in the right direction."]
+                ? ["{$analysis->improving[0]->label} is trending in the right direction."]
                 : [],
             needsWork: $needsWork,
             patternToWatch: 'We need a few more sessions to identify clear patterns.',

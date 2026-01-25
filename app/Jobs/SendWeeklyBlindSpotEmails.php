@@ -7,7 +7,7 @@ use App\Models\BlindSpotEmail;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\ArticleRecommender;
-use App\Services\BlindSpotAnalyzer;
+use App\Services\BlindSpotService;
 use App\Services\WeeklyEmailContentGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -22,7 +22,7 @@ class SendWeeklyBlindSpotEmails implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function handle(
-        BlindSpotAnalyzer $analyzer,
+        BlindSpotService $service,
         WeeklyEmailContentGenerator $contentGenerator,
         ArticleRecommender $articleRecommender,
     ): void {
@@ -41,7 +41,7 @@ class SendWeeklyBlindSpotEmails implements ShouldQueue
             try {
                 $this->sendEmailToUser(
                     $user,
-                    $analyzer,
+                    $service,
                     $contentGenerator,
                     $articleRecommender,
                     $weekNumber,
@@ -88,21 +88,21 @@ class SendWeeklyBlindSpotEmails implements ShouldQueue
 
     private function sendEmailToUser(
         User $user,
-        BlindSpotAnalyzer $analyzer,
+        BlindSpotService $service,
         WeeklyEmailContentGenerator $contentGenerator,
         ArticleRecommender $articleRecommender,
         int $weekNumber,
         int $year,
     ): void {
         // Check if user has enough data
-        if (! $analyzer->hasEnoughData($user)) {
+        if (! $service->hasEnoughData($user)) {
             Log::debug('Skipping user - insufficient data', ['user_id' => $user->id]);
 
             return;
         }
 
         // Run analysis
-        $analysis = $analyzer->analyze($user);
+        $analysis = $service->analyze($user);
 
         // Skip if no meaningful data
         if (! $analysis->hasBlindSpots() && empty($analysis->improving) && empty($analysis->slipping)) {

@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\DrillScore;
+use App\Models\BlindSpot;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -39,25 +40,21 @@ describe('GET /api/blind-spots', function () {
     it('returns requires_upgrade for free user with 5+ sessions', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        // Create drill scores with blind spots
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withAuthorityIssues()
-            ->create();
-
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($sessions->first())
-            ->withGoodScores()
+        // Create blind spots with low scores (to trigger blind spot detection)
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots');
@@ -107,24 +104,20 @@ describe('GET /api/blind-spots', function () {
     it('returns full data unlocked for pro user with 5+ sessions', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withAuthorityIssues()
-            ->create();
-
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($sessions->first())
-            ->withGoodScores()
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots');
@@ -149,17 +142,19 @@ describe('GET /api/blind-spots', function () {
     it('returns full data unlocked for unlimited user', function () {
         $user = User::factory()->create(['plan' => 'unlimited']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(10)
-            ->forSession($sessions->first())
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
             ->withGoodScores()
             ->create();
 
@@ -187,18 +182,20 @@ describe('GET /api/blind-spots/teaser', function () {
     it('returns showTeaser false for pro user', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withAuthorityIssues()
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots/teaser');
@@ -235,24 +232,20 @@ describe('GET /api/blind-spots/teaser', function () {
     it('returns teaser data for free user with blind spots', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withAuthorityIssues()
-            ->create();
-
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($sessions->first())
-            ->withGoodScores()
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots/teaser');
@@ -304,18 +297,20 @@ describe('GET /api/blind-spots/status', function () {
     it('returns correct status flags for free user with enough data', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(8)
-            ->forSession($sessions->first())
-            ->withAuthorityIssues()
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots/status');
@@ -336,17 +331,19 @@ describe('GET /api/blind-spots/status', function () {
     it('returns correct status flags for pro user with enough data', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
-        $sessions = TrainingSession::factory()
+        TrainingSession::factory()
             ->count(5)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
             ->create();
 
-        DrillScore::factory()
-            ->count(10)
-            ->forSession($sessions->first())
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
             ->withGoodScores()
             ->create();
 

@@ -627,10 +627,7 @@ class TrainingSessionService
         $this->recordDimensionScores(
             $user,
             $drill,
-            $dimensionScores,
-            $session->current_scenario,
-            $response,
-            $feedbackData['feedback']
+            $dimensionScores
         );
 
         // Append score to drill_scores
@@ -775,19 +772,24 @@ class TrainingSessionService
     /**
      * Record dimension scores to blind_spots and update user_skill_dimension_progress.
      *
-     * @param  array<string, int>  $dimensionScores  dimension_key => score (1-10)
+     * @param  array<string, array{score: int, suggestion: ?string}>  $dimensionScores
      */
     private function recordDimensionScores(
         User $user,
         Drill $drill,
-        array $dimensionScores,
-        string $scenario,
-        string $userResponse,
-        string $feedback
+        array $dimensionScores
     ): void {
-        foreach ($dimensionScores as $dimensionKey => $score) {
-            // Ensure score is an integer in valid range
-            $score = (int) $score;
+        foreach ($dimensionScores as $dimensionKey => $dimensionData) {
+            // Handle both new format (array with score/suggestion) and legacy format (just score)
+            if (is_array($dimensionData)) {
+                $score = (int) ($dimensionData['score'] ?? 5);
+                $suggestion = $dimensionData['suggestion'] ?? null;
+            } else {
+                $score = (int) $dimensionData;
+                $suggestion = null;
+            }
+
+            // Ensure score is in valid range
             $score = max(1, min(10, $score));
 
             // Create blind spot record
@@ -796,9 +798,7 @@ class TrainingSessionService
                 'drill_id' => $drill->id,
                 'dimension_key' => $dimensionKey,
                 'score' => $score,
-                'scenario' => $scenario,
-                'user_response' => $userResponse,
-                'feedback' => $feedback,
+                'suggestion' => $suggestion,
                 'created_at' => now(),
             ]);
 

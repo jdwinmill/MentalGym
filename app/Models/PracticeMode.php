@@ -140,4 +140,42 @@ class PracticeMode extends Model
 
         return $this->injectUserContext($prompt, $profile);
     }
+
+    /**
+     * Get the required profile fields that are missing for a user.
+     *
+     * @return array<string> List of missing field names
+     */
+    public function getMissingRequiredFields(?UserProfile $profile): array
+    {
+        $requiredFields = $this->getRequiredContextFields();
+
+        if (empty($requiredFields)) {
+            return [];
+        }
+
+        if (! $profile) {
+            return $requiredFields;
+        }
+
+        $missing = [];
+        foreach ($requiredFields as $field) {
+            $value = $profile->getAttribute($field);
+
+            // Consider a field missing if null, empty string, or empty array
+            if ($value === null || $value === '' || (is_array($value) && empty($value))) {
+                $missing[] = $field;
+            }
+        }
+
+        return $missing;
+    }
+
+    /**
+     * Check if a user has all required profile fields filled.
+     */
+    public function hasRequiredContext(?UserProfile $profile): bool
+    {
+        return empty($this->getMissingRequiredFields($profile));
+    }
 }

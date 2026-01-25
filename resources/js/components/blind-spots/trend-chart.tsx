@@ -13,33 +13,56 @@ interface TrendChartProps {
     history: WeekData[];
 }
 
-const skillColors: Record<string, string> = {
-    clarity: '#3b82f6',      // blue
-    brevity: '#6366f1',      // indigo
-    authority: '#ef4444',    // red
-    structure: '#10b981',    // green
-    composure: '#f59e0b',    // amber
-    directness: '#8b5cf6',   // purple
-    ownership: '#ec4899',    // pink
-    authenticity: '#14b8a6', // teal
-    specificity: '#f97316',  // orange
-    solution_focus: '#06b6d4', // cyan
-    empathy: '#84cc16',      // lime
+// Colors for different skill categories
+const categoryColors: Record<string, string> = {
+    communication: '#3b82f6',  // blue
+    reasoning: '#8b5cf6',      // purple
+    resilience: '#10b981',     // green
+    influence: '#f59e0b',      // amber
+    self_awareness: '#ec4899', // pink
 };
 
-const skillLabels: Record<string, string> = {
-    clarity: 'Clarity',
-    brevity: 'Brevity',
-    authority: 'Authority',
-    structure: 'Structure',
-    composure: 'Composure',
-    directness: 'Directness',
-    ownership: 'Ownership',
-    authenticity: 'Authenticity',
-    specificity: 'Specificity',
-    solution_focus: 'Solution Focus',
-    empathy: 'Empathy',
+// Fallback colors for dimensions not matched by category
+const dimensionColors: Record<string, string> = {
+    assertiveness: '#3b82f6',
+    perspective_taking: '#6366f1',
+    active_listening: '#06b6d4',
+    clarity: '#0ea5e9',
+    diplomatic_framing: '#14b8a6',
+    logical_structure: '#8b5cf6',
+    cognitive_flexibility: '#a855f7',
+    critical_analysis: '#7c3aed',
+    assumption_identification: '#6d28d9',
+    evidence_evaluation: '#5b21b6',
+    emotional_regulation: '#10b981',
+    pressure_composure: '#059669',
+    recovery_speed: '#047857',
+    defensiveness_management: '#0d9488',
+    uncertainty_tolerance: '#0f766e',
+    stress_management: '#15803d',
+    self_confidence: '#16a34a',
+    persuasion: '#f59e0b',
+    negotiation_leverage: '#d97706',
+    stakeholder_reading: '#b45309',
+    objection_handling: '#92400e',
+    timing_awareness: '#ea580c',
+    blind_spot_recognition: '#ec4899',
+    bias_detection: '#db2777',
+    overconfidence_calibration: '#be185d',
+    emotional_triggers: '#9d174d',
+    feedback_receptivity: '#831843',
 };
+
+function getSkillColor(skill: string): string {
+    return dimensionColors[skill] || categoryColors[skill] || '#888888';
+}
+
+function formatLabel(skill: string): string {
+    return skill
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
 
 // Helper to extract available skills from history
 function getAvailableSkillsFromHistory(history: WeekData[]): string[] {
@@ -80,12 +103,15 @@ export function TrendChart({ history }: TrendChartProps) {
     const innerWidth = chartWidth - padding.left - padding.right;
     const innerHeight = chartHeight - padding.top - padding.bottom;
 
+    // Scale: scores are 1-10, map to chart height (10 at top, 1 at bottom)
     const getPoints = (skill: string) => {
         const points: { x: number; y: number; value: number }[] = [];
         chartData.forEach((week, index) => {
             if (week.data && week.data[skill] !== null) {
                 const x = padding.left + (index / (chartData.length - 1 || 1)) * innerWidth;
-                const y = padding.top + (1 - week.data[skill]!) * innerHeight;
+                // Score 10 = top (y=padding.top), Score 1 = bottom (y=padding.top + innerHeight)
+                const normalizedScore = (week.data[skill]! - 1) / 9; // 0 to 1
+                const y = padding.top + (1 - normalizedScore) * innerHeight;
                 points.push({ x, y, value: week.data[skill]! });
             }
         });
@@ -136,11 +162,11 @@ export function TrendChart({ history }: TrendChartProps) {
                             }`}
                             style={
                                 selectedSkills.includes(skill)
-                                    ? { backgroundColor: skillColors[skill] }
+                                    ? { backgroundColor: getSkillColor(skill) }
                                     : {}
                             }
                         >
-                            {skillLabels[skill] || skill}
+                            {formatLabel(skill)}
                         </button>
                     ))}
                 </div>
@@ -151,9 +177,10 @@ export function TrendChart({ history }: TrendChartProps) {
                         className="w-full"
                         style={{ minWidth: 400 }}
                     >
-                        {/* Grid lines */}
-                        {[0, 25, 50, 75, 100].map((value) => {
-                            const y = padding.top + ((100 - value) / 100) * innerHeight;
+                        {/* Grid lines - now 1-10 scale */}
+                        {[1, 4, 7, 10].map((value) => {
+                            const normalizedValue = (value - 1) / 9; // 0 to 1
+                            const y = padding.top + (1 - normalizedValue) * innerHeight;
                             return (
                                 <g key={value}>
                                     <line
@@ -171,11 +198,22 @@ export function TrendChart({ history }: TrendChartProps) {
                                         dominantBaseline="middle"
                                         className="fill-neutral-400 text-xs"
                                     >
-                                        {value}%
+                                        {value}
                                     </text>
                                 </g>
                             );
                         })}
+
+                        {/* Threshold line at 4 (blind spot threshold) */}
+                        <line
+                            x1={padding.left}
+                            y1={padding.top + (1 - (4 - 1) / 9) * innerHeight}
+                            x2={chartWidth - padding.right}
+                            y2={padding.top + (1 - (4 - 1) / 9) * innerHeight}
+                            stroke="#ef4444"
+                            strokeOpacity={0.3}
+                            strokeDasharray="4 4"
+                        />
 
                         {/* X-axis labels */}
                         {chartData.map((week, index) => {
@@ -199,6 +237,7 @@ export function TrendChart({ history }: TrendChartProps) {
                             if (points.length === 0) return null;
 
                             const path = getPath(points);
+                            const color = getSkillColor(skill);
 
                             return (
                                 <g key={skill}>
@@ -207,7 +246,7 @@ export function TrendChart({ history }: TrendChartProps) {
                                         <path
                                             d={path}
                                             fill="none"
-                                            stroke={skillColors[skill] || '#888'}
+                                            stroke={color}
                                             strokeWidth={2}
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -215,13 +254,15 @@ export function TrendChart({ history }: TrendChartProps) {
                                     )}
                                     {/* Always draw dots for data points */}
                                     {points.map((point, i) => (
-                                        <circle
-                                            key={i}
-                                            cx={point.x}
-                                            cy={point.y}
-                                            r={4}
-                                            fill={skillColors[skill] || '#888'}
-                                        />
+                                        <g key={i}>
+                                            <circle
+                                                cx={point.x}
+                                                cy={point.y}
+                                                r={4}
+                                                fill={color}
+                                            />
+                                            {/* Tooltip on hover would go here */}
+                                        </g>
                                     ))}
                                 </g>
                             );
@@ -229,9 +270,13 @@ export function TrendChart({ history }: TrendChartProps) {
                     </svg>
                 </div>
 
-                <p className="text-xs text-neutral-400 mt-2 text-center">
-                    Lower is better (failure rate %)
-                </p>
+                <div className="flex items-center justify-center gap-4 text-xs text-neutral-400 mt-2">
+                    <span>Higher is better (score 1-10)</span>
+                    <span className="flex items-center gap-1">
+                        <span className="w-4 h-0.5 bg-red-400 opacity-50" style={{ borderStyle: 'dashed', borderWidth: '1px 0 0 0' }} />
+                        Blind spot threshold (4)
+                    </span>
+                </div>
             </CardContent>
         </Card>
     );

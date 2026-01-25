@@ -2,8 +2,9 @@
 
 use App\Jobs\SendWeeklyBlindSpotEmails;
 use App\Mail\WeeklyBlindSpotReport;
+use App\Models\BlindSpot;
 use App\Models\BlindSpotEmail;
-use App\Models\DrillScore;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -20,8 +21,9 @@ function createUserWithSessions(array $userAttributes = [], int $sessionCount = 
 {
     $user = User::factory()->create($userAttributes);
     $mode = PracticeMode::factory()->create();
+    $drill = Drill::factory()->forMode($mode)->create();
 
-    $sessions = TrainingSession::factory()
+    TrainingSession::factory()
         ->count($sessionCount)
         ->completed()
         ->forUser($user)
@@ -30,14 +32,20 @@ function createUserWithSessions(array $userAttributes = [], int $sessionCount = 
             'created_at' => now()->subDays($daysAgo),
         ]);
 
-    // Add drill scores to make blind spots detectable
-    foreach ($sessions as $session) {
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($session)
-            ->withAuthorityIssues()
-            ->create();
-    }
+    // Create a dimension that we'll use for all blind spots
+    // Analysis requires at least 3 records per dimension to be counted
+    $dimension = \App\Models\SkillDimension::factory()->create();
+
+    // Add blind spots with low scores to make blind spots detectable
+    // All use the same dimension so we meet the 3+ threshold
+    BlindSpot::factory()
+        ->count($sessionCount * 3)
+        ->forUser($user)
+        ->forDrill($drill)
+        ->forDimension($dimension->key)
+        ->withLowScores()
+        ->createdAt(now()->subDays($daysAgo))
+        ->create();
 
     return $user;
 }
@@ -46,7 +54,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
     it('sends email to pro user with recent sessions', function () {
         $user = createUserWithSessions(['plan' => 'pro']);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertSent(WeeklyBlindSpotReport::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email);
@@ -58,7 +66,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
     it('sends email to unlimited user with recent sessions', function () {
         $user = createUserWithSessions(['plan' => 'unlimited']);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertSent(WeeklyBlindSpotReport::class, function ($mail) use ($user) {
             return $mail->hasTo($user->email);
@@ -68,7 +76,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
     it('does not send email to free user', function () {
         createUserWithSessions(['plan' => 'free']);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertNothingSent();
         expect(BlindSpotEmail::count())->toBe(0);
@@ -78,14 +86,14 @@ describe('SendWeeklyBlindSpotEmails job', function () {
         $user = createUserWithSessions(['plan' => 'pro']);
 
         // Send first email
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         expect(BlindSpotEmail::where('user_id', $user->id)->count())->toBe(1);
 
         Mail::fake(); // Reset mail fake
 
         // Try to send again
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         // Still only one email record
         expect(BlindSpotEmail::where('user_id', $user->id)->count())->toBe(1);
@@ -96,7 +104,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
         // Sessions from 2 weeks ago
         createUserWithSessions(['plan' => 'pro'], 6, 14);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertNothingSent();
         expect(BlindSpotEmail::count())->toBe(0);
@@ -108,7 +116,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
             'email_preferences' => ['weekly_report' => false],
         ]);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertNothingSent();
         expect(BlindSpotEmail::count())->toBe(0);
@@ -118,7 +126,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
         // Only 3 sessions (need 5 minimum)
         createUserWithSessions(['plan' => 'pro'], 3);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertNothingSent();
         expect(BlindSpotEmail::count())->toBe(0);
@@ -127,7 +135,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
     it('records email send with correct metadata', function () {
         $user = createUserWithSessions(['plan' => 'pro']);
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         $email = BlindSpotEmail::where('user_id', $user->id)->first();
 
@@ -145,7 +153,7 @@ describe('SendWeeklyBlindSpotEmails job', function () {
         $user2 = createUserWithSessions(['plan' => 'unlimited']);
         createUserWithSessions(['plan' => 'free']); // Should be skipped
 
-        SendWeeklyBlindSpotEmails::dispatch();
+        SendWeeklyBlindSpotEmails::dispatchSync();
 
         Mail::assertSent(WeeklyBlindSpotReport::class, 2);
         expect(BlindSpotEmail::count())->toBe(2);

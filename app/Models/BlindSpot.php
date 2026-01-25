@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BlindSpot extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -14,9 +17,7 @@ class BlindSpot extends Model
         'drill_id',
         'dimension_key',
         'score',
-        'scenario',
-        'user_response',
-        'feedback',
+        'suggestion',
         'created_at',
     ];
 

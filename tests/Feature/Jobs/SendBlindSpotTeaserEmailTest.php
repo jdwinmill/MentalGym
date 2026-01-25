@@ -4,8 +4,9 @@ use App\Events\SessionCompleted;
 use App\Jobs\SendBlindSpotTeaserEmail;
 use App\Listeners\CheckBlindSpotTeaserTrigger;
 use App\Mail\BlindSpotTeaserEmail;
+use App\Models\BlindSpot;
 use App\Models\BlindSpotEmail;
-use App\Models\DrillScore;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -23,6 +24,7 @@ function createFreeUserWithSessions(int $sessionCount = 5, bool $withBlindSpots 
 {
     $user = User::factory()->create(array_merge(['plan' => 'free'], $userAttributes));
     $mode = PracticeMode::factory()->create();
+    $drill = Drill::factory()->forMode($mode)->create();
 
     $sessions = TrainingSession::factory()
         ->count($sessionCount)
@@ -32,21 +34,21 @@ function createFreeUserWithSessions(int $sessionCount = 5, bool $withBlindSpots 
         ->create();
 
     if ($withBlindSpots) {
-        foreach ($sessions as $session) {
-            DrillScore::factory()
-                ->count(2)
-                ->forSession($session)
-                ->withAuthorityIssues()
-                ->create();
-        }
+        // Create low-scoring blind spots (scores <= 4 are considered blind spots)
+        BlindSpot::factory()
+            ->count($sessionCount * 3)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
+            ->create();
     } else {
-        foreach ($sessions as $session) {
-            DrillScore::factory()
-                ->count(2)
-                ->forSession($session)
-                ->withGoodScores()
-                ->create();
-        }
+        // Create good scores (no blind spots)
+        BlindSpot::factory()
+            ->count($sessionCount * 3)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withGoodScores()
+            ->create();
     }
 
     return $user;
@@ -56,6 +58,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
     it('triggers teaser email at exactly 5 sessions for free user', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         // Create 4 completed sessions - no email should trigger
         $sessions = TrainingSession::factory()
@@ -65,13 +68,12 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
             ->forMode($mode)
             ->create();
 
-        foreach ($sessions as $session) {
-            DrillScore::factory()
-                ->count(2)
-                ->forSession($session)
-                ->withAuthorityIssues()
-                ->create();
-        }
+        BlindSpot::factory()
+            ->count(12)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
+            ->create();
 
         // Create 5th session (not completed yet)
         $fifthSession = TrainingSession::factory()
@@ -79,10 +81,11 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
             ->forMode($mode)
             ->create(['status' => TrainingSession::STATUS_ACTIVE]);
 
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($fifthSession)
-            ->withAuthorityIssues()
+        BlindSpot::factory()
+            ->count(3)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
             ->create();
 
         // Complete it
@@ -123,6 +126,7 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
     it('does not trigger for pro user', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         $sessions = TrainingSession::factory()
             ->count(5)
@@ -131,13 +135,12 @@ describe('CheckBlindSpotTeaserTrigger listener', function () {
             ->forMode($mode)
             ->create();
 
-        foreach ($sessions as $session) {
-            DrillScore::factory()
-                ->count(2)
-                ->forSession($session)
-                ->withAuthorityIssues()
-                ->create();
-        }
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
+            ->create();
 
         $listener = new CheckBlindSpotTeaserTrigger;
         $listener->handle(new SessionCompleted($user, $sessions->last()));
@@ -179,6 +182,7 @@ describe('SendBlindSpotTeaserEmail job', function () {
     it('does not send to pro user', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         $sessions = TrainingSession::factory()
             ->count(5)
@@ -187,13 +191,12 @@ describe('SendBlindSpotTeaserEmail job', function () {
             ->forMode($mode)
             ->create();
 
-        foreach ($sessions as $session) {
-            DrillScore::factory()
-                ->count(2)
-                ->forSession($session)
-                ->withAuthorityIssues()
-                ->create();
-        }
+        BlindSpot::factory()
+            ->count(15)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
+            ->create();
 
         SendBlindSpotTeaserEmail::dispatch($user);
 

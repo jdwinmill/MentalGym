@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Mail\BlindSpotTeaserEmail;
 use App\Models\BlindSpotEmail;
 use App\Models\User;
-use App\Services\BlindSpotAnalyzer;
+use App\Services\BlindSpotService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,7 +22,7 @@ class SendBlindSpotTeaserEmail implements ShouldQueue
         public User $user
     ) {}
 
-    public function handle(BlindSpotAnalyzer $analyzer): void
+    public function handle(BlindSpotService $service): void
     {
         // Double-check eligibility (in case of race conditions)
         if (! $this->isEligible()) {
@@ -34,7 +34,7 @@ class SendBlindSpotTeaserEmail implements ShouldQueue
         }
 
         // Run analysis
-        $analysis = $analyzer->analyze($this->user);
+        $analysis = $service->analyze($this->user);
 
         // Only send if there are actual blind spots
         if (! $analysis->hasBlindSpots()) {

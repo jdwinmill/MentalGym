@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\DrillScore;
+use App\Models\BlindSpot;
+use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\TrainingSession;
 use App\Models\User;
@@ -13,8 +14,9 @@ function createUserWithSessionsAndScores(array $userAttributes = [], int $sessio
 {
     $user = User::factory()->create($userAttributes);
     $mode = PracticeMode::factory()->create();
+    $drill = Drill::factory()->forMode($mode)->create();
 
-    $sessions = TrainingSession::factory()
+    TrainingSession::factory()
         ->count($sessionCount)
         ->completed()
         ->forUser($user)
@@ -23,13 +25,13 @@ function createUserWithSessionsAndScores(array $userAttributes = [], int $sessio
             'created_at' => now()->subDays($daysAgo),
         ]);
 
-    foreach ($sessions as $session) {
-        DrillScore::factory()
-            ->count(2)
-            ->forSession($session)
-            ->withAuthorityIssues()
-            ->create();
-    }
+    BlindSpot::factory()
+        ->count($sessionCount * 3)
+        ->forUser($user)
+        ->forDrill($drill)
+        ->withLowScores()
+        ->createdAt(now()->subDays($daysAgo))
+        ->create();
 
     return $user;
 }
@@ -126,13 +128,14 @@ describe('GET /blind-spots', function () {
 });
 
 describe('BlindSpotService historical trends', function () {
-    it('calculates weekly failure rates', function () {
+    it('calculates weekly scores', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         // Create sessions across multiple weeks
         for ($week = 0; $week < 3; $week++) {
-            $session = TrainingSession::factory()
+            TrainingSession::factory()
                 ->completed()
                 ->forUser($user)
                 ->forMode($mode)
@@ -140,13 +143,13 @@ describe('BlindSpotService historical trends', function () {
                     'created_at' => now()->subWeeks($week),
                 ]);
 
-            DrillScore::factory()
+            BlindSpot::factory()
                 ->count(5)
-                ->forSession($session)
-                ->withAuthorityIssues()
-                ->create([
-                    'created_at' => now()->subWeeks($week),
-                ]);
+                ->forUser($user)
+                ->forDrill($drill)
+                ->withLowScores()
+                ->createdAt(now()->subWeeks($week))
+                ->create();
         }
 
         $service = app(\App\Services\BlindSpotService::class);

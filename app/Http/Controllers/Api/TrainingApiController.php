@@ -116,6 +116,114 @@ class TrainingApiController extends Controller
     // =========================================================================
 
     /**
+     * Check if user has required profile context for a practice mode.
+     * GET /api/training/v2/check-context/{mode_slug}
+     */
+    public function checkRequiredContext(Request $request, string $modeSlug): JsonResponse
+    {
+        $mode = PracticeMode::where('slug', $modeSlug)->firstOrFail();
+        $user = $request->user();
+        $user->loadMissing('profile');
+
+        $missingFields = $mode->getMissingRequiredFields($user->profile);
+
+        if (empty($missingFields)) {
+            return response()->json([
+                'success' => true,
+                'has_required_context' => true,
+                'missing_fields' => [],
+            ]);
+        }
+
+        // Get field metadata for the frontend
+        $fieldConfig = config('profile.context_fields_meta', []);
+        $missingFieldsMeta = [];
+
+        foreach ($missingFields as $field) {
+            $meta = $fieldConfig[$field] ?? [
+                'label' => ucwords(str_replace('_', ' ', $field)),
+                'type' => 'text',
+            ];
+            $meta['key'] = $field;
+
+            // Add options for select fields
+            $optionsKey = match ($field) {
+                'company_size' => 'company_sizes',
+                'career_level' => 'career_levels',
+                'team_composition' => 'team_compositions',
+                'collaboration_style' => 'collaboration_styles',
+                'cross_functional_teams' => 'cross_functional_options',
+                'improvement_areas' => 'improvement_areas',
+                'upcoming_challenges' => 'challenges',
+                default => null,
+            };
+
+            if ($optionsKey) {
+                $meta['options'] = config("profile.{$optionsKey}", []);
+            }
+
+            $missingFieldsMeta[] = $meta;
+        }
+
+        return response()->json([
+            'success' => true,
+            'has_required_context' => false,
+            'missing_fields' => $missingFieldsMeta,
+        ]);
+    }
+
+    /**
+     * Update specific profile fields (for required context modal).
+     * PATCH /api/training/v2/update-profile
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Define allowed profile fields
+        $allowedFields = [
+            'birth_year',
+            'gender',
+            'zip_code',
+            'job_title',
+            'industry',
+            'company_size',
+            'career_level',
+            'years_in_role',
+            'years_experience',
+            'manages_people',
+            'direct_reports',
+            'reports_to_role',
+            'team_composition',
+            'collaboration_style',
+            'cross_functional_teams',
+            'communication_tools',
+            'improvement_areas',
+            'upcoming_challenges',
+        ];
+
+        // Only validate and accept allowed fields
+        $data = $request->only($allowedFields);
+
+        if (empty($data)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No valid profile fields provided.',
+            ], 422);
+        }
+
+        // Get or create profile
+        $profile = $user->getOrCreateProfile();
+        $profile->fill($data);
+        $profile->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully.',
+        ]);
+    }
+
+    /**
      * Start a new drill-based session.
      * POST /api/training/v2/start/{mode_slug}
      */
