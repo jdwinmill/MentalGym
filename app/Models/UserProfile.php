@@ -89,8 +89,12 @@ class UserProfile extends Model
             return implode(', ', $value);
         }
 
-        // Handle booleans
+        // Handle booleans with contextual phrasing
         if (is_bool($value)) {
+            if ($field === 'manages_people') {
+                return $value ? ' who manages people' : '';
+            }
+
             return $value ? 'yes' : 'no';
         }
 

@@ -36,6 +36,11 @@ class SkillDimension extends Model
         return $this->hasMany(BlindSpot::class, 'dimension_key', 'key');
     }
 
+    public function userProgress(): HasMany
+    {
+        return $this->hasMany(UserSkillDimensionProgress::class, 'dimension_key', 'key');
+    }
+
     // ─────────────────────────────────────────────────────────────
     // Scopes
     // ─────────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\SessionCompleted;
 use App\Jobs\ScoreDrillResponse;
+use App\Models\BlindSpot;
 use App\Models\DailyUsage;
 use App\Models\Drill;
 use App\Models\PracticeMode;
@@ -11,6 +12,7 @@ use App\Models\SessionMessage;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Models\UserModeProgress;
+use App\Models\UserSkillDimensionProgress;
 use App\Models\UserStreak;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
@@ -620,12 +622,24 @@ class TrainingSessionService
             $session
         );
 
+        // Save dimension-level scores to blind_spots and user_skill_dimension_progress
+        $dimensionScores = $feedbackData['dimension_scores'] ?? [];
+        $this->recordDimensionScores(
+            $user,
+            $drill,
+            $dimensionScores,
+            $session->current_scenario,
+            $response,
+            $feedbackData['feedback']
+        );
+
         // Append score to drill_scores
         $scores = $session->drill_scores ?? [];
         $scores[] = [
             'drill_id' => $drill->id,
             'drill_name' => $drill->name,
             'score' => $feedbackData['score'],
+            'dimension_scores' => $dimensionScores,
         ];
 
         $session->update([
@@ -644,6 +658,7 @@ class TrainingSessionService
                 'type' => 'feedback',
                 'content' => $feedbackData['feedback'],
                 'score' => $feedbackData['score'],
+                'dimension_scores' => $dimensionScores,
             ],
         ];
     }
@@ -755,5 +770,48 @@ class TrainingSessionService
                 'scores' => $scores,
             ],
         ];
+    }
+
+    /**
+     * Record dimension scores to blind_spots and update user_skill_dimension_progress.
+     *
+     * @param  array<string, int>  $dimensionScores  dimension_key => score (1-10)
+     */
+    private function recordDimensionScores(
+        User $user,
+        Drill $drill,
+        array $dimensionScores,
+        string $scenario,
+        string $userResponse,
+        string $feedback
+    ): void {
+        foreach ($dimensionScores as $dimensionKey => $score) {
+            // Ensure score is an integer in valid range
+            $score = (int) $score;
+            $score = max(1, min(10, $score));
+
+            // Create blind spot record
+            BlindSpot::create([
+                'user_id' => $user->id,
+                'drill_id' => $drill->id,
+                'dimension_key' => $dimensionKey,
+                'score' => $score,
+                'scenario' => $scenario,
+                'user_response' => $userResponse,
+                'feedback' => $feedback,
+                'created_at' => now(),
+            ]);
+
+            // Update user skill dimension progress
+            $progress = UserSkillDimensionProgress::getOrCreate(
+                $user->id,
+                $drill->id,
+                $dimensionKey
+            );
+
+            // Update level based on new score
+            // Simple approach: set level to the score (scores are 1-10, levels are 1-10)
+            $progress->setLevel($score);
+        }
     }
 }

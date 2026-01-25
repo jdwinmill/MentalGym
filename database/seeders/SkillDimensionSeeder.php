@@ -195,6 +195,30 @@ class SkillDimensionSeeder extends Seeder
                     'exemplary' => 'Embraces uncertainty as opportunity; makes sound judgments in fog of ambiguity',
                 ],
             ],
+            [
+                'key' => 'stress_management',
+                'label' => 'Stress Management',
+                'description' => 'Effectively managing stress levels to maintain performance and well-being during challenging periods.',
+                'category' => 'resilience',
+                'score_anchors' => [
+                    'low' => 'Stress significantly impairs functioning; lacks coping strategies',
+                    'mid' => 'Manages routine stress but struggles with intense or prolonged pressure',
+                    'high' => 'Maintains effectiveness under stress; employs healthy coping mechanisms',
+                    'exemplary' => 'Transforms stress into productive energy; models healthy stress management for others',
+                ],
+            ],
+            [
+                'key' => 'self_confidence',
+                'label' => 'Self-Confidence',
+                'description' => 'Trusting in one\'s abilities and judgment while remaining open to feedback and growth.',
+                'category' => 'resilience',
+                'score_anchors' => [
+                    'low' => 'Excessive self-doubt; seeks constant validation; avoids taking stands',
+                    'mid' => 'Generally confident but shaken by criticism or setbacks',
+                    'high' => 'Secure in abilities; takes appropriate risks; handles criticism constructively',
+                    'exemplary' => 'Grounded confidence that inspires others; admits limitations without losing credibility',
+                ],
+            ],
 
             // Influence
             [

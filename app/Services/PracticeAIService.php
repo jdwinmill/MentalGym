@@ -721,6 +721,13 @@ PROMPT;
         $profileContext = $user->getProfileContext();
         $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
 
+        // Get dimensions for this drill and build scoring guide
+        $dimensions = $drill->dimensions ?? [];
+        $scoringGuide = $this->buildDimensionScoringGuide($dimensions);
+        $dimensionScoresExample = ! empty($dimensions)
+            ? collect($dimensions)->mapWithKeys(fn ($d) => [$d => '1-10'])->toJson()
+            : '{"overall_performance": "1-10"}';
+
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT
 {$profileSection}
@@ -734,10 +741,13 @@ USER SELECTED OPTION INDEX: {$userResponse}
 
 Evaluate this response. If correct, explain why. If incorrect, explain the correct answer.
 
+{$scoringGuide}
+
 Respond with valid JSON only (no markdown, no code blocks):
 {
     "feedback": "...",
-    "score": 0-100
+    "score": 0-100,
+    "dimension_scores": {$dimensionScoresExample}
 }
 PROMPT;
         }
@@ -755,12 +765,44 @@ USER RESPONSE:
 
 Evaluate this response according to the drill criteria.
 
+{$scoringGuide}
+
 Respond with valid JSON only (no markdown, no code blocks):
 {
     "feedback": "...",
-    "score": 0-100
+    "score": 0-100,
+    "dimension_scores": {$dimensionScoresExample}
 }
 PROMPT;
+    }
+
+    /**
+     * Build the dimension scoring guide from skill_dimensions table.
+     */
+    private function buildDimensionScoringGuide(array $dimensionKeys): string
+    {
+        if (empty($dimensionKeys)) {
+            return 'Score overall_performance on a 1-10 scale.';
+        }
+
+        $dimensions = \App\Models\SkillDimension::whereIn('key', $dimensionKeys)->get();
+
+        if ($dimensions->isEmpty()) {
+            return 'Score the following dimensions on a 1-10 scale: '.implode(', ', $dimensionKeys);
+        }
+
+        $guide = "DIMENSION SCORING GUIDE (1-10 scale):\n";
+
+        foreach ($dimensions as $dimension) {
+            $anchors = $dimension->score_anchors;
+            $guide .= "\n{$dimension->label} ({$dimension->key}):\n";
+            $guide .= "  1-3 (Low): {$anchors['low']}\n";
+            $guide .= "  4-5 (Mid): {$anchors['mid']}\n";
+            $guide .= "  6-8 (High): {$anchors['high']}\n";
+            $guide .= "  9-10 (Exemplary): {$anchors['exemplary']}\n";
+        }
+
+        return $guide;
     }
 
     /**
@@ -790,6 +832,7 @@ PROMPT;
         return [
             'feedback' => $data['feedback'] ?? '',
             'score' => (int) ($data['score'] ?? 0),
+            'dimension_scores' => $data['dimension_scores'] ?? [],
         ];
     }
 

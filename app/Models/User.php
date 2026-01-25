@@ -180,6 +180,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(UserModeProgress::class);
     }
 
+    public function skillDimensionProgress(): HasMany
+    {
+        return $this->hasMany(UserSkillDimensionProgress::class);
+    }
+
     public function streak(): HasOne
     {
         return $this->hasOne(UserStreak::class);

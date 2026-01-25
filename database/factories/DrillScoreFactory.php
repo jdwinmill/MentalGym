@@ -96,10 +96,12 @@ class DrillScoreFactory extends Factory
     public function withClarityIssues(): static
     {
         return $this->state(function (array $attributes) {
-            $scores = $attributes['scores'] ?? [];
-            $scores['core_point_captured'] = false;
-            $scores['jargon_removed'] = false;
-            $scores['clarity'] = false;
+            // Only include clarity-related scores, no authority criteria
+            $scores = [
+                'core_point_captured' => false,
+                'jargon_removed' => false,
+                'clarity' => false,
+            ];
 
             return [
                 'scores' => $scores,

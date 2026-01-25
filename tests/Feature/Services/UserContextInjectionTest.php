@@ -14,7 +14,7 @@ describe('PracticeMode user context injection', function () {
         $this->mode = PracticeMode::factory()->create([
             'slug' => 'test-mode',
             'name' => 'Test Mode',
-            'instruction_set' => 'You are coaching a {{career_level}} professional who works as a {{job_title}}. They {{manages_people}}.',
+            'instruction_set' => 'You are coaching a {{career_level}} {{job_title}}{{manages_people}}.',
         ]);
 
         // Add required context fields
@@ -43,7 +43,7 @@ describe('PracticeMode user context injection', function () {
 
         expect($result)->toContain('Senior')
             ->and($result)->toContain('Product Manager')
-            ->and($result)->toContain('yes')
+            ->and($result)->toContain('who manages people')
             ->and($result)->not->toContain('{{career_level}}')
             ->and($result)->not->toContain('{{job_title}}')
             ->and($result)->not->toContain('{{manages_people}}');
@@ -109,12 +109,12 @@ describe('UserProfile getContextValue', function () {
         expect($profile->getContextValue('company_size'))->toBe('Enterprise (500+)');
     });
 
-    it('returns yes/no for boolean fields', function () {
+    it('returns contextual phrasing for manages_people boolean', function () {
         $profile = new UserProfile(['manages_people' => true]);
-        expect($profile->getContextValue('manages_people'))->toBe('yes');
+        expect($profile->getContextValue('manages_people'))->toBe(' who manages people');
 
         $profile = new UserProfile(['manages_people' => false]);
-        expect($profile->getContextValue('manages_people'))->toBe('no');
+        expect($profile->getContextValue('manages_people'))->toBe('');
     });
 
     it('returns comma-separated list for array fields', function () {
