@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { CreditCard, Users, Dumbbell, Tags, Activity, Eye, MessageCircle, Lightbulb, BookOpen, LogIn } from 'lucide-react';
+import { CreditCard, Users, Dumbbell, Tags, Activity, Eye, MessageCircle, Lightbulb, BookOpen, LogIn, Ruler } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -110,6 +110,17 @@ export function AppSidebar() {
                                     <a href="/admin/insights">
                                         <BookOpen />
                                         <span>Insights</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    tooltip={{ children: 'Skill Dimensions' }}
+                                >
+                                    <a href="/admin/skill-dimensions">
+                                        <Ruler />
+                                        <span>Skill Dimensions</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

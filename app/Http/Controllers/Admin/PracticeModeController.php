@@ -128,6 +128,7 @@ class PracticeModeController extends Controller
                     'scenario_instruction_set' => $drill->scenario_instruction_set,
                     'evaluation_instruction_set' => $drill->evaluation_instruction_set,
                     'primary_insight_id' => $drill->insights->where('pivot.is_primary', true)->first()?->id,
+                    'dimensions' => $drill->dimensions ?? [],
                 ]),
             ],
             'tagsByCategory' => Tag::ordered()->get()->groupBy('category'),
@@ -213,6 +214,8 @@ class PracticeModeController extends Controller
             'drills.*.scenario_instruction_set' => ['required', 'string'],
             'drills.*.evaluation_instruction_set' => ['required', 'string'],
             'drills.*.primary_insight_id' => ['nullable', 'integer', 'exists:insights,id'],
+            'drills.*.dimensions' => ['nullable', 'array'],
+            'drills.*.dimensions.*' => ['string', 'exists:skill_dimensions,key,active,1'],
         ];
     }
 
@@ -261,6 +264,7 @@ class PracticeModeController extends Controller
                         'input_type' => $drillData['input_type'],
                         'scenario_instruction_set' => $drillData['scenario_instruction_set'],
                         'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
+                        'dimensions' => $drillData['dimensions'] ?? [],
                     ]);
                     $submittedDrillIds[] = $drill->id;
 
@@ -277,6 +281,7 @@ class PracticeModeController extends Controller
                     'input_type' => $drillData['input_type'],
                     'scenario_instruction_set' => $drillData['scenario_instruction_set'],
                     'evaluation_instruction_set' => $drillData['evaluation_instruction_set'],
+                    'dimensions' => $drillData['dimensions'] ?? [],
                 ]);
                 $submittedDrillIds[] = $drill->id;
 

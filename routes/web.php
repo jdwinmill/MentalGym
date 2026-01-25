@@ -7,9 +7,11 @@ use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeController;
 use App\Http\Controllers\Admin\PrincipleController as AdminPrincipleController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\Admin\SkillDimensionController as AdminSkillDimensionController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\BlindSpotController;
+use App\Http\Controllers\Api\SkillDimensionController as ApiSkillDimensionController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\PrinciplesApiController;
 use App\Http\Controllers\Api\TrainingApiController;
@@ -79,6 +81,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('api/principles', [PrinciplesApiController::class, 'index'])->name('api.principles.index');
     Route::get('api/insights/{slug}', [PrinciplesApiController::class, 'showInsight'])->name('api.insights.show');
 
+    // Skill Dimensions API
+    Route::get('api/skill-dimensions', [ApiSkillDimensionController::class, 'index'])->name('api.skill-dimensions.index');
+
     // Blind Spots Dashboard
     Route::get('blind-spots', [BlindSpotDashboardController::class, 'index'])->name('blind-spots.index');
 });
@@ -110,6 +115,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Principles & Insights management
     Route::resource('principles', AdminPrincipleController::class)->except(['show']);
     Route::resource('insights', AdminInsightController::class)->except(['show']);
+
+    // Skill Dimensions management
+    Route::resource('skill-dimensions', AdminSkillDimensionController::class)->except(['show']);
 
     // API Metrics
     Route::get('api-metrics', [AdminApiMetricsController::class, 'index'])->name('api-metrics.index');

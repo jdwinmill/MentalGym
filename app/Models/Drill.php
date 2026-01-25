@@ -20,10 +20,12 @@ class Drill extends Model
         'timer_seconds',
         'input_type',
         'config',
+        'dimensions',
     ];
 
     protected $casts = [
         'config' => 'array',
+        'dimensions' => 'array',
         'timer_seconds' => 'integer',
         'position' => 'integer',
     ];

@@ -549,7 +549,7 @@ class PracticeAIService
         $model = $mode->config['model'] ?? 'claude-sonnet-4-20250514';
         $startTime = microtime(true);
 
-        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->scenario_instruction_set);
+        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->scenario_instruction_set, $user);
         $userPrompt = $this->buildGeneratePrompt($drill, $user);
 
         try {
@@ -598,7 +598,7 @@ class PracticeAIService
         $model = $mode->config['model'] ?? 'claude-sonnet-4-20250514';
         $startTime = microtime(true);
 
-        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->evaluation_instruction_set);
+        $systemPrompt = $this->buildDrillSystemPrompt($mode, $drill->evaluation_instruction_set, $user);
         $userPrompt = $this->buildEvaluatePrompt($scenario, $task, $userResponse, $drill, $user);
 
         try {
@@ -633,10 +633,26 @@ class PracticeAIService
 
     /**
      * Build system prompt from hierarchy: Global + Mode + Drill instruction
+     * Injects user context into placeholders like {{career_level}}, {{job_title}}, etc.
      */
-    private function buildDrillSystemPrompt(PracticeMode $mode, string $drillInstruction): string
+    private function buildDrillSystemPrompt(PracticeMode $mode, string $drillInstruction, User $user): string
     {
         $global = config('mentalgym.main_instruction_set');
+
+        // Get user's level for this mode
+        $progress = $user->modeProgress()->where('practice_mode_id', $mode->id)->first();
+        $level = $progress?->current_level ?? 1;
+
+        // Load user profile for context injection
+        $user->loadMissing('profile');
+        $profile = $user->profile;
+
+        // Inject level and user context into mode instruction set
+        $modeInstructionSet = $mode->getInstructionSetWithContext($level, $profile);
+
+        // Also inject user context into drill instruction set
+        $drillInstructionSet = $mode->injectUserContext($drillInstruction, $profile);
+        $drillInstructionSet = str_replace('{{level}}', (string) $level, $drillInstructionSet);
 
         return <<<PROMPT
 {$global}
@@ -644,12 +660,12 @@ class PracticeAIService
 ---
 
 MODE: {$mode->name}
-{$mode->instruction_set}
+{$modeInstructionSet}
 
 ---
 
 DRILL INSTRUCTIONS:
-{$drillInstruction}
+{$drillInstructionSet}
 PROMPT;
     }
 

@@ -15,10 +15,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             QuestionSeeder::class,
-            PlansAndCapabilitiesSeeder::class,
             TagSeeder::class,
             PrincipleSeeder::class,
             InsightSeeder::class,
+            SkillDimensionSeeder::class,
+            PracticeModeSeeder::class,
         ]);
 
         User::factory()->create([

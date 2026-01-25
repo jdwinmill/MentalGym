@@ -24,6 +24,15 @@ return new class extends Migration
         Schema::dropIfExists('lesson_content_blocks');
         Schema::dropIfExists('lesson_questions');
         Schema::dropIfExists('lessons');
+
+        // Drop plan_id foreign key from users before dropping plans table
+        if (Schema::hasColumn('users', 'plan_id')) {
+            Schema::table('users', function ($table) {
+                $table->dropForeign(['plan_id']);
+                $table->dropColumn(['plan_id', 'plan_started_at', 'plan_expires_at', 'subscription_status']);
+            });
+        }
+
         Schema::dropIfExists('plans');
         Schema::dropIfExists('practice_mode_tag');
         Schema::dropIfExists('question_tag');

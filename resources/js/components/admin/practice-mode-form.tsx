@@ -21,6 +21,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import DimensionSelect from '@/components/admin/dimension-select';
 
 interface PracticeModeConfig {
     input_character_limit: number;
@@ -39,6 +40,7 @@ interface DrillData {
     scenario_instruction_set: string;
     evaluation_instruction_set: string;
     primary_insight_id: number | null;
+    dimensions: string[];
 }
 
 interface InsightOption {
@@ -109,6 +111,7 @@ const defaultDrill: DrillData = {
     scenario_instruction_set: '',
     evaluation_instruction_set: '',
     primary_insight_id: null,
+    dimensions: [],
 };
 
 export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory = {}, selectedTags = [], insightsByPrinciple = [], contextFields = {}, selectedContext = [] }: Props) {
@@ -198,7 +201,7 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
         form.setData('drills', newDrills);
     };
 
-    const updateDrill = (index: number, field: keyof DrillData, value: string | number | null) => {
+    const updateDrill = (index: number, field: keyof DrillData, value: string | number | string[] | null) => {
         const newDrills = [...form.data.drills];
         newDrills[index] = { ...newDrills[index], [field]: value };
         form.setData('drills', newDrills);
@@ -490,6 +493,17 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                                                         </p>
                                                     </div>
                                                 )}
+
+                                                <div className="space-y-2">
+                                                    <Label>Skill Dimensions</Label>
+                                                    <DimensionSelect
+                                                        value={drill.dimensions || []}
+                                                        onChange={(dims) => updateDrill(index, 'dimensions', dims)}
+                                                    />
+                                                    <p className="text-xs text-neutral-500">
+                                                        Select which skill dimensions this drill evaluates
+                                                    </p>
+                                                </div>
 
                                                 <div className="space-y-2">
                                                     <Label>Scenario Instruction Set *</Label>
