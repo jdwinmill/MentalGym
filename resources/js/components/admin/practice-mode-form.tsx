@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { HighlightedTextarea } from '@/components/ui/highlighted-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
@@ -335,13 +336,15 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Textarea
+                    <HighlightedTextarea
                         id="instruction_set"
                         value={form.data.instruction_set}
                         onChange={(e) => form.setData('instruction_set', e.target.value)}
                         placeholder="You are a decision-making coach running a focused training session..."
                         rows={10}
                         className="font-mono text-sm"
+                        validContextFields={form.data.required_context}
+                        includeLevelPlaceholder={true}
                     />
                     {form.errors.instruction_set && (
                         <p className="text-sm text-red-500 mt-2">{form.errors.instruction_set}</p>
@@ -490,12 +493,14 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
 
                                                 <div className="space-y-2">
                                                     <Label>Scenario Instruction Set *</Label>
-                                                    <Textarea
+                                                    <HighlightedTextarea
                                                         value={drill.scenario_instruction_set}
                                                         onChange={(e) => updateDrill(index, 'scenario_instruction_set', e.target.value)}
                                                         placeholder="Instructions for generating the scenario and task..."
                                                         rows={8}
                                                         className="font-mono text-sm"
+                                                        validContextFields={form.data.required_context}
+                                                        includeLevelPlaceholder={true}
                                                     />
                                                     <p className="text-xs text-neutral-500">
                                                         Instructions for generating the drill scenario. Should output JSON with "scenario" and "task" fields.
@@ -504,12 +509,14 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
 
                                                 <div className="space-y-2">
                                                     <Label>Evaluation Instruction Set *</Label>
-                                                    <Textarea
+                                                    <HighlightedTextarea
                                                         value={drill.evaluation_instruction_set}
                                                         onChange={(e) => updateDrill(index, 'evaluation_instruction_set', e.target.value)}
                                                         placeholder="Instructions for evaluating the user's response..."
                                                         rows={8}
                                                         className="font-mono text-sm"
+                                                        validContextFields={form.data.required_context}
+                                                        includeLevelPlaceholder={true}
                                                     />
                                                     <p className="text-xs text-neutral-500">
                                                         Instructions for evaluating the response. Should output JSON with "feedback" and "score" fields.
