@@ -147,14 +147,27 @@ export default function TrainPage({ mode }: TrainPageProps) {
 
     // Handle context form submission
     const handleContextSubmit = async (data: Record<string, unknown>) => {
+        const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
+        if (!csrfToken) {
+            throw new Error('Session expired. Please refresh the page.');
+        }
+
         const response = await fetch('/api/training/v2/update-profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(data),
         });
+
+        if (!response.ok) {
+            if (response.status === 419) {
+                throw new Error('Session expired. Please refresh the page.');
+            }
+            throw new Error('Something went wrong. Please try again.');
+        }
 
         const result = await response.json();
 
