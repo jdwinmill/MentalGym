@@ -11,14 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('practice_mode_required_context', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('practice_mode_id')->constrained()->cascadeOnDelete();
-            $table->string('profile_field', 50);
-            $table->timestamps();
+        if (! Schema::hasTable('practice_mode_required_context')) {
+            Schema::create('practice_mode_required_context', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('practice_mode_id')->constrained()->cascadeOnDelete();
+                $table->string('profile_field', 50);
+                $table->timestamps();
 
-            $table->unique(['practice_mode_id', 'profile_field'], 'pm_required_context_unique');
-        });
+                $table->unique(['practice_mode_id', 'profile_field'], 'pm_required_context_unique');
+            });
+        } else {
+            // Table exists but index might be missing (from failed previous migration)
+            // Try to add the index, ignore if it already exists
+            try {
+                Schema::table('practice_mode_required_context', function (Blueprint $table) {
+                    $table->unique(['practice_mode_id', 'profile_field'], 'pm_required_context_unique');
+                });
+            } catch (\Exception $e) {
+                // Index already exists, ignore
+            }
+        }
     }
 
     /**
