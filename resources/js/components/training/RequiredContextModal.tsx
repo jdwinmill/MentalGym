@@ -68,7 +68,8 @@ export function RequiredContextModal({
         try {
             await onSubmit(formData);
         } catch (err) {
-            setError('Failed to save. Please try again.');
+            const message = err instanceof Error ? err.message : 'Failed to save. Please try again.';
+            setError(message);
             console.error('Submit error:', err);
         } finally {
             setIsSubmitting(false);
