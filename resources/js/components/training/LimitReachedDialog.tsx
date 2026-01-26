@@ -36,8 +36,8 @@ export function LimitReachedDialog({ isOpen, plan, onClose }: LimitReachedDialog
                     <DialogDescription className="text-center">
                         {isFree ? (
                             <>
-                                You've hit your daily limit on the free plan.
-                                Upgrade to Pro for 10x more practice each day and unlock all features.
+                                You've used all 10 free drills for this month.
+                                Upgrade to Pro for unlimited practice and unlock all features.
                             </>
                         ) : (
                             <>

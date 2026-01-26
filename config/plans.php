@@ -2,7 +2,7 @@
 
 return [
     'free' => [
-        'daily_exchanges' => 5,
+        'monthly_drills' => 10,
         'max_level' => 2,
     ],
     'pro' => [

@@ -94,7 +94,7 @@ class TrainingSessionService
             if (! Gate::forUser($user)->allows('can-train')) {
                 return [
                     'error' => 'limit_reached',
-                    'message' => "You've reached your daily exchange limit.",
+                    'message' => "You've reached your exchange limit.",
                 ];
             }
 
@@ -458,7 +458,7 @@ class TrainingSessionService
             throw new AuthorizationException('Cannot start training in this mode.');
         }
 
-        // Check daily limit
+        // Check usage limit
         if (! Gate::forUser($user)->allows('can-train')) {
             return [
                 'error' => 'limit_reached',
@@ -595,7 +595,7 @@ class TrainingSessionService
      */
     public function submitDrillResponse(TrainingSession $session, string $response, User $user): array
     {
-        // Check daily limit before processing response
+        // Check usage limit before processing response
         if (! Gate::forUser($user)->allows('can-train')) {
             return [
                 'error' => 'limit_reached',
@@ -668,7 +668,7 @@ class TrainingSessionService
         $nextIndex = $session->drill_index + 1;
         $totalDrills = $session->practiceMode->drills()->count();
 
-        // Check daily limit before starting next drill (unless completing session)
+        // Check usage limit before starting next drill (unless completing session)
         if ($nextIndex < $totalDrills && ! Gate::forUser($user)->allows('can-train')) {
             return [
                 'error' => 'limit_reached',

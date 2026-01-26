@@ -69,12 +69,21 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerGates(): void
     {
-        // User has exchanges remaining today
+        // User has exchanges remaining (monthly for free, daily for pro)
         Gate::define('can-train', function (User $user) {
-            $usage = DailyUsage::forUserToday($user);
-            $limit = $user->planConfig()['daily_exchanges'];
+            $planConfig = $user->planConfig();
 
-            return $usage->exchange_count < $limit;
+            // Free users have monthly limits
+            if (isset($planConfig['monthly_drills'])) {
+                $monthlyUsage = DailyUsage::monthlyExchangeCount($user);
+
+                return $monthlyUsage < $planConfig['monthly_drills'];
+            }
+
+            // Pro users have daily limits
+            $usage = DailyUsage::forUserToday($user);
+
+            return $usage->exchange_count < $planConfig['daily_exchanges'];
         });
 
         // User can train AND their current level in the mode doesn't exceed plan's max level

@@ -25,7 +25,8 @@ class PlanController extends Controller
             return [
                 'key' => $key,
                 'name' => ucfirst($key),
-                'daily_exchanges' => $config['daily_exchanges'],
+                'monthly_drills' => $config['monthly_drills'] ?? null,
+                'daily_exchanges' => $config['daily_exchanges'] ?? null,
                 'max_level' => $config['max_level'],
                 'user_count' => $userCounts[$key] ?? 0,
             ];

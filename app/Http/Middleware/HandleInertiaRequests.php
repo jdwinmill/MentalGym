@@ -71,10 +71,32 @@ class HandleInertiaRequests extends Middleware
         }
 
         $planConfig = $user->planConfig();
-        $usage = DailyUsage::forUserToday($user);
-        $exchangesUsed = $usage->exchange_count;
-
         $isAdmin = Gate::allows('admin');
+
+        // Build limits based on plan type (monthly for free, daily for pro)
+        $hasMonthlyLimit = isset($planConfig['monthly_drills']);
+        if ($hasMonthlyLimit) {
+            $used = DailyUsage::monthlyExchangeCount($user);
+            $limit = $planConfig['monthly_drills'];
+            $limits = [
+                'type' => 'monthly',
+                'limit' => $limit,
+                'used' => $used,
+                'remaining' => max(0, $limit - $used),
+                'max_level' => $planConfig['max_level'],
+            ];
+        } else {
+            $usage = DailyUsage::forUserToday($user);
+            $used = $usage->exchange_count;
+            $limit = $planConfig['daily_exchanges'];
+            $limits = [
+                'type' => 'daily',
+                'limit' => $limit,
+                'used' => $used,
+                'remaining' => max(0, $limit - $used),
+                'max_level' => $planConfig['max_level'],
+            ];
+        }
 
         return [
             'user' => $user,
@@ -83,12 +105,7 @@ class HandleInertiaRequests extends Middleware
                 'train' => Gate::allows('can-train'),
                 'admin' => $isAdmin,
             ],
-            'limits' => [
-                'daily_exchanges' => $planConfig['daily_exchanges'],
-                'exchanges_used' => $exchangesUsed,
-                'exchanges_remaining' => max(0, $planConfig['daily_exchanges'] - $exchangesUsed),
-                'max_level' => $planConfig['max_level'],
-            ],
+            'limits' => $limits,
             'plan' => $user->plan,
         ];
     }

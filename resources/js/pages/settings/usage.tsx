@@ -26,6 +26,10 @@ interface UsageData {
         exchanges: number;
         sessions: number;
     };
+    monthly: {
+        exchanges: number;
+        sessions: number;
+    };
     allTime: {
         exchanges: number;
         sessions: number;
@@ -36,7 +40,8 @@ interface UsageData {
 interface UsageProps {
     usage: UsageData;
     limits: {
-        daily_exchanges: number;
+        monthly_drills: number | null;
+        daily_exchanges: number | null;
         max_level: number;
     };
     streak: number;
@@ -76,10 +81,13 @@ function StatCard({
 }
 
 export default function Usage({ usage, limits, streak }: UsageProps) {
-    const exchangePercentage = Math.min(
-        100,
-        (usage.today.exchanges / limits.daily_exchanges) * 100
-    );
+    // Determine if user has monthly or daily limits
+    const hasMonthlyLimit = limits.monthly_drills !== null;
+    const limitValue = hasMonthlyLimit ? limits.monthly_drills! : limits.daily_exchanges!;
+    const currentUsage = hasMonthlyLimit ? usage.monthly.exchanges : usage.today.exchanges;
+    const limitLabel = hasMonthlyLimit ? 'Drills This Month' : 'Exchanges Today';
+
+    const usagePercentage = Math.min(100, (currentUsage / limitValue) * 100);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -94,23 +102,22 @@ export default function Usage({ usage, limits, streak }: UsageProps) {
                         description="Track your training activity and progress"
                     />
 
-                    {/* Today's Usage */}
+                    {/* Usage Limit Progress */}
                     <div className="space-y-4">
-                        <h3 className="text-sm font-medium">Today</h3>
+                        <h3 className="text-sm font-medium">{hasMonthlyLimit ? 'This Month' : 'Today'}</h3>
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span>Exchanges</span>
+                                <span>{limitLabel}</span>
                                 <span>
-                                    {usage.today.exchanges} /{' '}
-                                    {limits.daily_exchanges}
+                                    {currentUsage} / {limitValue}
                                 </span>
                             </div>
-                            <Progress value={exchangePercentage} />
+                            <Progress value={usagePercentage} />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <StatCard
                                 title="Sessions"
-                                value={usage.today.sessions}
+                                value={hasMonthlyLimit ? usage.monthly.sessions : usage.today.sessions}
                             />
                             <StatCard title="Streak" value={`${streak} days`} />
                         </div>

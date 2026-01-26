@@ -35,6 +35,12 @@ class UsageController extends Controller
             ->where('started_at', '>=', $weekStart)
             ->count();
 
+        // This month's usage
+        $monthlyExchanges = DailyUsage::monthlyExchangeCount($user);
+        $monthlySessions = TrainingSession::where('user_id', $user->id)
+            ->where('started_at', '>=', now()->startOfMonth())
+            ->count();
+
         // All-time stats from TrainingSession for accuracy
         $allTimeStats = TrainingSession::where('user_id', $user->id)
             ->selectRaw('COUNT(*) as sessions, SUM(exchange_count) as exchanges')
@@ -66,6 +72,10 @@ class UsageController extends Controller
                     'exchanges' => $weeklyExchanges,
                     'sessions' => $weeklySessions,
                 ],
+                'monthly' => [
+                    'exchanges' => $monthlyExchanges,
+                    'sessions' => $monthlySessions,
+                ],
                 'allTime' => [
                     'exchanges' => (int) ($allTimeStats->exchanges ?? 0),
                     'sessions' => (int) ($allTimeStats->sessions ?? 0),
@@ -73,7 +83,8 @@ class UsageController extends Controller
                 'modeProgress' => $modeProgress,
             ],
             'limits' => [
-                'daily_exchanges' => $planConfig['daily_exchanges'],
+                'monthly_drills' => $planConfig['monthly_drills'] ?? null,
+                'daily_exchanges' => $planConfig['daily_exchanges'] ?? null,
                 'max_level' => $planConfig['max_level'],
             ],
             'streak' => $user->streak?->current_streak ?? 0,

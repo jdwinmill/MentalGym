@@ -47,6 +47,16 @@ class DailyUsage extends Model
     }
 
     /**
+     * Get total exchanges for a user this month.
+     */
+    public static function monthlyExchangeCount(User $user): int
+    {
+        return (int) static::where('user_id', $user->id)
+            ->where('date', '>=', now()->startOfMonth())
+            ->sum('exchange_count');
+    }
+
+    /**
      * Record activity for today using atomic increments to prevent race conditions.
      */
     public static function recordActivity(int $userId, int $timeSeconds = 0, int $messages = 0, bool $newSession = false): self

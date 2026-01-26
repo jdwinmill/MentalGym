@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 interface Plan {
     key: string;
     name: string;
-    daily_exchanges: number;
+    monthly_drills: number | null;
+    daily_exchanges: number | null;
     max_level: number;
     user_count: number;
 }
@@ -38,7 +39,7 @@ export default function PlansIndex({ plans }: Props) {
                     {/* Header */}
                     <div className="grid grid-cols-5 gap-4 p-3 bg-neutral-50 dark:bg-neutral-800 text-sm font-medium text-neutral-500 border-b">
                         <div>Plan</div>
-                        <div>Daily Exchanges</div>
+                        <div>Usage Limit</div>
                         <div>Max Level</div>
                         <div>Users</div>
                         <div>Status</div>
@@ -54,7 +55,9 @@ export default function PlansIndex({ plans }: Props) {
                                 )}
                             </div>
                             <div className="text-neutral-600 dark:text-neutral-400">
-                                {plan.daily_exchanges} / day
+                                {plan.monthly_drills !== null
+                                    ? `${plan.monthly_drills} / month`
+                                    : `${plan.daily_exchanges} / day`}
                             </div>
                             <div className="text-neutral-600 dark:text-neutral-400">
                                 Level {plan.max_level}
@@ -84,7 +87,8 @@ export default function PlansIndex({ plans }: Props) {
                         Each plan defines:
                     </p>
                     <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li><strong>daily_exchanges</strong> - Maximum AI exchanges per day</li>
+                        <li><strong>monthly_drills</strong> - Maximum drills per month (for free plan)</li>
+                        <li><strong>daily_exchanges</strong> - Maximum AI exchanges per day (for paid plans)</li>
                         <li><strong>max_level</strong> - Highest training level accessible</li>
                     </ul>
                 </div>
