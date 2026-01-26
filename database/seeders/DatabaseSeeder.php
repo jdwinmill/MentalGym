@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             InsightSeeder::class,
             SkillDimensionSeeder::class,
             PracticeModeSeeder::class,
+            SystemsThinkingSeeder::class,
+            GameTheorySeeder::class,
+            ThinkStraightSeeder::class,
+            ReadTheRoomSeeder::class,
         ]);
 
         User::factory()->create([
