@@ -354,20 +354,31 @@ class PracticeModeImportService
 
         // Analyze tags (from tags array and practice_mode.tags)
         $tagSlugsToCheck = array_column($data['tags'] ?? [], 'slug');
+        $tagsData = [];
+        foreach ($data['tags'] ?? [] as $tag) {
+            $tagsData[$tag['slug']] = $tag;
+        }
         $pmTagSlugs = $data['practice_mode']['tags'] ?? [];
         $allTagSlugs = array_unique(array_merge($tagSlugsToCheck, $pmTagSlugs));
 
         foreach ($allTagSlugs as $slug) {
+            // Check by slug first
             if (Tag::where('slug', $slug)->exists()) {
                 $this->result['would_link_existing']['tags'][] = $slug;
             } else {
-                // Check if it's defined in the tags array
-                $inTagsArray = in_array($slug, $tagSlugsToCheck);
-                if ($inTagsArray) {
-                    $this->result['would_create']['tags'][] = $slug;
+                // Also check by name
+                $tagName = $tagsData[$slug]['name'] ?? Str::title(str_replace('-', ' ', $slug));
+                if (Tag::where('name', $tagName)->exists()) {
+                    $this->result['would_link_existing']['tags'][] = $slug;
                 } else {
-                    $this->warnings[] = "Tag '{$slug}' referenced but not defined in tags array - will be created with defaults";
-                    $this->result['would_create']['tags'][] = $slug;
+                    // Check if it's defined in the tags array
+                    $inTagsArray = in_array($slug, $tagSlugsToCheck);
+                    if ($inTagsArray) {
+                        $this->result['would_create']['tags'][] = $slug;
+                    } else {
+                        $this->warnings[] = "Tag '{$slug}' referenced but not defined in tags array - will be created with defaults";
+                        $this->result['would_create']['tags'][] = $slug;
+                    }
                 }
             }
         }
@@ -486,6 +497,7 @@ class PracticeModeImportService
 
             $allTagSlugsNeeded = $data['practice_mode']['tags'] ?? [];
             foreach ($allTagSlugsNeeded as $slug) {
+                // Check by slug first
                 $existing = Tag::where('slug', $slug)->first();
                 if ($existing) {
                     $tagMap[$slug] = $existing->id;
@@ -495,15 +507,22 @@ class PracticeModeImportService
                         'name' => Str::title(str_replace('-', ' ', $slug)),
                         'category' => 'skill',
                     ];
-                    $maxOrder = Tag::where('category', $tagData['category'])->max('display_order') ?? 0;
-                    $tag = Tag::create([
-                        'slug' => $tagData['slug'],
-                        'name' => $tagData['name'],
-                        'category' => $tagData['category'],
-                        'display_order' => $maxOrder + 1,
-                        'color' => $tagData['color'] ?? null,
-                    ]);
-                    $tagMap[$slug] = $tag->id;
+
+                    // Also check by name to avoid duplicate name constraint violation
+                    $existingByName = Tag::where('name', $tagData['name'])->first();
+                    if ($existingByName) {
+                        $tagMap[$slug] = $existingByName->id;
+                    } else {
+                        $maxOrder = Tag::where('category', $tagData['category'])->max('display_order') ?? 0;
+                        $tag = Tag::create([
+                            'slug' => $tagData['slug'],
+                            'name' => $tagData['name'],
+                            'category' => $tagData['category'],
+                            'display_order' => $maxOrder + 1,
+                            'color' => $tagData['color'] ?? null,
+                        ]);
+                        $tagMap[$slug] = $tag->id;
+                    }
                 }
             }
 

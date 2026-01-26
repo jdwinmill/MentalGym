@@ -42,7 +42,7 @@ class DashboardController extends Controller
                     'tags' => $mode->tags->map(fn ($tag) => [
                         'id' => $tag->id,
                         'name' => $tag->name,
-                        'color' => $tag->color,
+                        'category' => $tag->category,
                     ]),
                     'progress' => $progress ? [
                         'current_level' => $progress->current_level,

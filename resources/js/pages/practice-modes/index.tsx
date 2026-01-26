@@ -6,6 +6,7 @@ import { Dumbbell, Lock, Play, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { getTagColorClasses, getVisibleTags } from '@/lib/tag-colors';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -75,19 +76,20 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
 
             <CardContent className="flex-1 pt-0">
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                    {mode.tags.map((tag) => (
+                    {getVisibleTags(mode.tags).map((tag, index) => (
                         <Badge
                             key={tag.id}
                             variant="secondary"
-                            className="text-xs"
-                            style={{
-                                backgroundColor: `${tag.color}20`,
-                                color: tag.color,
-                            }}
+                            className={`text-xs ${getTagColorClasses(tag.category, index)}`}
                         >
                             {tag.name}
                         </Badge>
                     ))}
+                    {mode.tags.length > 4 && (
+                        <Badge variant="outline" className="text-xs text-neutral-500">
+                            +{mode.tags.length - 4}
+                        </Badge>
+                    )}
                 </div>
 
                 {hasProgress && (

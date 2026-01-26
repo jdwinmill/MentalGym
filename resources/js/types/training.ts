@@ -2,7 +2,8 @@
 export interface Tag {
     id: number;
     name: string;
-    color: string;
+    category: 'skill' | 'context' | 'duration' | 'role';
+    color?: string; // Optional - colors are now category-based
 }
 
 export interface ModeProgress {
