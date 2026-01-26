@@ -11,7 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('PRAGMA foreign_keys = OFF');
+        // Disable foreign key checks (works for both MySQL and SQLite)
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF');
+        }
 
         Schema::dropIfExists('answer_feedback');
         Schema::dropIfExists('answer_options');
@@ -42,7 +48,12 @@ return new class extends Migration
         Schema::dropIfExists('user_content_interactions');
         Schema::dropIfExists('user_weakness_patterns');
 
-        DB::statement('PRAGMA foreign_keys = ON');
+        // Re-enable foreign key checks
+        if ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+        } elseif ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON');
+        }
     }
 
     /**
