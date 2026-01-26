@@ -89,18 +89,8 @@ class BlindSpotService
             ->where('created_at', '>=', now()->subDays($this->baselineDays))
             ->get();
 
-        $recentSpots = $allSpots->filter(
-            fn ($spot) => $spot->created_at >= now()->subDays($this->recentDays)
-        );
-
-        $baselineSpots = $allSpots->filter(
-            fn ($spot) => $spot->created_at < now()->subDays($this->recentDays)
-        );
-
         // Group by dimension
         $allByDimension = $allSpots->groupBy('dimension_key');
-        $recentByDimension = $recentSpots->groupBy('dimension_key');
-        $baselineByDimension = $baselineSpots->groupBy('dimension_key');
 
         // Load dimension metadata
         $dimensions = SkillDimension::active()->get()->keyBy('key');
@@ -118,10 +108,7 @@ class BlindSpotService
             }
 
             $allAvg = $spots->avg('score');
-            $recentAvg = $recentByDimension->get($dimensionKey)?->avg('score') ?? $allAvg;
-            $baselineAvg = $baselineByDimension->get($dimensionKey)?->avg('score');
-
-            $trend = $this->calculateTrend($recentAvg, $baselineAvg);
+            $trend = $this->calculateTrend($spots);
 
             // Get latest suggestion for this dimension
             $latestSuggestion = $spots
@@ -145,10 +132,48 @@ class BlindSpotService
         return $analyses;
     }
 
-    private function calculateTrend(float $recentAvg, ?float $baselineAvg): string
+    /**
+     * Calculate trend for a dimension.
+     *
+     * @param  \Illuminate\Support\Collection  $spots  All spots for this dimension, sorted by created_at
+     */
+    private function calculateTrend($spots): string
     {
-        if ($baselineAvg === null) {
+        // Need at least 4 samples to calculate a meaningful trend
+        if ($spots->count() < 4) {
             return 'new';
+        }
+
+        // Sort by date ascending
+        $sorted = $spots->sortBy('created_at')->values();
+
+        // Check if we have data older than 7 days
+        $oldestSpot = $sorted->first();
+        $hasOlderBaseline = $oldestSpot->created_at < now()->subDays($this->recentDays);
+
+        if ($hasOlderBaseline) {
+            // Use the standard approach: compare last 7 days to older data
+            $recentSpots = $sorted->filter(fn ($s) => $s->created_at >= now()->subDays($this->recentDays));
+            $baselineSpots = $sorted->filter(fn ($s) => $s->created_at < now()->subDays($this->recentDays));
+
+            if ($recentSpots->isEmpty() || $baselineSpots->isEmpty()) {
+                return 'new';
+            }
+
+            $recentAvg = $recentSpots->avg('score');
+            $baselineAvg = $baselineSpots->avg('score');
+        } else {
+            // All data is recent - split in half temporally
+            $midpoint = (int) floor($sorted->count() / 2);
+            $baselineSpots = $sorted->take($midpoint);
+            $recentSpots = $sorted->skip($midpoint);
+
+            if ($baselineSpots->isEmpty() || $recentSpots->isEmpty()) {
+                return 'new';
+            }
+
+            $recentAvg = $recentSpots->avg('score');
+            $baselineAvg = $baselineSpots->avg('score');
         }
 
         $delta = $recentAvg - $baselineAvg;

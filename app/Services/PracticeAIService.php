@@ -763,7 +763,7 @@ Evaluate this response. If correct, explain why. If incorrect, explain the corre
 Respond with valid JSON only (no markdown, no code blocks):
 {
     "feedback": "...",
-    "score": 0-100,
+    "score": 1-10,
     "dimension_scores": {$dimensionScoresExample}
 }
 PROMPT;
@@ -789,7 +789,7 @@ Evaluate this response according to the drill criteria.
 Respond with valid JSON only (no markdown, no code blocks):
 {
     "feedback": "...",
-    "score": 0-100,
+    "score": 1-10,
     "dimension_scores": {$dimensionScoresExample}
 }
 PROMPT;

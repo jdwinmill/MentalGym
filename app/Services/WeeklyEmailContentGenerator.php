@@ -57,28 +57,35 @@ class WeeklyEmailContentGenerator
         return <<<PROMPT
 You are writing a weekly training report email for a professional using SharpStack, a mental fitness training platform.
 
+SCORING SYSTEM:
+- Skills are scored 1-10 (higher is better)
+- Scores ≤4 = blind spot (needs significant work)
+- Scores 5-6 = developing (room for growth)
+- Scores 7+ = strong (performing well)
+- Trends: "improving" (score rising), "slipping" (score declining), "stable" (consistent), "new" (insufficient history)
+
 USER DATA:
 - First name: {$user->first_name}
 - Sessions this week: {$sessionsThisWeek}
 - Total sessions: {$analysis->totalSessions}
 
 ANALYSIS DATA:
-- Blind spots: {$blindSpotsText}
+- Blind spots (≤4/10): {$blindSpotsText}
 - Improving: {$improvingText}
 - Slipping: {$slippingText}
 - Stable: {$stableText}
 - Biggest gap: {$analysis->biggestGap}
 - Biggest win: {$analysis->biggestWin}
 
-Generate the following sections. Be direct, specific, and actionable. No fluff. No motivational clichés. Reference their actual data.
+Generate the following sections. Be direct, specific, and actionable. No fluff. No motivational clichés. Reference their actual scores and sample sizes.
 
 1. SUBJECT_LINE: Short, specific subject line (under 50 chars). Format: "Your week: [insight]"
 
-2. IMPROVING: 1-2 bullet points about what's getting better. Be specific. Reference the skill and what changed. If nothing is improving, return an empty array.
+2. IMPROVING: 1-2 bullet points about what's getting better. Reference the skill, score, and trend. If nothing is improving, return an empty array.
 
-3. NEEDS_WORK: 1-2 bullet points about blind spots or slipping skills. Include the frequency (e.g., "8 of 12 responses"). Be direct but not harsh.
+3. NEEDS_WORK: 1-2 bullet points about blind spots or slipping skills. Reference the score (e.g., "averaging 3.2/10 across 8 responses"). Be direct but not harsh.
 
-4. PATTERN_TO_WATCH: 1-2 sentences about their most important pattern. Add context about WHERE it shows up if available. This should be insightful, not just restating data.
+4. PATTERN_TO_WATCH: 1-2 sentences about their most important pattern. Connect the score to real-world impact. This should be insightful, not just restating data.
 
 5. WEEKLY_FOCUS: One specific, actionable thing they can do this week. Should be concrete (e.g., "Before submitting any response, delete 'I think' and 'maybe'. See what's left."). Not generic advice.
 
@@ -101,9 +108,15 @@ PROMPT;
 
         $items = array_map(function ($spot) {
             $score = round($spot->averageScore, 1);
+            $samples = $spot->sampleSize;
             $suggestion = $spot->latestSuggestion ?? '';
 
-            return "{$spot->label} (avg score: {$score}/10" . ($suggestion ? ", suggestion: {$suggestion}" : '') . ')';
+            $text = "{$spot->label}: {$score}/10 across {$samples} responses";
+            if ($suggestion) {
+                $text .= " (AI suggestion: {$suggestion})";
+            }
+
+            return $text;
         }, $blindSpots);
 
         return implode('; ', $items);
@@ -117,9 +130,10 @@ PROMPT;
 
         $items = array_map(function ($skill) {
             $score = round($skill->averageScore, 1);
+            $samples = $skill->sampleSize;
             $trend = $skill->trend;
 
-            return "{$skill->label} (score: {$score}/10, trend: {$trend})";
+            return "{$skill->label}: {$score}/10 across {$samples} responses, trend: {$trend}";
         }, $skills);
 
         return implode('; ', $items);
@@ -156,20 +170,26 @@ PROMPT;
         if (! empty($analysis->blindSpots)) {
             $topBlindSpot = $analysis->blindSpots[0];
             $score = round($topBlindSpot->averageScore, 1);
-            $needsWork[] = "{$topBlindSpot->label}: averaging {$score}/10 - needs focused practice.";
+            $samples = $topBlindSpot->sampleSize;
+            $needsWork[] = "{$topBlindSpot->label}: averaging {$score}/10 across {$samples} responses - needs focused practice.";
         }
 
         if (empty($needsWork)) {
             $needsWork[] = 'Continue building your training data for more specific insights.';
         }
 
+        $improving = [];
+        if (! empty($analysis->improving)) {
+            $topImproving = $analysis->improving[0];
+            $score = round($topImproving->averageScore, 1);
+            $improving[] = "{$topImproving->label} is trending up (now at {$score}/10).";
+        }
+
         return new WeeklyEmailContent(
             subjectLine: $analysis->biggestGap
                 ? "Your week: Focus on {$analysis->biggestGap}"
                 : 'Your weekly training report',
-            improving: ! empty($analysis->improving)
-                ? ["{$analysis->improving[0]->label} is trending in the right direction."]
-                : [],
+            improving: $improving,
             needsWork: $needsWork,
             patternToWatch: 'We need a few more sessions to identify clear patterns.',
             weeklyFocus: 'Complete 3+ training sessions this week to unlock deeper insights.',

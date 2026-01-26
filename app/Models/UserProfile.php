@@ -90,11 +90,13 @@ class UserProfile extends Model
         }
 
         // Handle booleans with contextual phrasing
-        if (is_bool($value)) {
-            if ($field === 'manages_people') {
-                return $value ? ' who manages people' : '';
-            }
+        if ($field === 'manages_people') {
+            // Special case: manages_people is used inline in sentences
+            // Return empty string for false/null, contextual phrase for true
+            return $value === true ? ' who manages people' : '';
+        }
 
+        if (is_bool($value)) {
             return $value ? 'yes' : 'no';
         }
 

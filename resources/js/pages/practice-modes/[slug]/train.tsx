@@ -85,6 +85,7 @@ export default function TrainPage({ mode }: TrainPageProps) {
     // Start the actual session (after context is verified)
     const startActualSession = useCallback(async () => {
         try {
+            console.log('[Training] Starting session for mode:', mode.slug);
             const response = await fetch(`/api/training/v2/start/${mode.slug}`, {
                 method: 'POST',
                 headers: {
@@ -94,6 +95,10 @@ export default function TrainPage({ mode }: TrainPageProps) {
             });
 
             const data = await response.json();
+            console.log('[Training] Start session response:', data);
+            if (data.card) {
+                console.log('[Training] Scenario card content:', data.card.content);
+            }
 
             // Handle limit reached
             if (data.error === 'limit_reached') {
@@ -181,6 +186,9 @@ export default function TrainPage({ mode }: TrainPageProps) {
         setIsLoading(true);
         setError(null);
 
+        console.log('[Training] Submitting response:', response);
+        console.log('[Training] Current scenario card:', currentCard);
+
         try {
             const res = await fetch(`/api/training/v2/respond/${session.id}`, {
                 method: 'POST',
@@ -192,6 +200,12 @@ export default function TrainPage({ mode }: TrainPageProps) {
             });
 
             const data = await res.json();
+            console.log('[Training] Submit response result:', data);
+            if (data.card) {
+                console.log('[Training] Feedback card content:', data.card.content);
+                console.log('[Training] Feedback card feedback:', data.card.feedback);
+                console.log('[Training] Dimension scores:', data.card.dimension_scores);
+            }
 
             // Handle limit reached
             if (data.error === 'limit_reached') {

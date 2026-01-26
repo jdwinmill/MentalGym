@@ -31,6 +31,7 @@ class DrillSeeder extends Seeder
                 'position' => 0,
                 'timer_seconds' => 45,
                 'input_type' => 'text',
+                'dimensions' => ['clarity', 'conciseness', 'information_synthesis'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a compression drill scenario.
 
@@ -63,17 +64,11 @@ Check for:
 
 Be specific about what worked or missed. If over 15 words, state the count.
 
-Format your response as JSON:
-{
-    "feedback": "[Your specific critique of their compression attempt]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Under 15 words, captures core point, crystal clear
-- 70-89: Slightly over OR misses a nuance, but mostly right
-- 50-69: Gets the gist but too wordy or unclear
-- 0-49: Misses the point or way too long
+Score guide (1-10):
+- 9-10: Under 15 words, captures core point, crystal clear
+- 7-8: Slightly over OR misses a nuance, but mostly right
+- 5-6: Gets the gist but too wordy or unclear
+- 1-4: Misses the point or way too long
 PROMPT,
             ],
             [
@@ -81,6 +76,7 @@ PROMPT,
                 'position' => 1,
                 'timer_seconds' => 90,
                 'input_type' => 'text',
+                'dimensions' => ['clarity', 'assertiveness', 'executive_presence', 'conciseness'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate an executive communication drill scenario.
 
@@ -111,17 +107,11 @@ Check for:
 
 Name the specific patterns you see in THEIR words. Quote them.
 
-Format your response as JSON:
-{
-    "feedback": "[Your specific critique with quotes from their response]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Boardroom-ready, authoritative, clear, no hedging
-- 70-89: Solid but one weakness (slight hedge, unclear opener, too long)
-- 50-69: Message there but undermined by tone or structure
-- 0-49: Hedging throughout, unclear, or doesn't address the situation
+Score guide (1-10):
+- 9-10: Boardroom-ready, authoritative, clear, no hedging
+- 7-8: Solid but one weakness (slight hedge, unclear opener, too long)
+- 5-6: Message there but undermined by tone or structure
+- 1-4: Hedging throughout, unclear, or doesn't address the situation
 PROMPT,
             ],
             [
@@ -129,6 +119,7 @@ PROMPT,
                 'position' => 2,
                 'timer_seconds' => 120,
                 'input_type' => 'text',
+                'dimensions' => ['strategic_thinking', 'decisiveness', 'risk_assessment', 'structured_reasoning'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a problem-solving drill scenario.
 
@@ -168,17 +159,11 @@ Evaluate the thinking:
 
 Be specific about what THEY wrote. Quote their words.
 
-Format your response as JSON:
-{
-    "feedback": "[Your specific critique of their decision framework]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Clear decision, strong rationale, realistic risk/mitigation
-- 70-89: Good decision but weak in one area (rationale thin, risk ignored)
-- 50-69: Made a choice but reasoning is fuzzy or structure is off
-- 0-49: No clear decision, or "it depends" without resolution
+Score guide (1-10):
+- 9-10: Clear decision, strong rationale, realistic risk/mitigation
+- 7-8: Good decision but weak in one area (rationale thin, risk ignored)
+- 5-6: Made a choice but reasoning is fuzzy or structure is off
+- 1-4: No clear decision, or "it depends" without resolution
 PROMPT,
             ],
             [
@@ -186,6 +171,7 @@ PROMPT,
                 'position' => 3,
                 'timer_seconds' => 75,
                 'input_type' => 'text',
+                'dimensions' => ['clarity', 'conciseness', 'impact', 'precision'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a writing precision drill scenario.
 
@@ -222,28 +208,28 @@ Also check:
 
 Compare their version to the original specifically.
 
-Format your response as JSON:
-{
-    "feedback": "[Your specific comparison of their rewrite to the original]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Significantly improved on target dimension, no new problems
-- 70-89: Improved but missed some opportunities or introduced minor issues
-- 50-69: Marginal improvement or sideways move
-- 0-49: No improvement, made it worse, or changed the meaning
+Score guide (1-10):
+- 9-10: Significantly improved on target dimension, no new problems
+- 7-8: Improved but missed some opportunities or introduced minor issues
+- 5-6: Marginal improvement or sideways move
+- 1-4: No improvement, made it worse, or changed the meaning
 PROMPT,
             ],
         ];
 
-        foreach ($drills as $drill) {
+        foreach ($drills as $drillData) {
+            $dimensions = $drillData['dimensions'] ?? [];
+            unset($drillData['dimensions']);
+
             Drill::updateOrCreate(
                 [
                     'practice_mode_id' => $mode->id,
-                    'name' => $drill['name'],
+                    'name' => $drillData['name'],
                 ],
-                array_merge($drill, ['practice_mode_id' => $mode->id])
+                array_merge($drillData, [
+                    'practice_mode_id' => $mode->id,
+                    'dimensions' => $dimensions,
+                ])
             );
         }
     }
@@ -256,6 +242,7 @@ PROMPT,
                 'position' => 0,
                 'timer_seconds' => 30,
                 'input_type' => 'text',
+                'dimensions' => ['quick_thinking', 'clarity', 'confidence', 'conciseness'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a quick response drill scenario.
 
@@ -284,17 +271,11 @@ Check for:
 
 This is about thinking on your feet. Value directness over perfection.
 
-Format your response as JSON:
-{
-    "feedback": "[Your critique of their quick response]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Direct, confident, substantive, right length
-- 70-89: Answered but hedged or slightly too long
-- 50-69: Got something out but stalled or unclear
-- 0-49: Didn't really answer or way too long
+Score guide (1-10):
+- 9-10: Direct, confident, substantive, right length
+- 7-8: Answered but hedged or slightly too long
+- 5-6: Got something out but stalled or unclear
+- 1-4: Didn't really answer or way too long
 PROMPT,
             ],
             [
@@ -302,6 +283,7 @@ PROMPT,
                 'position' => 1,
                 'timer_seconds' => 60,
                 'input_type' => 'text',
+                'dimensions' => ['assertiveness', 'persuasion', 'composure', 'logical_reasoning'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a position defense drill scenario.
 
@@ -335,17 +317,11 @@ Check for:
 
 Good defense = acknowledge + reframe + hold.
 
-Format your response as JSON:
-{
-    "feedback": "[Your critique of their defense]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Acknowledged, held ground with evidence, professional tone
-- 70-89: Defended but missed acknowledgment or got slightly defensive
-- 50-69: Held ground but poorly, or caved too easily
-- 0-49: Got defensive, caved completely, or ignored the objection
+Score guide (1-10):
+- 9-10: Acknowledged, held ground with evidence, professional tone
+- 7-8: Defended but missed acknowledgment or got slightly defensive
+- 5-6: Held ground but poorly, or caved too easily
+- 1-4: Got defensive, caved completely, or ignored the objection
 PROMPT,
             ],
             [
@@ -353,6 +329,7 @@ PROMPT,
                 'position' => 2,
                 'timer_seconds' => 45,
                 'input_type' => 'text',
+                'dimensions' => ['information_synthesis', 'leadership', 'clarity', 'diplomatic_framing'],
                 'scenario_instruction_set' => <<<'PROMPT'
 Generate a summarize-and-redirect drill scenario.
 
@@ -380,28 +357,28 @@ Check for:
 
 This is about leadership in meetings.
 
-Format your response as JSON:
-{
-    "feedback": "[Your critique of their summary and redirect]",
-    "score": 0-100
-}
-
-Score guide:
-- 90-100: Accurate summary, clear redirect, diplomatic
-- 70-89: Good but summary too long or redirect unclear
-- 50-69: Got the gist but added confusion or was abrupt
-- 0-49: Wrong summary, no redirect, or insulted contributors
+Score guide (1-10):
+- 9-10: Accurate summary, clear redirect, diplomatic
+- 7-8: Good but summary too long or redirect unclear
+- 5-6: Got the gist but added confusion or was abrupt
+- 1-4: Wrong summary, no redirect, or insulted contributors
 PROMPT,
             ],
         ];
 
-        foreach ($drills as $drill) {
+        foreach ($drills as $drillData) {
+            $dimensions = $drillData['dimensions'] ?? [];
+            unset($drillData['dimensions']);
+
             Drill::updateOrCreate(
                 [
                     'practice_mode_id' => $mode->id,
-                    'name' => $drill['name'],
+                    'name' => $drillData['name'],
                 ],
-                array_merge($drill, ['practice_mode_id' => $mode->id])
+                array_merge($drillData, [
+                    'practice_mode_id' => $mode->id,
+                    'dimensions' => $dimensions,
+                ])
             );
         }
     }
