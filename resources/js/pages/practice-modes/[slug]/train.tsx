@@ -147,29 +147,43 @@ export default function TrainPage({ mode }: TrainPageProps) {
 
     // Handle context form submission
     const handleContextSubmit = async (data: Record<string, unknown>) => {
+        console.log('[Profile] Submitting data:', data);
+
         const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
+        console.log('[Profile] CSRF token present:', !!csrfToken);
+
         if (!csrfToken) {
             throw new Error('Session expired. Please refresh the page.');
         }
 
-        const response = await fetch('/api/training/v2/update-profile', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-            },
-            body: JSON.stringify(data),
-        });
+        let response: Response;
+        try {
+            response = await fetch('/api/training/v2/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(data),
+            });
+            console.log('[Profile] Response status:', response.status);
+        } catch (fetchError) {
+            console.error('[Profile] Fetch failed:', fetchError);
+            throw new Error('Network error. Please check your connection.');
+        }
 
         if (!response.ok) {
+            const text = await response.text();
+            console.error('[Profile] Error response:', response.status, text);
             if (response.status === 419) {
                 throw new Error('Session expired. Please refresh the page.');
             }
-            throw new Error('Something went wrong. Please try again.');
+            throw new Error(`Server error (${response.status}). Please try again.`);
         }
 
         const result = await response.json();
+        console.log('[Profile] Result:', result);
 
         if (!result.success) {
             throw new Error(result.error || 'Failed to update profile');
