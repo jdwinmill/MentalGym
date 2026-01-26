@@ -141,7 +141,7 @@ export function RequiredContextModal({
                     </div>
                 );
 
-            case 'multiselect':
+            case 'multiselect': {
                 const selected = (formData[field.key] as string[]) || [];
                 return (
                     <div className="grid grid-cols-2 gap-2">
@@ -165,6 +165,7 @@ export function RequiredContextModal({
                             ))}
                     </div>
                 );
+            }
 
             default:
                 return null;

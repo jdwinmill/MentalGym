@@ -741,7 +741,7 @@ PROMPT;
             $dimensionScoresExample = '{"overall_performance": {"score": 7, "suggestion": null}}';
         }
 
-        $suggestionInstruction = "For each dimension, provide a score (1-10) and a brief, actionable suggestion if score <= 6 (null if score > 6). Suggestions should be specific to what the user did wrong and how to improve.";
+        $suggestionInstruction = 'For each dimension, provide a score (1-10) and a brief, actionable suggestion if score <= 6 (null if score > 6). Suggestions should be specific to what the user did wrong and how to improve.';
 
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT

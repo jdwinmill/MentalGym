@@ -64,6 +64,7 @@ class DimensionAnalysis
         if ($this->averageScore <= 6) {
             return 'mid';
         }
+
         return 'high';
     }
 }

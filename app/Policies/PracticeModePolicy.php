@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\PracticeMode;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 
 class PracticeModePolicy
 {

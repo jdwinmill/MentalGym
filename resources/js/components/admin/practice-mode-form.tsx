@@ -145,12 +145,6 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        // Use transform to convert 'all' required_plan to null for backend
-        form.transform((data) => ({
-            ...data,
-            required_plan: data.required_plan === 'all' ? null : data.required_plan,
-        }));
-
         if (isEdit && mode?.id) {
             form.put(`/admin/practice-modes/${mode.id}`);
         } else {
@@ -659,7 +653,6 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                                 <SelectContent>
                                     <SelectItem value="all">All Users</SelectItem>
                                     <SelectItem value="pro">Pro+ Only</SelectItem>
-                                    <SelectItem value="unlimited">Unlimited Only</SelectItem>
                                 </SelectContent>
                             </Select>
                             <p className="text-xs text-neutral-500">

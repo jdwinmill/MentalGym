@@ -75,6 +75,11 @@ class PracticeModeController extends Controller
         // Build config array from individual fields
         $validated['config'] = $this->buildConfig($request);
 
+        // Convert 'all' to null for required_plan
+        if (($validated['required_plan'] ?? null) === 'all') {
+            $validated['required_plan'] = null;
+        }
+
         $practiceMode = PracticeMode::create($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
 
@@ -148,6 +153,11 @@ class PracticeModeController extends Controller
         // Build config array from individual fields
         $validated['config'] = $this->buildConfig($request);
 
+        // Convert 'all' to null for required_plan
+        if (($validated['required_plan'] ?? null) === 'all') {
+            $validated['required_plan'] = null;
+        }
+
         $practiceMode->update($validated);
         $practiceMode->tags()->sync($request->input('tags', []));
 
@@ -189,7 +199,7 @@ class PracticeModeController extends Controller
             'tagline' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'instruction_set' => ['required', 'string'],
-            'required_plan' => ['nullable', 'in:pro,unlimited'],
+            'required_plan' => ['nullable', 'in:all,pro'],
             'is_active' => ['boolean'],
             'sort_order' => ['integer', 'min:0'],
             // Config fields validated individually
@@ -215,7 +225,7 @@ class PracticeModeController extends Controller
             'drills.*.evaluation_instruction_set' => ['required', 'string'],
             'drills.*.primary_insight_id' => ['nullable', 'integer', 'exists:insights,id'],
             'drills.*.dimensions' => ['nullable', 'array'],
-            'drills.*.dimensions.*' => ['string', 'exists:skill_dimensions,key,active,1'],
+            'drills.*.dimensions.*' => ['string'],
         ];
     }
 

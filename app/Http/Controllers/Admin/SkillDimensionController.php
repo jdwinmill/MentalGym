@@ -120,7 +120,7 @@ class SkillDimensionController extends Controller
             'active' => ['boolean'],
         ];
 
-        if (!$isEdit) {
+        if (! $isEdit) {
             $rules['key'] = [
                 'nullable',
                 'string',

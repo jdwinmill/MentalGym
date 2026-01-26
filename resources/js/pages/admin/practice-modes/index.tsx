@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Trash2, Plus, Check, X } from 'lucide-react';
+import { Pencil, Trash2, Plus, Check, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -59,12 +59,20 @@ export default function PracticeModesIndex({ modes }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Practice Modes</h1>
-                    <Link href="/admin/practice-modes/create">
-                        <Button>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create New Mode
-                        </Button>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link href="/admin/practice-modes-import">
+                            <Button variant="outline">
+                                <Upload className="h-4 w-4 mr-2" />
+                                Bulk Import
+                            </Button>
+                        </Link>
+                        <Link href="/admin/practice-modes/create">
+                            <Button>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Create New Mode
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="rounded-lg border bg-white dark:bg-neutral-900 overflow-hidden">

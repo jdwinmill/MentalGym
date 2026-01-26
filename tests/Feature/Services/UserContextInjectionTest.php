@@ -3,7 +3,6 @@
 use App\Models\Drill;
 use App\Models\PracticeMode;
 use App\Models\PracticeModeRequiredContext;
-use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

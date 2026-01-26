@@ -5,15 +5,16 @@ use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\Admin\InsightController as AdminInsightController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PracticeModeController as AdminPracticeModeController;
+use App\Http\Controllers\Admin\PracticeModeImportController;
 use App\Http\Controllers\Admin\PrincipleController as AdminPrincipleController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SkillDimensionController as AdminSkillDimensionController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\BlindSpotController;
-use App\Http\Controllers\Api\SkillDimensionController as ApiSkillDimensionController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\PrinciplesApiController;
+use App\Http\Controllers\Api\SkillDimensionController as ApiSkillDimensionController;
 use App\Http\Controllers\Api\TrainingApiController;
 use App\Http\Controllers\BlindSpotDashboardController;
 use App\Http\Controllers\DashboardController;
@@ -110,6 +111,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     // Practice Mode management
     Route::resource('practice-modes', AdminPracticeModeController::class)->except(['show']);
+    Route::get('practice-modes-import', [PracticeModeImportController::class, 'index'])->name('practice-modes.import');
+    Route::post('practice-modes-import/validate', [PracticeModeImportController::class, 'validate'])->name('practice-modes.import.validate');
+    Route::post('practice-modes-import/test', [PracticeModeImportController::class, 'testRun'])->name('practice-modes.import.test');
+    Route::post('practice-modes-import/execute', [PracticeModeImportController::class, 'import'])->name('practice-modes.import.execute');
 
     // Tag management
     Route::resource('tags', AdminTagController::class)->except(['show']);

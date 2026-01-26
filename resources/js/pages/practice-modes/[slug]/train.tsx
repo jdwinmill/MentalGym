@@ -8,9 +8,6 @@ import {
     type DrillCard,
     type DrillProgress,
     type SessionStats,
-    type StartDrillResponse,
-    type SubmitDrillResponse,
-    type ContinueDrillResponse,
     type PrimaryInsight,
 } from '@/types/training';
 import { Head, router } from '@inertiajs/react';

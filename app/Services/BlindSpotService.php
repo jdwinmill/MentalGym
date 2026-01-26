@@ -13,7 +13,9 @@ use App\Models\User;
 class BlindSpotService
 {
     private int $minimumSessions = 5;
+
     private int $recentDays = 7;
+
     private int $baselineDays = 30;
 
     public function getAnalysis(User $user): GatedBlindSpotAnalysis
@@ -50,14 +52,14 @@ class BlindSpotService
         $dimensionAnalyses = $this->analyzeDimensions($user);
 
         $blindSpots = array_filter($dimensionAnalyses, fn ($d) => $d->isBlindSpot());
-        $improving = array_filter($dimensionAnalyses, fn ($d) => $d->isImproving() && !$d->isBlindSpot());
+        $improving = array_filter($dimensionAnalyses, fn ($d) => $d->isImproving() && ! $d->isBlindSpot());
         $slipping = array_filter($dimensionAnalyses, fn ($d) => $d->isSlipping());
-        $stable = array_filter($dimensionAnalyses, fn ($d) => $d->isStable() && !$d->isBlindSpot());
+        $stable = array_filter($dimensionAnalyses, fn ($d) => $d->isStable() && ! $d->isBlindSpot());
 
         // Sort by score (lowest first for blind spots)
         usort($blindSpots, fn ($a, $b) => $a->averageScore <=> $b->averageScore);
 
-        $biggestGap = !empty($blindSpots) ? $blindSpots[0]->dimensionKey : null;
+        $biggestGap = ! empty($blindSpots) ? $blindSpots[0]->dimensionKey : null;
         $biggestWin = $this->findBiggestWin($dimensionAnalyses);
         $growthEdge = $this->findGrowthEdge($dimensionAnalyses);
 
@@ -103,7 +105,7 @@ class BlindSpotService
             }
 
             $dimension = $dimensions->get($dimensionKey);
-            if (!$dimension) {
+            if (! $dimension) {
                 continue;
             }
 
@@ -194,8 +196,9 @@ class BlindSpotService
         // Find the dimension with highest score or most improvement
         $improving = array_filter($analyses, fn ($d) => $d->isImproving());
 
-        if (!empty($improving)) {
+        if (! empty($improving)) {
             usort($improving, fn ($a, $b) => $b->averageScore <=> $a->averageScore);
+
             return $improving[0]->dimensionKey;
         }
 
@@ -203,7 +206,7 @@ class BlindSpotService
         $sorted = $analyses;
         usort($sorted, fn ($a, $b) => $b->averageScore <=> $a->averageScore);
 
-        return !empty($sorted) && $sorted[0]->averageScore >= 6
+        return ! empty($sorted) && $sorted[0]->averageScore >= 6
             ? $sorted[0]->dimensionKey
             : null;
     }
@@ -215,7 +218,7 @@ class BlindSpotService
         usort($sorted, fn ($a, $b) => $a->averageScore <=> $b->averageScore);
 
         foreach ($sorted as $analysis) {
-            if (!$analysis->isBlindSpot() && $analysis->averageScore < 7) {
+            if (! $analysis->isBlindSpot() && $analysis->averageScore < 7) {
                 return $analysis->dimensionKey;
             }
         }
@@ -244,6 +247,7 @@ class BlindSpotService
         }
 
         $analysis = $this->analyze($user);
+
         return $analysis->hasBlindSpots();
     }
 
@@ -312,6 +316,7 @@ class BlindSpotService
                     'sessions' => 0,
                     'responses' => 0,
                 ];
+
                 continue;
             }
 
