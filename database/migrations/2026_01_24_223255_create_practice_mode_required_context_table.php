@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('profile_field', 50);
             $table->timestamps();
 
-            $table->unique(['practice_mode_id', 'profile_field']);
+            $table->unique(['practice_mode_id', 'profile_field'], 'pm_required_context_unique');
         });
     }
 
