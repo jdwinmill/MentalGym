@@ -148,7 +148,7 @@ export default function TrainPage({ mode }: TrainPageProps) {
     // Handle context form submission
     const handleContextSubmit = async (data: Record<string, unknown>) => {
         const response = await fetch('/api/training/v2/update-profile', {
-            method: 'PATCH',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',

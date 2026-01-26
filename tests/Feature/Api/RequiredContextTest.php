@@ -123,12 +123,12 @@ describe('GET /api/training/v2/check-context/{mode_slug}', function () {
     });
 });
 
-describe('PATCH /api/training/v2/update-profile', function () {
+describe('POST /api/training/v2/update-profile', function () {
     it('updates user profile with provided fields', function () {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->patchJson('/api/training/v2/update-profile', [
+            ->postJson('/api/training/v2/update-profile', [
                 'job_title' => 'Senior Engineer',
                 'career_level' => 'senior',
                 'manages_people' => true,
@@ -151,7 +151,7 @@ describe('PATCH /api/training/v2/update-profile', function () {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)
-            ->patchJson('/api/training/v2/update-profile', [
+            ->postJson('/api/training/v2/update-profile', [
                 'invalid_field' => 'value',
             ]);
 
@@ -171,7 +171,7 @@ describe('PATCH /api/training/v2/update-profile', function () {
         ]);
 
         $response = $this->actingAs($user)
-            ->patchJson('/api/training/v2/update-profile', [
+            ->postJson('/api/training/v2/update-profile', [
                 'career_level' => 'mid',
             ]);
 
