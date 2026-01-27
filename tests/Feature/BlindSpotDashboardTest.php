@@ -11,7 +11,7 @@ use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
 
-function createUserWithSessionsAndScores(array $userAttributes = [], int $sessionCount = 5, int $daysAgo = 2): User
+function createUserWithSessionsAndScores(array $userAttributes = [], int $responseCount = 6, int $daysAgo = 2): User
 {
     $user = User::factory()->create($userAttributes);
     $mode = PracticeMode::factory()->create();
@@ -28,7 +28,7 @@ function createUserWithSessionsAndScores(array $userAttributes = [], int $sessio
     ]);
 
     TrainingSession::factory()
-        ->count($sessionCount)
+        ->count(3)
         ->completed()
         ->forUser($user)
         ->forMode($mode)
@@ -37,7 +37,7 @@ function createUserWithSessionsAndScores(array $userAttributes = [], int $sessio
         ]);
 
     BlindSpot::factory()
-        ->count($sessionCount * 3)
+        ->count($responseCount)
         ->forUser($user)
         ->forDrill($drill)
         ->forDimension('test_dimension')
@@ -92,8 +92,8 @@ describe('GET /blind-spots', function () {
         );
     });
 
-    it('shows insufficient data for user with less than 5 sessions', function () {
-        $user = createUserWithSessionsAndScores(['plan' => 'pro'], 3);
+    it('shows insufficient data for user with less than 6 responses', function () {
+        $user = createUserWithSessionsAndScores(['plan' => 'pro'], 3); // Only 3 responses
 
         $response = $this->actingAs($user)->get('/blind-spots');
 
@@ -101,6 +101,7 @@ describe('GET /blind-spots', function () {
         $response->assertInertia(fn (AssertableInertia $page) => $page->component('blind-spots/index')
             ->where('pageData.hasEnoughData', false)
             ->where('pageData.gateReason', 'insufficient_data')
+            ->where('pageData.responsesRemaining', 3) // 6 - 3 = 3 remaining
         );
     });
 
@@ -143,7 +144,7 @@ describe('BlindSpotService primary blind spot', function () {
             ->forMode($mode)
             ->create();
 
-        // Create low scores for one dimension
+        // Create low scores for one dimension (need 3+ for it to be considered)
         BlindSpot::factory()
             ->count(5)
             ->forUser($user)
@@ -152,7 +153,7 @@ describe('BlindSpotService primary blind spot', function () {
             ->withLowScores()
             ->create();
 
-        // Create high scores for another dimension
+        // Create high scores for another dimension (need 3+ for it to be considered)
         BlindSpot::factory()
             ->count(5)
             ->forUser($user)
@@ -165,6 +166,7 @@ describe('BlindSpotService primary blind spot', function () {
         $blindSpot = $service->findPrimaryBlindSpot($user);
 
         expect($blindSpot)->not->toBeNull();
+        // Both have same count, but low_score_dim has lower average so it should be selected
         expect($blindSpot->dimensionKey)->toBe('low_score_dim');
     });
 

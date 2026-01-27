@@ -10,15 +10,23 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 describe('GET /api/blind-spots', function () {
-    it('returns insufficient_data for free user with less than 5 sessions', function () {
+    it('returns insufficient_data for free user with less than 6 responses', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         TrainingSession::factory()
             ->count(3)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
+            ->create();
+
+        // Only 3 responses (need 6)
+        BlindSpot::factory()
+            ->count(3)
+            ->forUser($user)
+            ->forDrill($drill)
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots');
@@ -34,10 +42,10 @@ describe('GET /api/blind-spots', function () {
             ],
         ]);
 
-        expect($response->json('analysis.sessionsUntilInsights'))->toBe(2);
+        expect($response->json('analysis.responsesUntilInsights'))->toBe(3);
     });
 
-    it('returns requires_upgrade for free user with 5+ sessions', function () {
+    it('returns requires_upgrade for free user with 6+ responses', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
         $drill = Drill::factory()->forMode($mode)->create();
@@ -77,15 +85,23 @@ describe('GET /api/blind-spots', function () {
         expect($response->json('analysis.hasBlindSpots'))->toBeBool();
     });
 
-    it('returns insufficient_data for pro user with less than 5 sessions', function () {
+    it('returns insufficient_data for pro user with less than 6 responses', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         TrainingSession::factory()
             ->count(3)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
+            ->create();
+
+        // Only 3 responses
+        BlindSpot::factory()
+            ->count(3)
+            ->forUser($user)
+            ->forDrill($drill)
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots');
@@ -101,7 +117,7 @@ describe('GET /api/blind-spots', function () {
         ]);
     });
 
-    it('returns full data unlocked for pro user with 5+ sessions', function () {
+    it('returns full data unlocked for pro user with 6+ responses', function () {
         $user = User::factory()->create(['plan' => 'pro']);
         $mode = PracticeMode::factory()->create();
         $drill = Drill::factory()->forMode($mode)->create();
@@ -211,12 +227,20 @@ describe('GET /api/blind-spots/teaser', function () {
     it('returns showTeaser false for free user with insufficient data', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         TrainingSession::factory()
             ->count(3)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
+            ->create();
+
+        // Only 3 responses
+        BlindSpot::factory()
+            ->count(3)
+            ->forUser($user)
+            ->forDrill($drill)
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots/teaser');
@@ -269,12 +293,20 @@ describe('GET /api/blind-spots/status', function () {
     it('returns correct status flags for free user without enough data', function () {
         $user = User::factory()->create(['plan' => 'free']);
         $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
 
         TrainingSession::factory()
             ->count(2)
             ->completed()
             ->forUser($user)
             ->forMode($mode)
+            ->create();
+
+        // Only 2 responses
+        BlindSpot::factory()
+            ->count(2)
+            ->forUser($user)
+            ->forDrill($drill)
             ->create();
 
         $response = $this->actingAs($user)->getJson('/api/blind-spots/status');
@@ -288,8 +320,8 @@ describe('GET /api/blind-spots/status', function () {
                 'canAccessFullInsights' => false,
                 'showTeaser' => false,
                 'totalSessions' => 2,
-                'minimumSessions' => 5,
-                'sessionsUntilInsights' => 3,
+                'minimumResponses' => 6,
+                'responsesUntilInsights' => 4,
             ],
         ]);
     });
@@ -323,7 +355,7 @@ describe('GET /api/blind-spots/status', function () {
                 'hasProAccess' => false,
                 'canAccessFullInsights' => false,
                 'totalSessions' => 5,
-                'sessionsUntilInsights' => 0,
+                'responsesUntilInsights' => 0,
             ],
         ]);
     });
@@ -358,7 +390,7 @@ describe('GET /api/blind-spots/status', function () {
                 'canAccessFullInsights' => true,
                 'showTeaser' => false,
                 'totalSessions' => 5,
-                'sessionsUntilInsights' => 0,
+                'responsesUntilInsights' => 0,
             ],
         ]);
     });

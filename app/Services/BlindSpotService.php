@@ -15,7 +15,7 @@ use App\Models\User;
 
 class BlindSpotService
 {
-    private int $minimumSessions = 5;
+    private int $minimumResponses = 6;
 
     private int $minimumOccurrences = 3;
 
@@ -36,7 +36,7 @@ class BlindSpotService
             return BlindSpotPageData::insufficientData(
                 $totalSessions,
                 $totalResponses,
-                $this->minimumSessions
+                $this->minimumResponses
             );
         }
 
@@ -44,7 +44,7 @@ class BlindSpotService
             return BlindSpotPageData::locked(
                 $totalSessions,
                 $totalResponses,
-                $this->minimumSessions
+                $this->minimumResponses
             );
         }
 
@@ -203,14 +203,14 @@ class BlindSpotService
             return GatedBlindSpotAnalysis::insufficientData(
                 $totalSessions,
                 $totalResponses,
-                $this->minimumSessions
+                $this->minimumResponses
             );
         }
 
         $analysis = $this->analyze($user);
 
         if (! $this->hasProAccess($user)) {
-            return GatedBlindSpotAnalysis::locked($analysis, $this->minimumSessions);
+            return GatedBlindSpotAnalysis::locked($analysis, $this->minimumResponses);
         }
 
         return GatedBlindSpotAnalysis::unlocked($analysis);
@@ -430,8 +430,8 @@ class BlindSpotService
             'canAccessFullInsights' => $hasEnoughData && $hasProAccess,
             'showTeaser' => $this->shouldShowTeaser($user),
             'totalSessions' => $totalSessions,
-            'minimumSessions' => $this->minimumSessions,
-            'sessionsUntilInsights' => max(0, $this->minimumSessions - $totalSessions),
+            'minimumResponses' => $this->minimumResponses,
+            'responsesUntilInsights' => max(0, $this->minimumResponses - $this->getResponseCount($user)),
             'blindSpotCount' => $blindSpotCount,
         ];
     }
@@ -481,7 +481,7 @@ class BlindSpotService
 
     public function hasEnoughData(User $user): bool
     {
-        return $this->getSessionCount($user) >= $this->minimumSessions;
+        return $this->getResponseCount($user) >= $this->minimumResponses;
     }
 
     public function canAccessFullInsights(User $user): bool
@@ -506,8 +506,8 @@ class BlindSpotService
         return BlindSpot::where('user_id', $user->id)->count();
     }
 
-    public function getMinimumSessions(): int
+    public function getMinimumResponses(): int
     {
-        return $this->minimumSessions;
+        return $this->minimumResponses;
     }
 }

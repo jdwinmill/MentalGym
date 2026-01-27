@@ -123,8 +123,28 @@ describe('SendWeeklyBlindSpotEmails job', function () {
     });
 
     it('does not send to user with insufficient data', function () {
-        // Only 3 sessions (need 5 minimum)
-        createUserWithSessions(['plan' => 'pro'], 3);
+        // Create user with only 1 response (need 6 minimum)
+        $user = User::factory()->create(['plan' => 'pro']);
+        $mode = PracticeMode::factory()->create();
+        $drill = Drill::factory()->forMode($mode)->create();
+
+        TrainingSession::factory()
+            ->count(2)
+            ->completed()
+            ->forUser($user)
+            ->forMode($mode)
+            ->create([
+                'created_at' => now()->subDays(2),
+            ]);
+
+        // Only 3 responses (need 6)
+        BlindSpot::factory()
+            ->count(3)
+            ->forUser($user)
+            ->forDrill($drill)
+            ->withLowScores()
+            ->createdAt(now()->subDays(2))
+            ->create();
 
         SendWeeklyBlindSpotEmails::dispatchSync();
 

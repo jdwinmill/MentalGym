@@ -40,7 +40,7 @@ interface PageData {
     hasEnoughData: boolean;
     totalSessions: number;
     totalResponses: number;
-    requiredSessions: number;
+    responsesRemaining: number;
     isUnlocked: boolean;
     gateReason: 'insufficient_data' | 'requires_pro' | null;
     primaryBlindSpot: PrimaryBlindSpot | null;
@@ -61,10 +61,7 @@ function TrendIcon({ trend }: { trend: string }) {
     }
 }
 
-function InsufficientDataView({ totalSessions, requiredSessions }: { totalSessions: number; requiredSessions: number }) {
-    const progress = (totalSessions / requiredSessions) * 100;
-    const remaining = requiredSessions - totalSessions;
-
+function InsufficientDataView({ responsesRemaining }: { responsesRemaining: number }) {
     return (
         <div className="flex flex-1 items-center justify-center">
             <Card className="max-w-md">
@@ -74,19 +71,12 @@ function InsufficientDataView({ totalSessions, requiredSessions }: { totalSessio
                     </div>
                     <CardTitle>Not Enough Data Yet</CardTitle>
                     <CardDescription>
-                        Complete {remaining} more {remaining === 1 ? 'session' : 'sessions'} to unlock your blind spot analysis.
+                        {responsesRemaining} more {responsesRemaining === 1 ? 'response' : 'responses'} until we can identify your patterns.
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <div className="mb-2 flex justify-between text-sm">
-                            <span className="text-neutral-500">Progress</span>
-                            <span className="font-medium">{totalSessions} / {requiredSessions}</span>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                    </div>
+                <CardContent>
                     <Button asChild className="w-full">
-                        <Link href="/practice">Start Training</Link>
+                        <Link href="/practice-modes">Start Training</Link>
                     </Button>
                 </CardContent>
             </Card>
@@ -265,10 +255,7 @@ export default function BlindSpotsIndex({ pageData }: BlindSpotsIndexProps) {
                 </div>
 
                 {!pageData.hasEnoughData ? (
-                    <InsufficientDataView
-                        totalSessions={pageData.totalSessions}
-                        requiredSessions={pageData.requiredSessions}
-                    />
+                    <InsufficientDataView responsesRemaining={pageData.responsesRemaining} />
                 ) : !pageData.isUnlocked ? (
                     <LockedView totalSessions={pageData.totalSessions} />
                 ) : !pageData.primaryBlindSpot ? (

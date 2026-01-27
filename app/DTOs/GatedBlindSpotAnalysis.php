@@ -18,7 +18,7 @@ class GatedBlindSpotAnalysis
         public bool $isUnlocked,
         public string $requiredPlan,
         public ?string $gateReason,
-        public int $sessionsUntilInsights,
+        public int $responsesUntilInsights,
 
         // Only populated if unlocked
         public ?array $blindSpots,
@@ -33,7 +33,7 @@ class GatedBlindSpotAnalysis
         public Carbon $analyzedAt,
     ) {}
 
-    public static function locked(BlindSpotAnalysis $analysis, int $minimumSessions): self
+    public static function locked(BlindSpotAnalysis $analysis, int $minimumResponses): self
     {
         return new self(
             hasEnoughData: $analysis->hasEnoughData,
@@ -45,7 +45,7 @@ class GatedBlindSpotAnalysis
             isUnlocked: false,
             requiredPlan: 'pro',
             gateReason: 'requires_upgrade',
-            sessionsUntilInsights: 0,
+            responsesUntilInsights: 0,
 
             blindSpots: null,
             improving: null,
@@ -60,7 +60,7 @@ class GatedBlindSpotAnalysis
         );
     }
 
-    public static function insufficientData(int $totalSessions, int $totalResponses, int $minimumSessions): self
+    public static function insufficientData(int $totalSessions, int $totalResponses, int $minimumResponses): self
     {
         return new self(
             hasEnoughData: false,
@@ -72,7 +72,7 @@ class GatedBlindSpotAnalysis
             isUnlocked: false,
             requiredPlan: 'pro',
             gateReason: 'insufficient_data',
-            sessionsUntilInsights: max(0, $minimumSessions - $totalSessions),
+            responsesUntilInsights: max(0, $minimumResponses - $totalResponses),
 
             blindSpots: null,
             improving: null,
@@ -99,7 +99,7 @@ class GatedBlindSpotAnalysis
             isUnlocked: true,
             requiredPlan: 'pro',
             gateReason: null,
-            sessionsUntilInsights: 0,
+            responsesUntilInsights: 0,
 
             blindSpots: $analysis->blindSpots,
             improving: $analysis->improving,
@@ -126,7 +126,7 @@ class GatedBlindSpotAnalysis
             'isUnlocked' => $this->isUnlocked,
             'requiredPlan' => $this->requiredPlan,
             'gateReason' => $this->gateReason,
-            'sessionsUntilInsights' => $this->sessionsUntilInsights,
+            'responsesUntilInsights' => $this->responsesUntilInsights,
 
             'blindSpots' => is_array($this->blindSpots) ? array_map(fn ($s) => $s->toArray(), $this->blindSpots) : null,
             'improving' => is_array($this->improving) ? array_map(fn ($s) => $s->toArray(), $this->improving) : null,
