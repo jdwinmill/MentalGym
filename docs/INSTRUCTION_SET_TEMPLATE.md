@@ -4,7 +4,227 @@ Use this template when creating new Practice Modes. The instruction set defines 
 
 ---
 
-## Template
+## Content Structure
+
+Every instruction set should follow this section order:
+
+```
+1. Role Definition (1-2 sentences)
+2. ## User Context (profile placeholders)
+3. ## Level {{level}} Difficulty (scaling reference)
+4. ## Coaching Focus (3-4 bullets max)
+5. ## Core Principles (mode-specific guidance)
+6. ## Pitfalls to Probe (optional—see guidance below)
+7. ## Output Rules (card types, tool usage)
+8. ## Critical Rules (protection, never violate)
+```
+
+---
+
+## User Context Section
+
+Inject user profile data to personalize scenarios. Available placeholders:
+
+| Placeholder | Returns | Notes |
+|-------------|---------|-------|
+| `{{career_level}}` | "Entry Level", "Mid-Level", "Senior", "Executive", "Founder" | Human-readable label |
+| `{{job_title}}` | User's job title | As entered |
+| `{{industry}}` | User's industry | As entered |
+| `{{company_size}}` | "Startup (1-50)", "SMB (51-500)", "Enterprise (500+)" | Human-readable label |
+| `{{years_experience}}` | Integer | Total years |
+| `{{years_in_role}}` | Integer | Current role |
+| `{{manages_people}}` | " who manages people" or "" | **Designed to append to role** |
+| `{{direct_reports}}` | Integer | Count |
+| `{{reports_to_role}}` | Role title | As entered |
+| `{{team_composition}}` | "Co-located", "Fully Remote", "Hybrid", "International/Distributed" | Human-readable label |
+| `{{collaboration_style}}` | "Async-heavy", "Meeting-heavy", "Mixed" | Human-readable label |
+| `{{cross_functional_teams}}` | "Engineering, Design, Product" | Comma-separated list |
+| `{{communication_tools}}` | "Slack, Zoom, Email" | Comma-separated list |
+| `{{improvement_areas}}` | "Communication, Leadership, Feedback" | Comma-separated list |
+| `{{upcoming_challenges}}` | "New Role, First-Time Manager" | Comma-separated list |
+
+**Default values:** Missing fields return `"not specified"`. Empty arrays return `"none"`.
+
+**Example usage:**
+```
+## User Context
+The user is a {{career_level}} {{job_title}}{{manages_people}} with {{years_experience}} years experience.
+They work in a {{team_composition}} environment, collaborating with {{cross_functional_teams}}.
+Upcoming challenges: {{upcoming_challenges}}.
+```
+
+**Output with profile data:**
+```
+The user is a Senior Product Manager who manages people with 8 years experience.
+They work in a Hybrid environment, collaborating with Engineering, Design, Sales.
+Upcoming challenges: Cross-Functional Project, Difficult Stakeholders.
+```
+
+**Required context:** When creating a mode, specify which fields are required via `practice_mode_required_context`. Users missing required fields will be prompted to complete their profile.
+
+---
+
+## Level Scaling (10-Level System)
+
+Use this condensed format for level descriptions:
+
+```
+## Level {{level}} Difficulty
+1-2: [Easy conditions] | 3-4: [Moderate conditions] | 5-6: [Challenging conditions] | 7-8: [High difficulty] | 9-10: [Maximum difficulty]
+```
+
+**Scaling dimensions to consider:**
+- **Stakes:** Low → career-affecting
+- **Other party:** Cooperative → hostile
+- **Complexity:** Single issue → competing interests
+- **Ambiguity:** Clear path → no right answer
+- **Coaching stance:** Explain concepts → assume fluency, probe hard
+
+**Example (Difficult Conversations):**
+```
+1-2: Low stakes, cooperative parties | 3-4: Mild resistance, moderate stakes | 5-6: Defensive reactions, higher stakes | 7-8: Competing interests, strong emotions | 9-10: Crisis-level, hostile parties, career stakes
+```
+
+**Example (Systems Thinking):**
+```
+1-2: Simple cause-effect, obvious loops; explain concepts, prompt for system effects
+3-4: Competing incentives, delayed feedback; question more than explain
+5-6: Interacting reinforcing/balancing loops, local vs global conflict; assume basic literacy
+7-8: Nested systems, non-obvious leverage, backfiring interventions; challenge aggressively
+9-10: Complex adaptive systems, multiple valid framings; probe paradigm-level thinking
+```
+
+---
+
+## When to Include "Pitfalls to Probe"
+
+**Include when:**
+- Mode teaches a **thinking pattern** (Systems Thinking, Strategic Reasoning, Decision Making)
+- Mode teaches a **skill** where common failure patterns are distinct from principles (Difficult Conversations)
+- There are identifiable patterns the AI can spot in user responses
+
+**Skip when:**
+- Pitfalls would just restate the coaching focus or principles
+- The mode is purely knowledge-based (no behavioral patterns to catch)
+
+**Format:**
+```
+## Pitfalls to Probe
+- [Pattern name]: [brief description of what it looks like]
+- [Pattern name]: [brief description]
+```
+
+**Example (Difficult Conversations):**
+```
+## Pitfalls to Probe
+- Sandwiching the real message between excessive positives
+- Softening into ambiguity ("maybe we could possibly...")
+- Over-apologizing for having the conversation
+- Asking instead of stating ("Don't you think..." vs "I need...")
+- Backing down at first pushback
+```
+
+**Example (Systems Thinking):**
+```
+## Pitfalls to Probe
+- Treating symptoms, ignoring structure
+- Missing reinforcing loops (snowballs) or balancing loops (resistance)
+- Ignoring delays between action and consequence
+- Local optimization harming global health
+- Boundaries drawn too narrow or too broad
+```
+
+---
+
+## Compression Guidelines
+
+The global instruction set (`config/mentalgym.php`) already includes:
+- Always respond in valid JSON format
+- Be direct. No fluff or filler phrases.
+- Feedback should be specific, actionable, and constructive.
+- Reference the user's actual words when giving feedback.
+- Never be condescending. Assume competence.
+
+**Do NOT repeat these in mode instruction sets.** Focus on mode-specific guidance only.
+
+**Compression techniques:**
+1. Use pipe-separated single-line formats for level scaling
+2. Limit coaching focus to 3-4 bullets
+3. Combine related principles
+4. Use semicolons to join related clauses
+5. Remove "You should" and "Make sure to"—just state the rule
+
+**Before:**
+```
+## Coaching Approach
+1. Present realistic scenarios that match the user's professional context
+2. Evaluate responses for clarity, empathy, directness, and professionalism
+3. Provide specific, actionable feedback that quotes the user's actual words
+4. Challenge hedging, passive language, and conflict avoidance
+5. Reward responses that balance assertiveness with emotional intelligence
+```
+
+**After:**
+```
+## Coaching Focus
+- Present scenarios matching user's context and level
+- Challenge hedging, passive language, and conflict avoidance
+- Reward assertiveness balanced with emotional intelligence
+```
+
+(Removed #2 and #3—covered by global instructions)
+
+---
+
+## Complete Compressed Example
+
+Here's a full instruction set following all guidelines (Difficult Conversations mode):
+
+```
+You are a workplace communication coach helping users practice high-stakes conversations.
+
+## User Context
+The user is a {{career_level}} {{job_title}}{{manages_people}} with {{years_experience}} years experience. They work in a {{team_composition}} environment, collaborating with {{cross_functional_teams}}. Upcoming challenges: {{upcoming_challenges}}.
+
+## Level {{level}} Difficulty
+1-2: Low stakes, cooperative parties | 3-4: Mild resistance, moderate stakes | 5-6: Defensive reactions, higher stakes | 7-8: Competing interests, strong emotions | 9-10: Crisis-level, hostile parties, career stakes
+
+## Coaching Focus
+- Present scenarios matching user's context and level
+- Challenge hedging, passive language, and conflict avoidance
+- Reward assertiveness balanced with emotional intelligence
+
+## Core Principles
+- Clarity is kindness—direct ≠ harsh
+- Acknowledge emotions without derailing
+- Own your message; no "they made me"
+- Separate person from behavior
+- Prepare for defensiveness without provoking it
+
+## Pitfalls to Probe
+- Sandwiching the real message between excessive positives
+- Softening into ambiguity ("maybe we could possibly...")
+- Over-apologizing for having the conversation
+- Disclaimers ("Don't take this the wrong way...")
+- Asking instead of stating ("Don't you think..." vs "I need...")
+- Premature problem-solving before the issue lands
+- Backing down at first pushback
+- Discussing next steps without addressing what happened
+
+## Output Rules
+[Standard output rules section - see below]
+
+## Critical Rules
+[Standard protection rules - see below]
+```
+
+**Required context fields for this mode:**
+- `career_level`, `job_title`, `manages_people`, `years_experience`
+- `team_composition`, `cross_functional_teams`, `upcoming_challenges`
+
+---
+
+## Template (Full Structure)
 
 ```
 You are a [ROLE] running a focused training session on [SKILL].
@@ -250,17 +470,29 @@ Begin with Drill 1. No preamble.
 
 Before publishing a new Practice Mode, verify:
 
+**Content Structure:**
+- [ ] Role definition is 1-2 sentences max
+- [ ] User Context section uses appropriate profile placeholders
+- [ ] Required context fields are configured in `practice_mode_required_context`
+- [ ] Level scaling uses 10-level system in compressed format
+- [ ] Coaching focus is 3-4 bullets max
+- [ ] Core principles are mode-specific (not duplicating global instructions)
+- [ ] Pitfalls section included if mode has identifiable failure patterns
+
+**Mechanics:**
 - [ ] OUTPUT RULES section instructs Claude to use display_card tool
 - [ ] CARD TYPES section explains when to use each type
-- [ ] Clear role defined (who is the AI being?)
-- [ ] Skill being trained is specific (not vague like "be better")
-- [ ] Level descriptions differentiate difficulty meaningfully (for open-ended modes)
+- [ ] {{level}} placeholder is present for injection
 - [ ] Drill sequence is explicit (for structured modes)
-- [ ] Coaching philosophy matches SharpStack voice (direct, not soft)
-- [ ] Scenarios are universal (don't require domain expertise)
-- [ ] Protection rules included verbatim
-- [ ] {{level}} placeholder is present for injection (if using levels)
 - [ ] Iteration requirements are explicit (if applicable)
+- [ ] Protection rules included verbatim
+
+**Quality:**
+- [ ] Skill being trained is specific (not vague like "be better")
+- [ ] Level descriptions differentiate difficulty meaningfully
+- [ ] Coaching philosophy matches voice (direct, not soft)
+- [ ] Scenarios are universal (don't require domain expertise)
+- [ ] No redundancy with global instruction set
 - [ ] Tested manually before publishing
 
 ---
@@ -289,3 +521,9 @@ Before going live:
 | Industry jargon in scenarios | Excludes non-experts | Use universal human scenarios |
 | Soft coaching | Doesn't challenge | Be direct, name the pattern |
 | Missing protection | Instructions could leak | Include CRITICAL RULES verbatim |
+| Redundant instructions | Bloated prompt, wasted tokens | Remove anything covered by global config |
+| Verbose level scaling | Hard to parse, inconsistent | Use single-line pipe-separated format |
+| Missing user context | Generic scenarios, low relevance | Add User Context section with placeholders |
+| Wrong `{{manages_people}}` usage | Grammar breaks | Append to role: `{{job_title}}{{manages_people}}` |
+| Pitfalls that restate principles | Redundancy, no added value | Only add pitfalls if distinct from coaching focus |
+| 5-level system | Inconsistent with other modes | Use 10-level system |

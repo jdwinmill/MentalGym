@@ -150,7 +150,9 @@ export default function TrainPage({ mode }: TrainPageProps) {
         console.log('[Profile] CSRF token present:', !!csrfToken);
 
         if (!csrfToken) {
-            throw new Error('Session expired. Please refresh the page.');
+            // CSRF token missing - reload to get fresh page
+            window.location.reload();
+            return;
         }
 
         let response: Response;
@@ -174,7 +176,9 @@ export default function TrainPage({ mode }: TrainPageProps) {
             const text = await response.text();
             console.error('[Profile] Error response:', response.status, text);
             if (response.status === 419) {
-                throw new Error('Session expired. Please refresh the page.');
+                // Session expired - reload to get fresh CSRF token
+                window.location.reload();
+                return;
             }
             throw new Error(`Server error (${response.status}). Please try again.`);
         }
