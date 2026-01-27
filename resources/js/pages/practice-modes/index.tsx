@@ -2,11 +2,89 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { type PracticeModesIndexProps, type PracticeMode } from '@/types/training';
 import { Head, Link } from '@inertiajs/react';
-import { Dumbbell, Lock, Play, RotateCcw } from 'lucide-react';
+import { Dumbbell, Lock, Play, RotateCcw, MessageCircle, Brain, Target, Users, Lightbulb, type LucideIcon } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getTagColorClasses, getVisibleTags } from '@/lib/tag-colors';
+
+type ModeCategory = 'communication' | 'thinking' | 'performance' | 'leadership' | 'default';
+
+interface CategoryConfig {
+    icon: LucideIcon;
+    bgColor: string;
+    iconColor: string;
+}
+
+const neutralStyle = {
+    bgColor: 'bg-neutral-100 dark:bg-neutral-800',
+    iconColor: 'text-neutral-600 dark:text-neutral-400',
+};
+
+const categoryConfigs: Record<ModeCategory, CategoryConfig> = {
+    communication: { icon: MessageCircle, ...neutralStyle },
+    thinking: { icon: Brain, ...neutralStyle },
+    performance: { icon: Target, ...neutralStyle },
+    leadership: { icon: Users, ...neutralStyle },
+    default: { icon: Lightbulb, ...neutralStyle },
+};
+
+function getModeCategory(mode: PracticeMode): ModeCategory {
+    const name = mode.name.toLowerCase();
+    const slug = mode.slug.toLowerCase();
+
+    // Communication modes
+    if (
+        name.includes('conversation') ||
+        name.includes('communication') ||
+        name.includes('feedback') ||
+        name.includes('negotiat') ||
+        slug.includes('conversation') ||
+        slug.includes('communication')
+    ) {
+        return 'communication';
+    }
+
+    // Thinking modes
+    if (
+        name.includes('thinking') ||
+        name.includes('think') ||
+        name.includes('systems') ||
+        name.includes('game theory') ||
+        name.includes('decision') ||
+        name.includes('problem') ||
+        slug.includes('thinking') ||
+        slug.includes('systems')
+    ) {
+        return 'thinking';
+    }
+
+    // Performance modes
+    if (
+        name.includes('interview') ||
+        name.includes('presentation') ||
+        name.includes('pitch') ||
+        name.includes('performance') ||
+        slug.includes('interview') ||
+        slug.includes('presentation')
+    ) {
+        return 'performance';
+    }
+
+    // Leadership modes
+    if (
+        name.includes('leadership') ||
+        name.includes('management') ||
+        name.includes('delegation') ||
+        name.includes('coaching') ||
+        slug.includes('leadership') ||
+        slug.includes('management')
+    ) {
+        return 'leadership';
+    }
+
+    return 'default';
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,14 +118,16 @@ function getLevelColor(level: number): string {
 function ModeCard({ mode }: { mode: PracticeMode }) {
     const currentLevel = mode.progress?.current_level ?? 1;
     const hasProgress = mode.progress !== null;
+    const category = getModeCategory(mode);
+    const { icon: CategoryIcon, bgColor, iconColor } = categoryConfigs[category];
 
     return (
         <Card className="flex flex-col h-full transition-shadow hover:shadow-md">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                            <Dumbbell className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}>
+                            <CategoryIcon className={`h-5 w-5 ${iconColor}`} />
                         </div>
                         <div>
                             <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
