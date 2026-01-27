@@ -46,8 +46,8 @@ export default function Pricing() {
             price: '$30/mo',
             tagline: 'The full system. Train daily. Track patterns. Actually improve.',
             features: [
-                { text: '50 exchanges per day' },
-                { text: 'All practice modes' },
+                { text: '20 responses per day' },
+                { text: 'Pro-only practice modes' },
                 { text: 'Full Blind Spots dashboard' },
                 { text: 'Weekly reports on how to improve' },
             ],
