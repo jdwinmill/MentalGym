@@ -11,14 +11,14 @@ interface FeedbackCardProps {
 }
 
 function getScoreBadgeVariant(score: number): 'default' | 'secondary' | 'destructive' {
-    if (score >= 80) return 'default';
-    if (score >= 60) return 'secondary';
+    if (score >= 8) return 'default';
+    if (score >= 6) return 'secondary';
     return 'destructive';
 }
 
 function getScoreColor(score: number): string {
-    if (score >= 80) return 'text-green-600 dark:text-green-400';
-    if (score >= 60) return 'text-amber-600 dark:text-amber-400';
+    if (score >= 8) return 'text-green-600 dark:text-green-400';
+    if (score >= 6) return 'text-amber-600 dark:text-amber-400';
     return 'text-red-600 dark:text-red-400';
 }
 
