@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { type DrillFeedbackCard } from '@/types/training';
 import { ChevronRight } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface FeedbackCardProps {
     card: DrillFeedbackCard;
@@ -36,9 +37,9 @@ export function FeedbackCard({ card, onContinue, isLoading }: FeedbackCardProps)
 
             <CardContent>
                 <div className="prose prose-neutral dark:prose-invert max-w-none">
-                    <p className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed">
+                    <ReactMarkdown>
                         {card.content}
-                    </p>
+                    </ReactMarkdown>
                 </div>
             </CardContent>
 

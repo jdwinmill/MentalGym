@@ -760,9 +760,16 @@ Evaluate this response. If correct, explain why. If incorrect, explain the corre
 
 {$suggestionInstruction}
 
+FORMAT YOUR FEEDBACK with this structure:
+**[Summary in 5-10 words]**
+[1-2 sentences explaining why correct/incorrect]
+
+- [Specific point 1]
+- [Specific point 2]
+
 Respond with valid JSON only (no markdown, no code blocks):
 {
-    "feedback": "...",
+    "feedback": "**Summary**\nExplanation.\n\n- Point 1\n- Point 2",
     "score": 1-10,
     "dimension_scores": {$dimensionScoresExample}
 }
@@ -786,9 +793,17 @@ Evaluate this response according to the drill criteria.
 
 {$suggestionInstruction}
 
+FORMAT YOUR FEEDBACK with this structure:
+**[Summary in 5-10 words]**
+[1-2 sentences explaining the main issue or strength]
+
+- [Specific point 1]
+- [Specific point 2]
+- [Specific point 3 if needed]
+
 Respond with valid JSON only (no markdown, no code blocks):
 {
-    "feedback": "...",
+    "feedback": "**Summary**\nExplanation.\n\n- Point 1\n- Point 2",
     "score": 1-10,
     "dimension_scores": {$dimensionScoresExample}
 }

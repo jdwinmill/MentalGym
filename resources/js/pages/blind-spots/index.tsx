@@ -4,8 +4,8 @@ import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { AlertTriangle, ArrowRight, Lock, TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -202,12 +202,14 @@ function PrimaryBlindSpotView({ blindSpot }: { blindSpot: PrimaryBlindSpot }) {
                                         className="rounded-lg border border-neutral-200 bg-white p-3 text-sm dark:border-neutral-700 dark:bg-neutral-800"
                                     >
                                         {item.drillName && (
-                                            <div className="mb-1 text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                                            <div className="mb-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
                                                 During "{item.drillName}"
                                             </div>
                                         )}
-                                        <div className="text-neutral-700 dark:text-neutral-300">
-                                            {item.suggestion}
+                                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&>ul]:mt-1 [&>ul]:mb-0">
+                                            <ReactMarkdown>
+                                                {item.suggestion}
+                                            </ReactMarkdown>
                                         </div>
                                     </div>
                                 ))}
