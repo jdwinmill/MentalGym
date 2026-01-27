@@ -813,12 +813,12 @@ PROMPT;
         $guide = "DIMENSION SCORING GUIDE (1-10 scale):\n";
 
         foreach ($dimensions as $dimension) {
-            $anchors = $dimension->score_anchors;
+            $anchors = $dimension->score_anchors ?? [];
             $guide .= "\n{$dimension->label} ({$dimension->key}):\n";
-            $guide .= "  1-3 (Low): {$anchors['low']}\n";
-            $guide .= "  4-5 (Mid): {$anchors['mid']}\n";
-            $guide .= "  6-8 (High): {$anchors['high']}\n";
-            $guide .= "  9-10 (Exemplary): {$anchors['exemplary']}\n";
+            $guide .= "  1-3 (Low): ".($anchors['low'] ?? 'Poor demonstration of this skill')."\n";
+            $guide .= "  4-5 (Mid): ".($anchors['mid'] ?? 'Basic demonstration of this skill')."\n";
+            $guide .= "  6-8 (High): ".($anchors['high'] ?? 'Strong demonstration of this skill')."\n";
+            $guide .= "  9-10 (Exemplary): ".($anchors['exemplary'] ?? 'Exceptional demonstration of this skill')."\n";
         }
 
         return $guide;
