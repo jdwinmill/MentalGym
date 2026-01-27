@@ -15,18 +15,10 @@ class BlindSpotDashboardController extends Controller
     public function index(): Response
     {
         $user = auth()->user();
-        $analysis = $this->service->getAnalysis($user);
-
-        // Get historical data for charts (Pro only)
-        $history = null;
-        if ($analysis->isUnlocked) {
-            $history = $this->service->getHistoricalTrends($user, weeks: 8);
-        }
+        $pageData = $this->service->getPageData($user);
 
         return Inertia::render('blind-spots/index', [
-            'analysis' => $analysis->toArray(),
-            'history' => $history,
-            'isPro' => $user->hasPaidPlan(),
+            'pageData' => $pageData->toArray(),
         ]);
     }
 }
