@@ -323,13 +323,6 @@ class User extends Authenticatable implements MustVerifyEmail
             $lines[] = '- Working on: '.implode(', ', $areaNames);
         }
 
-        // Upcoming challenges
-        if (! empty($profile->upcoming_challenges)) {
-            $challengeLabels = config('profile.challenges');
-            $challengeNames = array_map(fn ($c) => $challengeLabels[$c] ?? ucfirst(str_replace('_', ' ', $c)), $profile->upcoming_challenges);
-            $lines[] = '- Upcoming challenge: '.implode(', ', $challengeNames);
-        }
-
         // Only return context if we have more than just the header
         if (count($lines) <= 1) {
             return '';

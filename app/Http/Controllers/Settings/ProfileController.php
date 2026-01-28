@@ -32,7 +32,6 @@ class ProfileController extends Controller
                 'collaborationStyles' => config('profile.collaboration_styles'),
                 'crossFunctionalOptions' => config('profile.cross_functional_options'),
                 'improvementAreas' => config('profile.improvement_areas'),
-                'challenges' => config('profile.challenges'),
             ],
         ]);
     }
@@ -77,7 +76,6 @@ class ProfileController extends Controller
             'cross_functional_teams',
             'communication_tools',
             'improvement_areas',
-            'upcoming_challenges',
         ];
         $profileData = array_intersect_key($validated, array_flip($profileFields));
 

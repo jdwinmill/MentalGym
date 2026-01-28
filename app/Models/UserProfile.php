@@ -31,7 +31,6 @@ class UserProfile extends Model
         'communication_tools',
         // Professional Goals
         'improvement_areas',
-        'upcoming_challenges',
     ];
 
     protected function casts(): array
@@ -45,7 +44,6 @@ class UserProfile extends Model
             'cross_functional_teams' => 'array',
             'communication_tools' => 'array',
             'improvement_areas' => 'array',
-            'upcoming_challenges' => 'array',
         ];
     }
 
@@ -76,7 +74,6 @@ class UserProfile extends Model
             $configKey = match ($field) {
                 'cross_functional_teams' => 'cross_functional_options',
                 'improvement_areas' => 'improvement_areas',
-                'upcoming_challenges' => 'challenges',
                 'communication_tools' => null, // No config lookup, use raw values
                 default => null,
             };

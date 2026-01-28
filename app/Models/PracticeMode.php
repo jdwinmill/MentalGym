@@ -162,8 +162,9 @@ class PracticeMode extends Model
         foreach ($requiredFields as $field) {
             $value = $profile->getAttribute($field);
 
-            // Consider a field missing if null, empty string, or empty array
-            if ($value === null || $value === '' || (is_array($value) && empty($value))) {
+            // Consider a field missing only if null or empty string
+            // Empty arrays are valid (user chose not to select any options)
+            if ($value === null || $value === '') {
                 $missing[] = $field;
             }
         }

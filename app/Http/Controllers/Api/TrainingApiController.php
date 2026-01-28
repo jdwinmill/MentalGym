@@ -154,7 +154,6 @@ class TrainingApiController extends Controller
                 'collaboration_style' => 'collaboration_styles',
                 'cross_functional_teams' => 'cross_functional_options',
                 'improvement_areas' => 'improvement_areas',
-                'upcoming_challenges' => 'challenges',
                 default => null,
             };
 
@@ -199,7 +198,6 @@ class TrainingApiController extends Controller
             'cross_functional_teams',
             'communication_tools',
             'improvement_areas',
-            'upcoming_challenges',
         ];
 
         // Only validate and accept allowed fields

@@ -57,7 +57,6 @@ export interface UserProfile {
     communication_tools: string[] | null;
     // Professional Goals
     improvement_areas: string[] | null;
-    upcoming_challenges: string[] | null;
 }
 
 export interface ProfileOptions {
@@ -67,7 +66,6 @@ export interface ProfileOptions {
     collaborationStyles: Record<string, string>;
     crossFunctionalOptions: Record<string, string>;
     improvementAreas: Record<string, string>;
-    challenges: Record<string, string>;
 }
 
 export interface User {

@@ -159,7 +159,6 @@ export default function Profile({
         communication_tools: profile?.communication_tools ?? [],
         // Professional Goals
         improvement_areas: profile?.improvement_areas ?? [],
-        upcoming_challenges: profile?.upcoming_challenges ?? [],
     });
 
     const updateField = <K extends keyof typeof formData>(
@@ -732,30 +731,6 @@ export default function Profile({
                                                 }
                                             />
                                         </div>
-
-                                        <div className="grid gap-2">
-                                            <Label>Upcoming Challenges</Label>
-                                            <MultiSelect
-                                                options={
-                                                    profileOptions.challenges
-                                                }
-                                                value={
-                                                    formData.upcoming_challenges
-                                                }
-                                                name="upcoming_challenges[]"
-                                                onChange={(v) =>
-                                                    updateField(
-                                                        'upcoming_challenges',
-                                                        v,
-                                                    )
-                                                }
-                                            />
-                                            <InputError
-                                                message={
-                                                    errors.upcoming_challenges
-                                                }
-                                            />
-                                        </div>
                                     </div>
                                 </Section>
 
@@ -778,16 +753,6 @@ export default function Profile({
                                         value={area}
                                     />
                                 ))}
-                                {formData.upcoming_challenges.map(
-                                    (challenge, i) => (
-                                        <input
-                                            key={`uc-${i}`}
-                                            type="hidden"
-                                            name="upcoming_challenges[]"
-                                            value={challenge}
-                                        />
-                                    ),
-                                )}
 
                                 <div className="flex items-center gap-4">
                                     <Button

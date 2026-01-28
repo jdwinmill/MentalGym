@@ -155,6 +155,172 @@ return [
                 'You can be direct AND kind—they\'re not opposites',
             ],
         ],
+
+        /*
+        |--------------------------------------------------------------------------
+        | Manipulation Resistance Skills (Cognitive Saboteur)
+        |--------------------------------------------------------------------------
+        */
+
+        'detection_speed' => [
+            'name' => 'Detection Speed',
+            'description' => 'How quickly you recognize manipulation is occurring',
+            'target' => 'Catch tactics in real-time, not just in retrospect',
+            'positive' => ['early_recognition', 'real_time_detection', 'pattern_spotted_quickly'],
+            'negative' => ['missed_until_debrief', 'late_recognition', 'only_retrospective'],
+            'tips' => [
+                'Notice when your emotions shift suddenly—that\'s often a signal',
+                'If you feel rushed, guilty, or flattered out of nowhere, pause',
+                'Trust the "something\'s off" feeling before you can name it',
+            ],
+            'score_anchors' => [
+                1 => 'Only recognized manipulation during debrief',
+                3 => 'Noticed something was off but couldn\'t act on it in time',
+                5 => 'Recognized manipulation mid-conversation but after key concessions',
+                7 => 'Caught tactics early enough to adjust approach',
+                10 => 'Identified manipulation immediately and responded from awareness',
+            ],
+        ],
+
+        'tactic_identification' => [
+            'name' => 'Tactic Identification',
+            'description' => 'Accurately naming the specific technique being used',
+            'target' => '"This is anchoring" vs. vague sense something\'s off',
+            'positive' => ['tactic_named', 'technique_identified', 'pattern_articulated'],
+            'negative' => ['vague_suspicion', 'couldnt_name_tactic', 'misidentified_technique'],
+            'tips' => [
+                'Learn the names: anchoring, false dichotomy, manufactured consensus',
+                'Naming it—even silently—breaks its power',
+                'Ask yourself: "What category does this fall into?"',
+            ],
+            'score_anchors' => [
+                1 => 'Couldn\'t identify any tactics used',
+                3 => 'Sensed manipulation but couldn\'t name what was happening',
+                5 => 'Identified the general category (e.g., "emotional pressure")',
+                7 => 'Named specific tactics accurately (e.g., "anchoring", "false dichotomy")',
+                10 => 'Precisely identified all tactics including layered/secondary techniques',
+            ],
+        ],
+
+        'frame_awareness' => [
+            'name' => 'Frame Awareness',
+            'description' => 'Recognizing when you\'re operating inside someone else\'s frame',
+            'target' => 'Notice you\'re debating "how" when you never agreed to "whether"',
+            'positive' => ['frame_recognized', 'reframed_conversation', 'rejected_false_frame'],
+            'negative' => ['accepted_frame', 'debated_within_frame', 'frame_blindness'],
+            'tips' => [
+                'If you\'re defending, ask: "Who set the terms of this debate?"',
+                'Watch for questions that assume conclusions you haven\'t agreed to',
+                'Step back: "Wait—should we even be discussing this?"',
+            ],
+            'score_anchors' => [
+                1 => 'Fully operated within manipulator\'s frame without noticing',
+                3 => 'Felt constrained but couldn\'t identify why',
+                5 => 'Recognized the frame late, after making concessions within it',
+                7 => 'Identified the frame and partially stepped outside it',
+                10 => 'Immediately recognized and rejected false framing, set own terms',
+            ],
+        ],
+
+        'emotional_regulation' => [
+            'name' => 'Emotional Regulation',
+            'description' => 'Maintaining clear thinking under pressure, guilt, flattery, or urgency',
+            'target' => 'Respond from assessment, not reaction',
+            'positive' => ['stayed_regulated', 'thinking_preserved', 'emotional_awareness'],
+            'negative' => ['reactive_response', 'emotionally_hijacked', 'pressure_caved'],
+            'tips' => [
+                'Name the emotion they\'re trying to trigger: "I notice I feel guilty"',
+                'Buy time: "Let me think about that" breaks the pressure loop',
+                'Flattery that feels too good is usually doing work',
+            ],
+            'score_anchors' => [
+                1 => 'Emotional response completely drove decision-making',
+                3 => 'Recognized emotional pressure but still got swept up',
+                5 => 'Managed some emotional tactics but others landed',
+                7 => 'Maintained composure, made decisions from reason not reaction',
+                10 => 'Fully regulated—acknowledged emotions without being controlled by them',
+            ],
+        ],
+
+        'premise_challenging' => [
+            'name' => 'Premise Challenging',
+            'description' => 'Questioning hidden assumptions before engaging with the surface question',
+            'target' => '"That assumes X—do we agree on X?"',
+            'positive' => ['premise_questioned', 'assumption_challenged', 'refused_loaded_question'],
+            'negative' => ['accepted_premise', 'engaged_surface_only', 'missed_hidden_assumption'],
+            'tips' => [
+                'Before answering, ask: "What does this question assume?"',
+                'Loaded questions have hidden premises—don\'t accept them by answering',
+                '"I don\'t agree with how that\'s framed" is a valid response',
+            ],
+            'score_anchors' => [
+                1 => 'Accepted all premises without question',
+                3 => 'Answered questions without examining assumptions',
+                5 => 'Challenged some premises but missed others',
+                7 => 'Consistently questioned assumptions before engaging',
+                10 => 'Identified and rejected hidden premises, reframed on own terms',
+            ],
+        ],
+
+        'boundary_assertion' => [
+            'name' => 'Boundary Assertion',
+            'description' => 'Clearly declining or redirecting without over-explaining or caving',
+            'target' => 'Clean "no" vs. waffling, apologizing, or eventual capitulation',
+            'positive' => ['boundary_held', 'clean_decline', 'position_maintained'],
+            'negative' => ['boundary_eroded', 'over_explained', 'eventually_caved'],
+            'tips' => [
+                'State your position once clearly—repetition weakens it',
+                'You don\'t need to justify your "no" with reasons they\'ll accept',
+                'Silence after declining is powerful—don\'t fill it',
+            ],
+            'score_anchors' => [
+                1 => 'No boundaries set; agreed to everything requested',
+                3 => 'Attempted boundaries but caved under pressure',
+                5 => 'Held some boundaries but over-explained or apologized excessively',
+                7 => 'Set clear boundaries with minimal justification',
+                10 => 'Maintained firm boundaries calmly, without defensiveness or excessive explanation',
+            ],
+        ],
+
+        'counter_move' => [
+            'name' => 'Counter-Move Execution',
+            'description' => 'Deploying effective responses that shift the dynamic',
+            'target' => 'Reframing, naming, redirecting—not just enduring',
+            'positive' => ['effective_counter', 'dynamic_shifted', 'took_initiative'],
+            'negative' => ['passive_response', 'only_defended', 'no_counter_move'],
+            'tips' => [
+                'Name the tactic out loud: "It sounds like you\'re creating urgency"',
+                'Ask questions that shift burden: "What makes you say that?"',
+                'Redirect to your terms: "Before we go there, let\'s establish..."',
+            ],
+            'score_anchors' => [
+                1 => 'No counter-moves; purely reactive or passive',
+                3 => 'Attempted resistance but didn\'t shift the dynamic',
+                5 => 'Some effective pushback but manipulator maintained control',
+                7 => 'Deployed counter-moves that changed the conversation flow',
+                10 => 'Skillfully reframed, redirected, or named tactics—took control of dynamic',
+            ],
+        ],
+
+        'recovery' => [
+            'name' => 'Recovery',
+            'description' => 'Regaining footing after getting caught or partially conceding',
+            'target' => 'Return to solid ground mid-conversation',
+            'positive' => ['recovered_position', 'regained_footing', 'corrected_course'],
+            'negative' => ['stayed_off_balance', 'compounded_concession', 'couldnt_recover'],
+            'tips' => [
+                '"Actually, let me reconsider what I just said" is always available',
+                'A partial concession doesn\'t mean total surrender',
+                'Pause, breathe, reset—you can change direction mid-conversation',
+            ],
+            'score_anchors' => [
+                1 => 'Once caught, stayed off-balance for remainder',
+                3 => 'Recognized slip but couldn\'t course-correct',
+                5 => 'Partial recovery—stopped bleeding but didn\'t regain ground',
+                7 => 'Recovered effectively after initial misstep',
+                10 => 'Turned a caught moment into a stronger position',
+            ],
+        ],
     ],
 
     /*
@@ -249,6 +415,70 @@ return [
         // Universal criteria
         'filler_phrases' => 'Filler words',
         'apology_detected' => 'Unnecessary apology',
+
+        // Manipulation Resistance - Detection Speed
+        'early_recognition' => 'Didn\'t recognize early',
+        'real_time_detection' => 'Missed in real-time',
+        'pattern_spotted_quickly' => 'Pattern spotted late',
+        'missed_until_debrief' => 'Only saw it in hindsight',
+        'late_recognition' => 'Recognized too late',
+        'only_retrospective' => 'Only retrospective awareness',
+
+        // Manipulation Resistance - Tactic Identification
+        'tactic_named' => 'Couldn\'t name the tactic',
+        'technique_identified' => 'Technique not identified',
+        'pattern_articulated' => 'Couldn\'t articulate pattern',
+        'vague_suspicion' => 'Only vague suspicion',
+        'couldnt_name_tactic' => 'Couldn\'t name what happened',
+        'misidentified_technique' => 'Misidentified the technique',
+
+        // Manipulation Resistance - Frame Awareness
+        'frame_recognized' => 'Didn\'t recognize the frame',
+        'reframed_conversation' => 'Failed to reframe',
+        'rejected_false_frame' => 'Accepted false framing',
+        'accepted_frame' => 'Operated in their frame',
+        'debated_within_frame' => 'Debated within their frame',
+        'frame_blindness' => 'Frame blindness',
+
+        // Manipulation Resistance - Emotional Regulation
+        'stayed_regulated' => 'Lost emotional regulation',
+        'thinking_preserved' => 'Thinking got clouded',
+        'emotional_awareness' => 'Lacked emotional awareness',
+        'reactive_response' => 'Responded reactively',
+        'emotionally_hijacked' => 'Got emotionally hijacked',
+        'pressure_caved' => 'Caved under pressure',
+
+        // Manipulation Resistance - Premise Challenging
+        'premise_questioned' => 'Didn\'t question premise',
+        'assumption_challenged' => 'Accepted hidden assumptions',
+        'refused_loaded_question' => 'Fell for loaded question',
+        'accepted_premise' => 'Accepted false premise',
+        'engaged_surface_only' => 'Only engaged surface level',
+        'missed_hidden_assumption' => 'Missed hidden assumption',
+
+        // Manipulation Resistance - Boundary Assertion
+        'boundary_held' => 'Boundary not held',
+        'clean_decline' => 'Messy decline',
+        'position_maintained' => 'Position eroded',
+        'boundary_eroded' => 'Boundary eroded',
+        'over_explained' => 'Over-explained',
+        'eventually_caved' => 'Eventually caved',
+
+        // Manipulation Resistance - Counter-Move
+        'effective_counter' => 'No effective counter',
+        'dynamic_shifted' => 'Didn\'t shift dynamic',
+        'took_initiative' => 'Stayed passive',
+        'passive_response' => 'Passive response',
+        'only_defended' => 'Only defended, didn\'t counter',
+        'no_counter_move' => 'No counter-move attempted',
+
+        // Manipulation Resistance - Recovery
+        'recovered_position' => 'Didn\'t recover position',
+        'regained_footing' => 'Couldn\'t regain footing',
+        'corrected_course' => 'Failed to course-correct',
+        'stayed_off_balance' => 'Stayed off-balance',
+        'compounded_concession' => 'Compounded the concession',
+        'couldnt_recover' => 'Couldn\'t recover',
     ],
 
     /*

@@ -36,6 +36,7 @@ const categoryLabels: Record<string, string> = {
     resilience: 'Resilience',
     influence: 'Influence',
     self_awareness: 'Self-Awareness',
+    manipulation_resistance: 'Manipulation Resistance',
 };
 
 export default function SkillDimensionsIndex({ dimensions }: Props) {

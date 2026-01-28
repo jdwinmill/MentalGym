@@ -57,8 +57,6 @@ class ProfileUpdateRequest extends FormRequest
             // Professional Goals
             'improvement_areas' => ['nullable', 'array'],
             'improvement_areas.*' => ['string', Rule::in(array_keys(config('profile.improvement_areas')))],
-            'upcoming_challenges' => ['nullable', 'array'],
-            'upcoming_challenges.*' => ['string', Rule::in(array_keys(config('profile.challenges')))],
         ];
     }
 }

@@ -112,7 +112,7 @@ class SkillDimensionController extends Controller
         $rules = [
             'label' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'category' => ['nullable', 'in:communication,reasoning,resilience,influence,self_awareness'],
+            'category' => ['nullable', 'in:communication,reasoning,resilience,influence,self_awareness,manipulation_resistance'],
             'anchor_low' => ['required', 'string', 'max:500'],
             'anchor_mid' => ['required', 'string', 'max:500'],
             'anchor_high' => ['required', 'string', 'max:500'],

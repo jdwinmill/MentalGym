@@ -21,7 +21,6 @@ return [
         'cross_functional_teams' => 'Cross-Functional Teams',
         'communication_tools' => 'Communication Tools',
         'improvement_areas' => 'Improvement Areas',
-        'upcoming_challenges' => 'Upcoming Challenges',
     ],
 
     'company_sizes' => [
@@ -73,15 +72,6 @@ return [
         'conflict_resolution' => 'Conflict Resolution',
         'executive_presence' => 'Executive Presence',
         'negotiation' => 'Negotiation',
-    ],
-
-    'challenges' => [
-        'new_role' => 'New Role',
-        'first_time_manager' => 'First-Time Manager',
-        'managing_managers' => 'Managing Managers',
-        'executive_transition' => 'Executive Transition',
-        'cross_functional_project' => 'Cross-Functional Project',
-        'difficult_stakeholders' => 'Difficult Stakeholders',
     ],
 
     // Field metadata for dynamic form generation
@@ -170,10 +160,6 @@ return [
         ],
         'improvement_areas' => [
             'label' => 'Areas to Improve',
-            'type' => 'multiselect',
-        ],
-        'upcoming_challenges' => [
-            'label' => 'Upcoming Challenges',
             'type' => 'multiselect',
         ],
     ],

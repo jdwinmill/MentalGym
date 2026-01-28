@@ -136,6 +136,7 @@ export default function SkillDimensionForm({ dimension, isEdit = false }: Props)
                                     <SelectItem value="resilience">Resilience</SelectItem>
                                     <SelectItem value="influence">Influence</SelectItem>
                                     <SelectItem value="self_awareness">Self-Awareness</SelectItem>
+                                    <SelectItem value="manipulation_resistance">Manipulation Resistance</SelectItem>
                                 </SelectContent>
                             </Select>
                             {form.errors.category && (
