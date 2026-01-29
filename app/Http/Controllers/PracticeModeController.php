@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlindSpot;
 use App\Models\PracticeMode;
+use App\Models\SkillDimension;
+use App\Models\TrainingSession;
 use App\Services\TrainingSessionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -83,6 +86,146 @@ class PracticeModeController extends Controller
         $requiredLevel = $planHierarchy[$mode->required_plan] ?? 0;
 
         return $userLevel >= $requiredLevel;
+    }
+
+    /**
+     * Display the detail page for a specific practice mode.
+     */
+    public function show(Request $request, PracticeMode $practiceMode): Response
+    {
+        $user = $request->user();
+
+        // Get drills for this mode
+        $drills = $practiceMode->drills()
+            ->orderBy('position')
+            ->get()
+            ->map(fn ($drill) => [
+                'id' => $drill->id,
+                'name' => $drill->name,
+                'timer_seconds' => $drill->timer_seconds,
+                'input_type' => $drill->input_type,
+                'position' => $drill->position,
+            ]);
+
+        // Calculate estimated minutes from drill timers (default 60s for untimed)
+        $totalSeconds = $practiceMode->drills->sum(function ($drill) {
+            return $drill->timer_seconds ?? 60;
+        });
+        $estimatedMinutes = (int) ceil($totalSeconds / 60);
+
+        // Get user's progress for this mode
+        $progress = $practiceMode->userProgress()
+            ->where('user_id', $user->id)
+            ->first();
+
+        // Get completed drill count (max drill_index from completed sessions)
+        $completedDrillCount = TrainingSession::where('user_id', $user->id)
+            ->where('practice_mode_id', $practiceMode->id)
+            ->where('status', TrainingSession::STATUS_COMPLETED)
+            ->max('drill_index');
+        $completedDrillCount = $completedDrillCount !== null ? $completedDrillCount + 1 : 0;
+
+        // Get drill IDs for this mode
+        $drillIds = $practiceMode->drills->pluck('id')->toArray();
+
+        // Get all unique dimensions for this mode's drills
+        $modeDimensionKeys = $practiceMode->drills
+            ->pluck('dimensions')
+            ->flatten()
+            ->unique()
+            ->filter()
+            ->values()
+            ->toArray();
+
+        // Get dimension labels
+        $modeDimensions = SkillDimension::whereIn('key', $modeDimensionKeys)
+            ->get()
+            ->map(fn ($dim) => [
+                'key' => $dim->key,
+                'label' => $dim->label,
+            ])
+            ->values()
+            ->toArray();
+
+        // Get user patterns (BlindSpot data filtered by mode's drill IDs)
+        $userPatterns = null;
+        $hasPatternHistory = false;
+
+        if (count($drillIds) > 0) {
+            $blindSpots = BlindSpot::where('user_id', $user->id)
+                ->whereIn('drill_id', $drillIds)
+                ->get();
+
+            $hasPatternHistory = $blindSpots->isNotEmpty();
+
+            if ($hasPatternHistory) {
+                // Group by dimension_key with avg scores
+                $groupedPatterns = $blindSpots->groupBy('dimension_key')->map(function ($spots, $dimensionKey) {
+                    $avgScore = round($spots->avg('score'), 1);
+                    $count = $spots->count();
+
+                    // Get dimension label
+                    $dimension = SkillDimension::find($dimensionKey);
+                    $label = $dimension?->label ?? $dimensionKey;
+
+                    // Categorize based on score
+                    $category = match (true) {
+                        $avgScore >= 7 => 'strength',
+                        $avgScore >= 4 => 'tendency',
+                        default => 'improve',
+                    };
+
+                    return [
+                        'dimension_key' => $dimensionKey,
+                        'label' => $label,
+                        'avg_score' => $avgScore,
+                        'count' => $count,
+                        'category' => $category,
+                    ];
+                })->values()->toArray();
+
+                if (count($groupedPatterns) > 0) {
+                    $userPatterns = [
+                        'patterns' => $groupedPatterns,
+                    ];
+                }
+            }
+        }
+
+        // Check for active session
+        $hasActiveSession = $this->trainingService->getActiveSession($user, $practiceMode) !== null;
+
+        // Check if user's plan allows this mode
+        $canAccess = $this->meetsPlanRequirement($user, $practiceMode);
+
+        return Inertia::render('practice/[slug]/show', [
+            'mode' => [
+                'id' => $practiceMode->id,
+                'slug' => $practiceMode->slug,
+                'name' => $practiceMode->name,
+                'tagline' => $practiceMode->tagline,
+                'description' => $practiceMode->description,
+                'sample_scenario' => $practiceMode->sample_scenario,
+                'icon' => $practiceMode->icon,
+                'required_plan' => $practiceMode->required_plan,
+            ],
+            'drills' => $drills,
+            'estimatedMinutes' => $estimatedMinutes,
+            'progress' => $progress ? [
+                'current_level' => $progress->current_level,
+                'total_drills_completed' => $progress->total_drills_completed,
+                'total_sessions' => $progress->total_sessions,
+                'last_session_at' => $progress->last_session_at?->toISOString(),
+            ] : null,
+            'completedDrillCount' => $completedDrillCount,
+            'userPatterns' => $userPatterns,
+            'modeDimensions' => $modeDimensions,
+            'hasPatternHistory' => $hasPatternHistory,
+            'userPlan' => $user->plan,
+            'isFirstTime' => $progress === null,
+            'hasActiveSession' => $hasActiveSession,
+            'canAccess' => $canAccess,
+        ]);
     }
 
     /**

@@ -16,6 +16,7 @@ class PracticeMode extends Model
         'name',
         'tagline',
         'description',
+        'sample_scenario',
         'instruction_set',
         'config',
         'required_plan',

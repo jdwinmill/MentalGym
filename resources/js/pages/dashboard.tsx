@@ -116,27 +116,35 @@ function ModeCard({ mode }: { mode: PracticeMode }) {
                 )}
             </CardContent>
 
-            <CardFooter className="pt-0 justify-end">
+            <CardFooter className="pt-0 gap-2 justify-end">
                 {mode.can_access ? (
-                    <Button asChild>
-                        <Link href={`/practice-modes/${mode.slug}/train`}>
-                            {mode.has_active_session ? (
-                                <>
-                                    <RotateCcw className="h-4 w-4 mr-2" />
-                                    Continue Training
-                                </>
-                            ) : (
-                                <>
-                                    <Play className="h-4 w-4 mr-2" />
-                                    Begin Training
-                                </>
-                            )}
-                        </Link>
-                    </Button>
+                    <>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href={`/practice/${mode.slug}`}>
+                                Learn More
+                            </Link>
+                        </Button>
+                        <Button asChild size="sm">
+                            <Link href={`/practice-modes/${mode.slug}/train`}>
+                                {mode.has_active_session ? (
+                                    <>
+                                        <RotateCcw className="h-4 w-4 mr-1" />
+                                        Continue
+                                    </>
+                                ) : (
+                                    <>
+                                        <Play className="h-4 w-4 mr-1" />
+                                        Train
+                                    </>
+                                )}
+                            </Link>
+                        </Button>
+                    </>
                 ) : (
-                    <Button variant="outline" disabled>
-                        <Lock className="h-4 w-4 mr-2" />
-                        Upgrade to Access
+                    <Button asChild variant="outline" size="sm">
+                        <Link href={`/practice/${mode.slug}`}>
+                            Learn More
+                        </Link>
                     </Button>
                 )}
             </CardFooter>

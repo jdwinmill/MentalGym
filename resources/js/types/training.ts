@@ -262,3 +262,65 @@ export interface TrainPageProps {
     progress: ModeProgress;
     has_active_session: boolean;
 }
+
+// =========================================================================
+// Practice Mode Detail Page Types
+// =========================================================================
+
+export interface PracticeModeDetail {
+    id: number;
+    slug: string;
+    name: string;
+    tagline: string;
+    description: string | null;
+    sample_scenario: string | null;
+    icon: string | null;
+    required_plan: string | null;
+}
+
+export interface ModeDetailDrill {
+    id: number;
+    name: string;
+    timer_seconds: number | null;
+    input_type: 'text' | 'multiple_choice';
+    position: number;
+}
+
+export interface ModeDetailProgress {
+    current_level: number;
+    total_drills_completed: number;
+    total_sessions: number;
+    last_session_at: string | null;
+}
+
+export interface UserPattern {
+    dimension_key: string;
+    label: string;
+    avg_score: number;
+    count: number;
+    category: 'strength' | 'tendency' | 'improve';
+}
+
+export interface UserPatterns {
+    patterns: UserPattern[];
+}
+
+export interface ModeDimension {
+    key: string;
+    label: string;
+}
+
+export interface PracticeModeShowProps {
+    mode: PracticeModeDetail;
+    drills: ModeDetailDrill[];
+    estimatedMinutes: number;
+    progress: ModeDetailProgress | null;
+    completedDrillCount: number;
+    userPatterns: UserPatterns | null;
+    modeDimensions: ModeDimension[];
+    hasPatternHistory: boolean;
+    userPlan: 'free' | 'pro' | 'unlimited';
+    isFirstTime: boolean;
+    hasActiveSession: boolean;
+    canAccess: boolean;
+}

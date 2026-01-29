@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Practice Modes
     Route::get('practice-modes', [PracticeModeController::class, 'index'])->name('practice-modes.index');
+    Route::get('practice/{practiceMode:slug}', [PracticeModeController::class, 'show'])->name('practice.show');
     Route::get('practice-modes/{practiceMode:slug}/train', [PracticeModeController::class, 'train'])->name('practice-modes.train');
 
     // Training API (legacy)
