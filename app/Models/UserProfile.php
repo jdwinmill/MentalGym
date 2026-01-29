@@ -31,6 +31,10 @@ class UserProfile extends Model
         'communication_tools',
         // Professional Goals
         'improvement_areas',
+        // Family
+        'has_kids',
+        'kid_birth_years',
+        'has_partner',
     ];
 
     protected function casts(): array
@@ -44,6 +48,9 @@ class UserProfile extends Model
             'cross_functional_teams' => 'array',
             'communication_tools' => 'array',
             'improvement_areas' => 'array',
+            'has_kids' => 'boolean',
+            'kid_birth_years' => 'array',
+            'has_partner' => 'boolean',
         ];
     }
 
@@ -68,6 +75,15 @@ class UserProfile extends Model
         if (is_array($value)) {
             if (empty($value)) {
                 return 'none';
+            }
+
+            // Special handling for kid_birth_years - convert to ages
+            if ($field === 'kid_birth_years') {
+                $currentYear = (int) date('Y');
+                $ages = array_map(fn ($year) => $currentYear - $year, $value);
+                sort($ages);
+
+                return implode(', ', $ages);
             }
 
             // Look up human-readable labels from config

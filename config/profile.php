@@ -21,6 +21,9 @@ return [
         'cross_functional_teams' => 'Cross-Functional Teams',
         'communication_tools' => 'Communication Tools',
         'improvement_areas' => 'Improvement Areas',
+        'has_kids' => 'Has Kids',
+        'kid_birth_years' => 'Kids Birth Years',
+        'has_partner' => 'Has Partner',
     ],
 
     'company_sizes' => [
@@ -161,6 +164,19 @@ return [
         'improvement_areas' => [
             'label' => 'Areas to Improve',
             'type' => 'multiselect',
+        ],
+        'has_kids' => [
+            'label' => 'Do you have kids?',
+            'type' => 'checkbox',
+        ],
+        'kid_birth_years' => [
+            'label' => 'Kids Birth Years',
+            'type' => 'array',
+            'placeholder' => 'e.g., 2017, 2012',
+        ],
+        'has_partner' => [
+            'label' => 'Do you have a partner?',
+            'type' => 'checkbox',
         ],
     ],
 ];

@@ -95,8 +95,8 @@ export default function Landing() {
                                 SharpStack builds the skills tips can't teach.
                             </p>
                             <p className="text-lg md:text-xl text-foreground mb-3">
-                                Daily practice sessions that systematically improve how you think,
-                                listen, and operate under pressure.
+                                Daily practice sessions that systematically sharpen how you think,
+                                communicate, and handle the conversations you usually fumble.
                             </p>
                             <p className="text-base md:text-lg text-muted-foreground">
                                 Not tips. Not frameworks. Actual training: you practice, get

@@ -323,6 +323,29 @@ class User extends Authenticatable implements MustVerifyEmail
             $lines[] = '- Working on: '.implode(', ', $areaNames);
         }
 
+        // Family context
+        $familyParts = [];
+        if ($profile->has_partner === true) {
+            $familyParts[] = 'has a partner';
+        } elseif ($profile->has_partner === false) {
+            $familyParts[] = 'single';
+        }
+        if ($profile->has_kids === true) {
+            if (! empty($profile->kid_birth_years)) {
+                $currentYear = (int) date('Y');
+                $ages = array_map(fn ($year) => $currentYear - $year, $profile->kid_birth_years);
+                sort($ages);
+                $familyParts[] = 'has kids (ages '.implode(', ', $ages).')';
+            } else {
+                $familyParts[] = 'has kids';
+            }
+        } elseif ($profile->has_kids === false) {
+            $familyParts[] = 'no kids';
+        }
+        if (! empty($familyParts)) {
+            $lines[] = '- Family: '.implode(', ', $familyParts);
+        }
+
         // Only return context if we have more than just the header
         if (count($lines) <= 1) {
             return '';
