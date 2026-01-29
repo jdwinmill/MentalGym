@@ -31,9 +31,9 @@ class TestEmail extends Command
         $this->info("Sending test email to {$email}...");
 
         try {
-            Mail::raw('This is a test email from MentalGym to verify the mail configuration is working correctly.', function ($message) use ($email) {
+            Mail::raw('This is a test email from SharpStack to verify the mail configuration is working correctly.', function ($message) use ($email) {
                 $message->to($email)
-                    ->subject('MentalGym Test Email');
+                    ->subject('SharpStack Test Email');
             });
 
             $this->info('Test email sent successfully!');

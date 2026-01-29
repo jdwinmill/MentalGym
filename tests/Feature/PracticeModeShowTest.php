@@ -245,13 +245,46 @@ describe('GET /practice/{slug}', function () {
         $mode = PracticeMode::factory()->create();
         Drill::factory()->forMode($mode)->count(3)->create();
         TrainingSession::factory()->forUser($user)->forMode($mode)->completed()->create([
-            'drill_index' => 2, // Completed up to drill index 2 (3 drills: 0, 1, 2)
+            'drill_index' => 2,
+            'phase' => 'complete',
         ]);
 
         $response = $this->actingAs($user)->get("/practice/{$mode->slug}");
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('completedDrillCount', 3) // drill_index + 1
+            ->where('completedDrillCount', 3) // drill_index + 1 when phase is complete
+        );
+    });
+
+    it('returns completedDrillCount for drills user has moved past in active session', function () {
+        $user = User::factory()->create();
+        $mode = PracticeMode::factory()->create();
+        Drill::factory()->forMode($mode)->count(3)->create();
+        TrainingSession::factory()->forUser($user)->forMode($mode)->active()->create([
+            'drill_index' => 2,
+            'phase' => 'responding', // On drill 2, haven't submitted yet
+        ]);
+
+        $response = $this->actingAs($user)->get("/practice/{$mode->slug}");
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('completedDrillCount', 2) // Drills 0 and 1 completed, working on 2
+        );
+    });
+
+    it('includes current drill in completedDrillCount when feedback shown', function () {
+        $user = User::factory()->create();
+        $mode = PracticeMode::factory()->create();
+        Drill::factory()->forMode($mode)->count(3)->create();
+        TrainingSession::factory()->forUser($user)->forMode($mode)->active()->create([
+            'drill_index' => 1,
+            'phase' => 'feedback', // Completed drill 1, seeing feedback
+        ]);
+
+        $response = $this->actingAs($user)->get("/practice/{$mode->slug}");
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('completedDrillCount', 2) // Drills 0 and 1 completed
         );
     });
 

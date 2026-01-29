@@ -118,12 +118,23 @@ class PracticeModeController extends Controller
             ->where('user_id', $user->id)
             ->first();
 
-        // Get completed drill count (max drill_index from completed sessions)
-        $completedDrillCount = TrainingSession::where('user_id', $user->id)
+        // Get completed drill count (drills user has worked through)
+        $sessions = TrainingSession::where('user_id', $user->id)
             ->where('practice_mode_id', $practiceMode->id)
-            ->where('status', TrainingSession::STATUS_COMPLETED)
-            ->max('drill_index');
-        $completedDrillCount = $completedDrillCount !== null ? $completedDrillCount + 1 : 0;
+            ->get(['drill_index', 'phase']);
+
+        $completedDrillCount = 0;
+        if ($sessions->isNotEmpty()) {
+            $maxDrillIndex = $sessions->max('drill_index');
+
+            // Check if the drill at maxDrillIndex was completed (feedback shown)
+            $completedCurrentDrill = $sessions->contains(function ($session) use ($maxDrillIndex) {
+                return $session->drill_index == $maxDrillIndex
+                    && in_array($session->phase, ['feedback', 'complete']);
+            });
+
+            $completedDrillCount = $completedCurrentDrill ? $maxDrillIndex + 1 : $maxDrillIndex;
+        }
 
         // Get drill IDs for this mode
         $drillIds = $practiceMode->drills->pluck('id')->toArray();
