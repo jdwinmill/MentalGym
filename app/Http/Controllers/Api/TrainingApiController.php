@@ -198,6 +198,9 @@ class TrainingApiController extends Controller
             'cross_functional_teams',
             'communication_tools',
             'improvement_areas',
+            'has_kids',
+            'kid_birth_years',
+            'has_partner',
         ];
 
         // Only validate and accept allowed fields

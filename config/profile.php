@@ -171,8 +171,8 @@ return [
         ],
         'kid_birth_years' => [
             'label' => 'Kids Birth Years',
-            'type' => 'array',
-            'placeholder' => 'e.g., 2017, 2012',
+            'type' => 'year_array',
+            'placeholder' => 'e.g., 2015',
         ],
         'has_partner' => [
             'label' => 'Do you have a partner?',
