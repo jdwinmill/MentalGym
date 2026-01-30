@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -54,78 +55,44 @@ class UserProfile extends Model
         ];
     }
 
-    public function user(): BelongsTo
+    /**
+     * Get the user's age derived from birth_year.
+     */
+    protected function age(): Attribute
     {
-        return $this->belongsTo(User::class);
+        return Attribute::make(
+            get: function (): ?int {
+                if ($this->birth_year === null) {
+                    return null;
+                }
+
+                return (int) date('Y') - $this->birth_year;
+            },
+        );
     }
 
     /**
-     * Get a formatted context value for prompt injection.
-     * Handles arrays, booleans, and config lookups for human-readable values.
+     * Get the ages of the user's kids derived from kid_birth_years.
      */
-    public function getContextValue(string $field): string
+    protected function kidsAges(): Attribute
     {
-        $value = $this->getAttribute($field);
+        return Attribute::make(
+            get: function (): ?array {
+                if ($this->kid_birth_years === null || empty($this->kid_birth_years)) {
+                    return null;
+                }
 
-        if ($value === null) {
-            return 'not specified';
-        }
-
-        // Handle arrays (JSON fields)
-        if (is_array($value)) {
-            if (empty($value)) {
-                return 'none';
-            }
-
-            // Special handling for kid_birth_years - convert to ages
-            if ($field === 'kid_birth_years') {
                 $currentYear = (int) date('Y');
-                $ages = array_map(fn ($year) => $currentYear - $year, $value);
+                $ages = array_map(fn ($year) => $currentYear - $year, $this->kid_birth_years);
                 sort($ages);
 
-                return implode(', ', $ages);
-            }
+                return $ages;
+            },
+        );
+    }
 
-            // Look up human-readable labels from config
-            $configKey = match ($field) {
-                'cross_functional_teams' => 'cross_functional_options',
-                'improvement_areas' => 'improvement_areas',
-                'communication_tools' => null, // No config lookup, use raw values
-                default => null,
-            };
-
-            if ($configKey && config("profile.{$configKey}")) {
-                $labels = config("profile.{$configKey}");
-                $value = array_map(fn ($v) => $labels[$v] ?? $v, $value);
-            }
-
-            return implode(', ', $value);
-        }
-
-        // Handle booleans with contextual phrasing
-        if ($field === 'manages_people') {
-            // Special case: manages_people is used inline in sentences
-            // Return empty string for false/null, contextual phrase for true
-            return $value === true ? ' who manages people' : '';
-        }
-
-        if (is_bool($value)) {
-            return $value ? 'yes' : 'no';
-        }
-
-        // Look up human-readable labels for enum-like fields
-        $configKey = match ($field) {
-            'company_size' => 'company_sizes',
-            'career_level' => 'career_levels',
-            'team_composition' => 'team_compositions',
-            'collaboration_style' => 'collaboration_styles',
-            default => null,
-        };
-
-        if ($configKey && config("profile.{$configKey}.{$value}")) {
-            return config("profile.{$configKey}.{$value}");
-        }
-
-        return (string) $value;
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

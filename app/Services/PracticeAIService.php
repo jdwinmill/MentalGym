@@ -633,7 +633,6 @@ class PracticeAIService
 
     /**
      * Build system prompt from hierarchy: Global + Mode + Drill instruction
-     * Injects user context into placeholders like {{career_level}}, {{job_title}}, etc.
      */
     private function buildDrillSystemPrompt(PracticeMode $mode, string $drillInstruction, User $user): string
     {
@@ -643,29 +642,22 @@ class PracticeAIService
         $progress = $user->modeProgress()->where('practice_mode_id', $mode->id)->first();
         $level = $progress?->current_level ?? 1;
 
-        // Load user profile for context injection
-        $user->loadMissing('profile');
-        $profile = $user->profile;
-
-        // Inject level and user context into mode instruction set
-        $modeInstructionSet = $mode->getInstructionSetWithContext($level, $profile);
-
-        // Also inject user context into drill instruction set
-        $drillInstructionSet = $mode->injectUserContext($drillInstruction, $profile);
-        $drillInstructionSet = str_replace('{{level}}', (string) $level, $drillInstructionSet);
-
         return <<<PROMPT
 {$global}
 
 ---
 
 MODE: {$mode->name}
-{$modeInstructionSet}
+{$mode->instruction_set}
 
 ---
 
 DRILL INSTRUCTIONS:
-{$drillInstructionSet}
+{$drillInstruction}
+
+---
+
+USER LEVEL: {$level}
 PROMPT;
     }
 
@@ -677,10 +669,14 @@ PROMPT;
         $progress = $user->modeProgress()->where('practice_mode_id', $drill->practice_mode_id)->first();
         $level = $progress?->current_level ?? 1;
 
-        // Load user profile for context
-        $user->loadMissing('profile');
-        $profileContext = $user->getProfileContext();
-        $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+        // Load user profile for context (only if mode requires context fields)
+        $requiredFields = $drill->practiceMode->getRequiredContextFields();
+        $profileSection = '';
+        if (! empty($requiredFields)) {
+            $user->loadMissing('profile');
+            $profileContext = $user->getProfileContext($requiredFields);
+            $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+        }
 
         if ($drill->input_type === 'multiple_choice') {
             return <<<PROMPT
@@ -716,10 +712,14 @@ PROMPT;
      */
     private function buildEvaluatePrompt(string $scenario, string $task, string $userResponse, Drill $drill, User $user): string
     {
-        // Load user profile for context
-        $user->loadMissing('profile');
-        $profileContext = $user->getProfileContext();
-        $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+        // Load user profile for context (only if mode requires context fields)
+        $requiredFields = $drill->practiceMode->getRequiredContextFields();
+        $profileSection = '';
+        if (! empty($requiredFields)) {
+            $user->loadMissing('profile');
+            $profileContext = $user->getProfileContext($requiredFields);
+            $profileSection = $profileContext ? "\n{$profileContext}\n" : '';
+        }
 
         // Get dimensions for this drill and build scoring guide
         $dimensions = $drill->dimensions ?? [];

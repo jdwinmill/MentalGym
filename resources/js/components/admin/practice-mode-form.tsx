@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { HighlightedTextarea } from '@/components/ui/highlighted-textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
@@ -289,8 +288,8 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                     <CardHeader>
                         <CardTitle>Required User Context</CardTitle>
                         <CardDescription>
-                            Select which user profile fields should be injected into prompts.
-                            Use {"{{field_name}}"} placeholders in your instruction set (e.g., {"{{job_title}}"}, {"{{industry}}"}).
+                            Select which user profile fields are required for this mode.
+                            Users will be prompted to fill in missing fields before starting.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -310,11 +309,6 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                                 </button>
                             ))}
                         </div>
-                        {form.data.required_context.length > 0 && (
-                            <p className="text-xs text-neutral-500 mt-3">
-                                Available placeholders: {form.data.required_context.map(f => `{{${f}}}`).join(', ')}
-                            </p>
-                        )}
                         {form.errors.required_context && (
                             <p className="text-sm text-red-500 mt-2">{form.errors.required_context}</p>
                         )}
@@ -329,19 +323,16 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
                     <CardDescription>
                         The base system prompt for this mode. This is combined with the global instruction set
                         and individual drill instructions.
-                        Use {"{{level}}"} placeholder for the user's current level.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <HighlightedTextarea
+                    <Textarea
                         id="instruction_set"
                         value={form.data.instruction_set}
                         onChange={(e) => form.setData('instruction_set', e.target.value)}
                         placeholder="You are a decision-making coach running a focused training session..."
                         rows={10}
                         className="font-mono text-sm"
-                        validContextFields={form.data.required_context}
-                        includeLevelPlaceholder={true}
                     />
                     {form.errors.instruction_set && (
                         <p className="text-sm text-red-500 mt-2">{form.errors.instruction_set}</p>
@@ -501,14 +492,12 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
 
                                                 <div className="space-y-2">
                                                     <Label>Scenario Instruction Set *</Label>
-                                                    <HighlightedTextarea
+                                                    <Textarea
                                                         value={drill.scenario_instruction_set}
                                                         onChange={(e) => updateDrill(index, 'scenario_instruction_set', e.target.value)}
                                                         placeholder="Instructions for generating the scenario and task..."
                                                         rows={8}
                                                         className="font-mono text-sm"
-                                                        validContextFields={form.data.required_context}
-                                                        includeLevelPlaceholder={true}
                                                     />
                                                     <p className="text-xs text-neutral-500">
                                                         Instructions for generating the drill scenario. Should output JSON with "scenario" and "task" fields.
@@ -517,14 +506,12 @@ export default function PracticeModeForm({ mode, isEdit = false, tagsByCategory 
 
                                                 <div className="space-y-2">
                                                     <Label>Evaluation Instruction Set *</Label>
-                                                    <HighlightedTextarea
+                                                    <Textarea
                                                         value={drill.evaluation_instruction_set}
                                                         onChange={(e) => updateDrill(index, 'evaluation_instruction_set', e.target.value)}
                                                         placeholder="Instructions for evaluating the user's response..."
                                                         rows={8}
                                                         className="font-mono text-sm"
-                                                        validContextFields={form.data.required_context}
-                                                        includeLevelPlaceholder={true}
                                                     />
                                                     <p className="text-xs text-neutral-500">
                                                         Instructions for evaluating the response. Should output JSON with "feedback" and "score" fields.

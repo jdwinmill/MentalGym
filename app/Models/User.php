@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\UserContextFormatter;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -245,8 +246,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get formatted profile context for AI prompts.
+     *
+     * @param  array<string>|null  $fields  Specific fields to include, or null for all available
      */
-    public function getProfileContext(): string
+    public function getProfileContext(?array $fields = null): string
     {
         $profile = $this->profile;
 
@@ -254,104 +257,19 @@ class User extends Authenticatable implements MustVerifyEmail
             return '';
         }
 
-        $lines = ['User Context:'];
-
-        // Role and company
-        if ($profile->job_title || $profile->company_size) {
-            $roleDesc = $profile->job_title ?? 'Professional';
-            if ($profile->career_level) {
-                $careerLevels = config('profile.career_levels');
-                $levelLabel = $careerLevels[$profile->career_level] ?? ucfirst($profile->career_level);
-                $roleDesc = $levelLabel.' '.$roleDesc;
-            }
-            if ($profile->company_size) {
-                $sizes = config('profile.company_sizes');
-                $sizeLabel = $sizes[$profile->company_size] ?? $profile->company_size;
-                $roleDesc .= ' at a '.strtolower(explode(' ', $sizeLabel)[0]);
-            }
-            $lines[] = "- Role: {$roleDesc}";
+        // If no fields specified, use all fields from config
+        if ($fields === null) {
+            $fields = array_keys(config('user_context', []));
         }
 
-        // Industry
-        if ($profile->industry) {
-            $lines[] = "- Industry: {$profile->industry}";
-        }
+        $formatter = new UserContextFormatter;
+        $block = $formatter->formatAsBlock($profile, $fields);
 
-        // Experience
-        $experienceParts = [];
-        if ($profile->years_experience) {
-            $experienceParts[] = "{$profile->years_experience} years total";
-        }
-        if ($profile->years_in_role) {
-            $experienceParts[] = "{$profile->years_in_role} years in current role";
-        }
-        if (! empty($experienceParts)) {
-            $lines[] = '- Experience: '.implode(', ', $experienceParts);
-        }
-
-        // Team structure
-        $teamParts = [];
-        if ($profile->manages_people && $profile->direct_reports) {
-            $teamParts[] = "Manages {$profile->direct_reports} direct reports";
-        }
-        if ($profile->reports_to_role) {
-            $teamParts[] = "reports to {$profile->reports_to_role}";
-        }
-        if (! empty($teamParts)) {
-            $lines[] = '- Team: '.implode(', ', $teamParts);
-        }
-
-        // Team setup and cross-functional work
-        $setupParts = [];
-        if ($profile->team_composition) {
-            $compositions = config('profile.team_compositions');
-            $setupParts[] = $compositions[$profile->team_composition] ?? ucfirst($profile->team_composition);
-        }
-        if (! empty($profile->cross_functional_teams)) {
-            $teamLabels = config('profile.cross_functional_options');
-            $teamNames = array_map(fn ($t) => $teamLabels[$t] ?? ucfirst($t), $profile->cross_functional_teams);
-            $setupParts[] = 'works with '.implode(', ', $teamNames);
-        }
-        if (! empty($setupParts)) {
-            $lines[] = '- Team setup: '.implode(', ', $setupParts);
-        }
-
-        // Improvement areas
-        if (! empty($profile->improvement_areas)) {
-            $areaLabels = config('profile.improvement_areas');
-            $areaNames = array_map(fn ($a) => $areaLabels[$a] ?? ucfirst(str_replace('_', ' ', $a)), $profile->improvement_areas);
-            $lines[] = '- Working on: '.implode(', ', $areaNames);
-        }
-
-        // Family context
-        $familyParts = [];
-        if ($profile->has_partner === true) {
-            $familyParts[] = 'has a partner';
-        } elseif ($profile->has_partner === false) {
-            $familyParts[] = 'single';
-        }
-        if ($profile->has_kids === true) {
-            if (! empty($profile->kid_birth_years)) {
-                $currentYear = (int) date('Y');
-                $ages = array_map(fn ($year) => $currentYear - $year, $profile->kid_birth_years);
-                sort($ages);
-                $familyParts[] = 'has kids (ages '.implode(', ', $ages).')';
-            } else {
-                $familyParts[] = 'has kids';
-            }
-        } elseif ($profile->has_kids === false) {
-            $familyParts[] = 'no kids';
-        }
-        if (! empty($familyParts)) {
-            $lines[] = '- Family: '.implode(', ', $familyParts);
-        }
-
-        // Only return context if we have more than just the header
-        if (count($lines) <= 1) {
+        if (empty($block)) {
             return '';
         }
 
-        return implode("\n", $lines);
+        return "<user>\n{$block}\n</user>";
     }
 
     /**

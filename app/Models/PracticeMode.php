@@ -105,44 +105,6 @@ class PracticeMode extends Model
     // ─────────────────────────────────────────────────────────────
 
     /**
-     * Get the instruction set with level placeholder replaced.
-     */
-    public function getInstructionSetForLevel(int $level): string
-    {
-        return str_replace('{{level}}', (string) $level, $this->instruction_set);
-    }
-
-    /**
-     * Inject user profile context into a prompt string.
-     * Replaces {{field_name}} placeholders with actual values from user's profile.
-     */
-    public function injectUserContext(string $prompt, ?UserProfile $profile): string
-    {
-        if (! $profile) {
-            return $prompt;
-        }
-
-        $requiredFields = $this->getRequiredContextFields();
-
-        foreach ($requiredFields as $field) {
-            $value = $profile->getContextValue($field);
-            $prompt = str_replace("{{{$field}}}", $value, $prompt);
-        }
-
-        return $prompt;
-    }
-
-    /**
-     * Get instruction set with both level and user context injected.
-     */
-    public function getInstructionSetWithContext(int $level, ?UserProfile $profile): string
-    {
-        $prompt = $this->getInstructionSetForLevel($level);
-
-        return $this->injectUserContext($prompt, $profile);
-    }
-
-    /**
      * Get the required profile fields that are missing for a user.
      *
      * @return array<string> List of missing field names
